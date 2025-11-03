@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quran Player with Translation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      select,
+      button {
+        padding: 8px;
+        font-size: 16px;
+      }
+      .result {
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .arabic {
+        font-size: 24px;
+        text-align: right;
+        margin-bottom: 10px;
+      }
+      .translation {
+        font-size: 18px;
+      }
+      audio {
+        width: 100%;
+        margin-top: 10px;
+      }
+      .ayah-range {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .playlist-item {
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #eee;
+        border-radius: 4px;
+      }
+      .playlist-item.active {
+        background-color: #e6f3ff;
+        border-color: #1a73e8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Quran Player with Translation</h1>
+
+      <select id="reciter">
+        <option value="Abdul_Basit_Mujawwad_128kbps">
+          Abdul Basit (Mujawwad)
+        </option>
+        <option value="Alafasy_128kbps">Mishary Alafasy</option>
+        <option value="Husary_128kbps">Mahmoud Khalil Al-Husary</option>
+        <option value="Hudhaify_128kbps">Ali Al-Hudhaify</option>
+        <option value="Minshawi_Mujawwad_128kbps">
+          Mohamed Siddiq El-Minshawi
+        </option>
+      </select>
+
+      <select id="surah"></select>
+      <div style="display: flex; gap: 10px; align-items: center">
+        <select id="ayahStart"></select>
+        <span>to</span>
+        <select id="ayahEnd"></select>
+      </div>
+
+      <button onclick="playAyahRange()">Play Ayahs</button>
+
+      <div id="result" class="result" style="display: none">
+        <div id="playlist"></div>
+        <div id="currentPlaying">
+          <div id="arabic" class="arabic"></div>
+          <div id="translation" class="translation"></div>
+        </div>
+        <audio id="audioPlayer" controls onended="playNextAyah()">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+    </div>
+
+    <script>
+      // Quran metadata
+      const quranData = {
+        surahs: [
+          { number: 1, name: "Al-Fatihah", ayahs: 7 },
+          { number: 2, name: "Al-Baqarah", ayahs: 286 },
+          // ... (will be populated dynamically)
+        ],
+      };
+
+      // Initialize surahs
+      async function initializeSurahs() {
+        try {
+          const response = await fetch("https://api.alquran.cloud/v1/meta");
+          const data = await response.json();
+
+          // Get English names
+          const engResponse = await fetch(
+            "https://api.quran.com/api/v4/chapters"
+          );
+          const engData = await engResponse.json();
+
+          // Combine the data
+          quranData.surahs = data.data.surahs.references.map((surah) => {
+            const engSurah = engData.chapters.find(
+              (c) => c.id === surah.number
+            );
+            return {
+              ...surah,
+              englishName: engSurah ? engSurah.name_simple : surah.name,
+            };
+          });
+
+          populateSurahDropdown();
+        } catch (error) {
+          console.error("Error loading surah data:", error);
+        }
+      }
+
+      // Populate surah dropdown
+      function populateSurahDropdown() {
+        const surahSelect = document.getElementById("surah");
+        surahSelect.innerHTML = quranData.surahs
+          .map(
+            (surah) =>
+              `<option value="${surah.number}">${surah.number}. ${surah.englishName} (${surah.name})</option>`
+          )
+          .join("");
+        updateAyahDropdown();
+      }
+
+      // Update ayah dropdowns based on selected surah
+      function updateAyahDropdown() {
+        const surahNumber = document.getElementById("surah").value;
+        const surah = quranData.surahs.find((s) => s.number == surahNumber);
+        const ayahStartSelect = document.getElementById("ayahStart");
+        const ayahEndSelect = document.getElementById("ayahEnd");
+
+        const options = Array.from(
+          { length: surah.numberOfAyahs },
+          (_, i) => `<option value="${i + 1}">Ayah ${i + 1}</option>`
+        ).join("");
+
+        ayahStartSelect.innerHTML = options;
+        ayahEndSelect.innerHTML = options;
+
+        // Set default end ayah to start ayah
+        ayahEndSelect.value = ayahStartSelect.value;
+
+        // Update end ayah min value when start ayah changes
+        ayahStartSelect.addEventListener("change", () => {
+          const startValue = parseInt(ayahStartSelect.value);
+          if (parseInt(ayahEndSelect.value) < startValue) {
+            ayahEndSelect.value = startValue;
+          }
+        });
+      }
+
+      // Format number to 3 digits (e.g., 1 -> 001)
+      function formatNumber(num) {
+        return num.toString().padStart(3, "0");
+      }
+
+      // Current playlist and index
+      let currentPlaylist = [];
+      let currentAyahIndex = 0;
+
+      // Play next ayah in the playlist
+      async function playNextAyah() {
+        currentAyahIndex++;
+        if (currentAyahIndex < currentPlaylist.length) {
+          await playAyah(currentPlaylist[currentAyahIndex]);
+          updatePlaylistHighlight();
+        }
+      }
+
+      // Update playlist highlight
+      function updatePlaylistHighlight() {
+        document.querySelectorAll(".playlist-item").forEach((item, index) => {
+          if (index === currentAyahIndex) {
+            item.classList.add("active");
+          } else {
+            item.classList.remove("active");
+          }
+        });
+      }
+
+      // Play range of ayahs
+      async function playAyahRange() {
+        const surahNum = parseInt(document.getElementById("surah").value);
+        const startAyah = parseInt(document.getElementById("ayahStart").value);
+        const endAyah = parseInt(document.getElementById("ayahEnd").value);
+
+        // Create playlist
+        currentPlaylist = [];
+        for (let ayah = startAyah; ayah <= endAyah; ayah++) {
+          currentPlaylist.push({
+            surah: surahNum,
+            ayah: ayah,
+          });
+        }
+
+        // Show result container and create playlist display
+        document.getElementById("result").style.display = "block";
+        const playlist = document.getElementById("playlist");
+        playlist.innerHTML = currentPlaylist
+          .map(
+            (item, index) =>
+              `<div class="playlist-item${
+                index === 0 ? " active" : ""
+              }" id="playlist-${index}">
+            Ayah ${item.ayah}
+           </div>`
+          )
+          .join("");
+
+        // Start playing from first ayah
+        currentAyahIndex = 0;
+        await playAyah(currentPlaylist[0]);
+      }
+
+      // Play a specific ayah
+      async function playAyah(ayahInfo) {
+        const reciter = document.getElementById("reciter").value;
+        const surahNum = formatNumber(ayahInfo.surah);
+        const ayahNum = formatNumber(ayahInfo.ayah);
+
+        // Set audio source
+        const audioUrl = `https://everyayah.com/data/${reciter}/${surahNum}${ayahNum}.mp3`;
+        const audioPlayer = document.getElementById("audioPlayer");
+        audioPlayer.src = audioUrl;
+
+        // Load text and translation
+        try {
+          const response = await fetch(
+            `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}`
+          );
+          const data = await response.json();
+
+          if (data.code === 200) {
+            document.getElementById("arabic").textContent = data.data.text;
+
+            // Get English translation
+            const translationResponse = await fetch(
+              `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/en.asad`
+            );
+            const translationData = await translationResponse.json();
+
+            if (translationData.code === 200) {
+              document.getElementById("translation").textContent =
+                translationData.data.text;
+            }
+          }
+        } catch (error) {
+          console.error("Error loading ayah data:", error);
+        }
+
+        // Play audio
+        audioPlayer.play();
+      }
+
+      // Event listeners
+      document
+        .getElementById("surah")
+        .addEventListener("change", updateAyahDropdown);
+
+      // Update end ayah when start ayah changes
+      document
+        .getElementById("ayahStart")
+        .addEventListener("change", function () {
+          const endSelect = document.getElementById("ayahEnd");
+          if (parseInt(endSelect.value) < parseInt(this.value)) {
+            endSelect.value = this.value;
+          }
+        });
+
+      // Initialize the page
+      initializeSurahs();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quran Shorts — Editor By TheAAA</title>
+    <link rel="icon" type="image/x-icon" href="quran.ico" />
+
+    <!-- Free Google Fonts (original set) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400;600;700&family=Merriweather:wght@400;700&family=Nunito:wght@400;700&family=Poppins:wght@400;600;700&family=Roboto+Slab:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Additional Google Fonts (Latin) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Source+Sans+3:wght@400;600;700&family=Work+Sans:wght@400;600;700&family=Raleway:wght@400;600;700&family=Playfair+Display:wght@400;700&family=DM+Serif+Text:ital@0;1&family=Libre+Baskerville:wght@400;700&family=Lato:wght@400;700&family=Oswald:wght@400;600;700&family=Ubuntu:wght@400;700&family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=Karla:wght@400;700&family=Rubik:wght@400;700&family=Quicksand:wght@400;700&family=Heebo:wght@400;700&family=Barlow:wght@400;700&family=Manrope:wght@400;700&family=Space+Grotesk:wght@400;700&family=Space+Mono:wght@400;700&family=Fira+Sans:wght@400;700&family=Fira+Code:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Additional Google Fonts (Arabic & Arabic-friendly) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&family=Cairo:wght@400;700&family=Changa:wght@400;700&family=Reem+Kufi:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Noto+Kufi+Arabic:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Tajawal:wght@400;700&family=El+Messiri:wght@400;700&family=Markazi+Text:wght@400;700&family=Lateef&family=Harmattan:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --panel: #0f131a;
+        --panel-2: #0c1117;
+        --text: #e8eef9;
+        --muted: #9fb0cc;
+        --line: rgba(255, 255, 255, 0.08);
+        --accent-1: #7c5cff;
+        --accent-2: #22d3ee;
+        --radius: 16px;
+        --gap: 14px;
+
+        /* Layout split */
+        --sidebar: 70%;
+        --preview: 30%;
+
+        /* Preview size (50% of previous) */
+        --previewMax: 360px; /* was 720px */
+        --previewMaxMobile: 210px; /* was 420px */
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
+        background: radial-gradient(
+            1200px 1200px at 10% -10%,
+            rgba(124, 92, 255, 0.12),
+            transparent 60%
+          ),
+          radial-gradient(
+            1000px 1000px at 110% -10%,
+            rgba(34, 211, 238, 0.1),
+            transparent 55%
+          ),
+          var(--bg);
+        color: var(--text);
+      }
+
+      .app {
+        height: 100%;
+        display: grid;
+        grid-template-columns: var(--sidebar) var(--preview);
+      }
+
+      /* Sidebar (left 70%) */
+      .sidebar {
+        border-right: 1px solid var(--line);
+        padding: 18px;
+        display: grid;
+        grid-template-rows: auto auto auto auto auto 1fr; /* brand, input, type+colors, credits, playback, spacer */
+        gap: 16px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: url("quran.png") center/contain no-repeat;
+      }
+      .title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .subtitle {
+        margin: 2px 0 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .panel {
+        display: grid;
+        gap: 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 14px;
+        background: #0e131a;
+      }
+      .panel h3 {
+        margin: 0 0 8px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+      label.small {
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .hint {
+        font-size: 11px;
+        color: var(--muted);
+        opacity: 0.9;
+      }
+
+      /* New horizontal helpers */
+      .three-col {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .four-col-inline {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+      .two-col-inline {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #0c1117;
+      }
+      .toggle input {
+        width: 16px;
+        height: 16px;
+      }
+
+      select,
+      button,
+      input[type="range"],
+      input[type="color"],
+      input[type="text"] {
+        appearance: none;
+        padding: 10px 12px;
+        font-size: 14px;
+        color: var(--text);
+        background: #0c1117;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        outline: none;
+        width: 100%;
+      }
+      select:focus,
+      input[type="range"]:focus,
+      input[type="color"]:focus {
+        border-color: rgba(124, 92, 255, 0.6);
+        box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.15);
+      }
+
+      input[type="color"] {
+        height: 48px;
+        padding: 0;
+        cursor: pointer;
+      }
+      input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+      input[type="color"]::-webkit-color-swatch {
+        border: none;
+        border-radius: 8px;
+      }
+      input[type="color"]::-moz-color-swatch {
+        border: none;
+        border-radius: 8px;
+      }
+
+      input[type="range"] {
+        height: 38px;
+        padding: 0 2px;
+        background: transparent;
+      }
+      input[type="range"]::-webkit-slider-runnable-track {
+        height: 6px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+        opacity: 0.6;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid #cbd5e1;
+        margin-top: -6px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      .btn {
+        cursor: pointer;
+        user-select: none;
+        background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+        color: #071018;
+        border: none;
+        font-weight: 700;
+        padding: 10px 12px;
+        border-radius: 10px;
+        box-shadow: 0 10px 28px rgba(124, 92, 255, 0.35);
+      }
+      .btn.ghost {
+        background: #0c1117;
+        color: var(--text);
+        border: 1px solid var(--line);
+        box-shadow: none;
+      }
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .status {
+        font-size: 12px;
+        color: var(--muted);
+        white-space: pre-wrap;
+      }
+      .meter {
+        width: 100%;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+        border: 1px solid var(--line);
+      }
+      .meter > span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+        transition: width 0.25s ease;
+      }
+
+      .version-info {
+        text-align: center;
+        margin-top: 12px;
+        opacity: 0.7;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .transport {
+        display: grid;
+        grid-template-columns: repeat(5, auto);
+        gap: 10px;
+        align-items: center;
+      }
+
+      /* Preview area (right 30%) */
+      .preview {
+        padding: 24px;
+        display: grid;
+        grid-template-rows: 1fr auto;
+        gap: 16px;
+      }
+      .preview-stage {
+        display: grid;
+        place-items: center;
+        border: 1px dashed var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.02);
+        min-height: 0;
+      }
+      #previewCanvas {
+        width: min(100%, var(--previewMax));
+        height: auto;
+        aspect-ratio: 9 / 16;
+        background: #fff;
+        border-radius: 22px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      }
+      audio {
+        width: 100%;
+      }
+
+      /* Responsive: stack under 900px */
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: relative;
+          height: auto;
+        }
+        .three-col,
+        .four-col-inline,
+        .two-col-inline {
+          grid-template-columns: 1fr;
+        }
+        #previewCanvas {
+          width: min(100%, var(--previewMaxMobile));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- LEFT: Sidebar (70%) -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="logo"></div>
+          <div>
+            <p class="title">Quran Shorts — Editor</p>
+            <p class="subtitle">Spread the message of Quran in short videos.</p>
+          </div>
+        </div>
+
+        <!-- Panel: Input (Row 1 horizontal) -->
+        <div class="panel">
+          <h3>Input</h3>
+          <div class="three-col">
+            <div class="field">
+              <label class="small" for="surah">Surah</label>
+              <select id="surah"></select>
+            </div>
+            <div class="field">
+              <label class="small" for="ayahStart">Start Ayah</label>
+              <select id="ayahStart"></select>
+            </div>
+            <div class="field">
+              <label class="small" for="ayahEnd">End Ayah</label>
+              <select id="ayahEnd"></select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="small" for="reciter">Reciter</label>
+            <select id="reciter">
+              <option value="Abdul_Basit_Mujawwad_128kbps">
+                Abdul Basit (Mujawwad)
+              </option>
+              <option value="Alafasy_128kbps">Mishary Alafasy</option>
+              <option value="Husary_128kbps">Mahmoud Khalil Al-Husary</option>
+              <option value="Hudhaify_128kbps">Ali Al-Hudhaify</option>
+              <option value="Minshawi_Mujawwad_128kbps">
+                Mohamed S. El-Minshawi
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Panel: Typography + Colors (Row 2 horizontal) -->
+        <div class="panel">
+          <h3>Typography</h3>
+          <div class="four-col-inline">
+            <div class="field">
+              <label class="small" for="fontPicker">Font Style</label>
+              <select id="fontPicker">
+                <!-- Original options -->
+                <option value="Inter, sans-serif">Inter</option>
+                <option value="Poppins, sans-serif">Poppins</option>
+                <option value="Lora, serif">Lora</option>
+                <option value="Merriweather, serif">Merriweather</option>
+                <option value="Nunito, sans-serif">Nunito</option>
+                <option value="Roboto Slab, serif">Roboto Slab</option>
+
+                <!-- Popular Latin sans-serifs -->
+                <option value="Montserrat, sans-serif">Montserrat</option>
+                <option value="Open Sans, sans-serif">Open Sans</option>
+                <option value="Source Sans 3, sans-serif">Source Sans 3</option>
+                <option value="Work Sans, sans-serif">Work Sans</option>
+                <option value="Raleway, sans-serif">Raleway</option>
+                <option value="Lato, sans-serif">Lato</option>
+                <option value="Oswald, sans-serif">Oswald</option>
+                <option value="Ubuntu, sans-serif">Ubuntu</option>
+                <option value="PT Sans, sans-serif">PT Sans</option>
+                <option value="Karla, sans-serif">Karla</option>
+                <option value="Rubik, sans-serif">Rubik</option>
+                <option value="Heebo, sans-serif">Heebo</option>
+                <option value="Barlow, sans-serif">Barlow</option>
+                <option value="Manrope, sans-serif">Manrope</option>
+                <option value="Space Grotesk, sans-serif">Space Grotesk</option>
+                <option value="Fira Sans, sans-serif">Fira Sans</option>
+
+                <!-- Latin serif / display -->
+                <option value="Playfair Display, serif">
+                  Playfair Display
+                </option>
+                <option value="DM Serif Text, serif">DM Serif Text</option>
+                <option value="Libre Baskerville, serif">
+                  Libre Baskerville
+                </option>
+                <option value="PT Serif, serif">PT Serif</option>
+
+                <!-- Friendly / rounded -->
+                <option value="Quicksand, sans-serif">Quicksand</option>
+
+                <!-- Mono (for captions/debug) -->
+                <option value="Space Mono, monospace">Space Mono</option>
+                <option value="Fira Code, monospace">Fira Code</option>
+                <option value="JetBrains Mono, monospace">
+                  JetBrains Mono
+                </option>
+
+                <!-- Arabic & Quran-friendly typefaces -->
+                <option value="Amiri, serif">Amiri</option>
+                <option value="Scheherazade New, serif">
+                  Scheherazade New
+                </option>
+                <option value="Cairo, sans-serif">Cairo</option>
+                <option value="Changa, sans-serif">Changa</option>
+                <option value="Reem Kufi, sans-serif">Reem Kufi</option>
+                <option value="Noto Naskh Arabic, serif">
+                  Noto Naskh Arabic
+                </option>
+                <option value="Noto Kufi Arabic, sans-serif">
+                  Noto Kufi Arabic
+                </option>
+                <option value="IBM Plex Sans Arabic, sans-serif">
+                  IBM Plex Sans Arabic
+                </option>
+                <option value="Tajawal, sans-serif">Tajawal</option>
+                <option value="El Messiri, sans-serif">El Messiri</option>
+                <option value="Markazi Text, serif">Markazi Text</option>
+                <option value="Lateef, serif">Lateef</option>
+                <option value="Harmattan, sans-serif">Harmattan</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="small" for="textSize">
+                Font Size <span id="textSizeVal" class="name-chip">(100%)</span>
+              </label>
+              <input
+                id="textSize"
+                type="range"
+                min="25"
+                max="160"
+                step="5"
+                value="100"
+              />
+            </div>
+            <div class="field">
+              <label class="small" for="fontColor">Font Color</label>
+              <input id="fontColor" type="color" value="#111111" />
+            </div>
+            <div class="field">
+              <label class="small" for="bgColor">Background Color</label>
+              <input id="bgColor" type="color" value="#ffffff" />
+            </div>
+          </div>
+          <p class="hint">Set your font, size, and colors in one row.</p>
+        </div>
+
+        <!-- Panel: Credits (Row 3 horizontal) -->
+        <div class="panel">
+          <h3>Credits</h3>
+          <div class="four-col-inline">
+            <label
+              class="toggle"
+              title="Show attribution to data/audio providers on the video"
+            >
+              <input type="checkbox" id="creditData" checked />
+              <span>Show Data Source Credit</span>
+            </label>
+            <label class="toggle" title="Show your creator tag on the video">
+              <input type="checkbox" id="creditCreator" checked />
+              <span>Show Editor Creator Credit (TheAAA)</span>
+            </label>
+            <div class="field">
+              <label class="small" for="madeByInput">Made by (name)</label>
+              <input
+                id="madeByInput"
+                type="text"
+                placeholder="Your name or channel"
+                value=""
+              />
+            </div>
+            <label
+              class="toggle"
+              title="Show a Made by badge in the top-right of the Short"
+            >
+              <input type="checkbox" id="creditMadeBy" checked />
+              <span>Show Made by</span>
+            </label>
+          </div>
+          <p class="status">
+            These credits appear as subtle watermarks on the exported video. You
+            can turn them off.
+          </p>
+        </div>
+
+        <!-- Panel: Playback & Export (Row 4 horizontal) -->
+        <div class="panel">
+          <h3>Playback & Export</h3>
+          <div class="transport">
+            <button id="buildPreviewBtn" class="btn">Load & Play</button>
+            <button id="downloadBtn" class="btn" disabled>
+              Download (WebM)
+            </button>
+            <button id="prevBtn" class="btn ghost">Prev</button>
+            <button id="playPauseBtn" class="btn ghost">Play</button>
+            <button id="nextBtn" class="btn ghost">Next</button>
+          </div>
+          <div class="two-col-inline">
+            <div class="status" id="status">Ready.</div>
+            <div class="status" id="recStatus">
+              Idle. Press “Load & Play” to preview & auto-record.
+            </div>
+          </div>
+          <div class="meter"><span id="meterBar"></span></div>
+          <div class="version-info">
+            Version 1.0 • Developed by TheAAA • 2025
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: Preview (30%) -->
+      <main class="preview">
+        <div class="preview-stage">
+          <canvas
+            id="previewCanvas"
+            width="1080"
+            height="1920"
+            aria-label="Shorts Preview"
+          ></canvas>
+        </div>
+        <audio id="audioPlayer" controls preload="metadata"></audio>
+      </main>
+    </div>
+
+    <script>
+      // ------------------ Utils ------------------
+      const $ = (s) => document.querySelector(s);
+      const pad3 = (n) => String(Number(n) || 0).padStart(3, "0");
+      const safe = (s) => (s || "").replace(/[^\w-]+/g, "_");
+      const timestampStr = (d = new Date()) => {
+        const z = (n) => String(n).padStart(2, "0");
+        return `${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}_${z(
+          d.getHours()
+        )}${z(d.getMinutes())}${z(d.getSeconds())}`;
+      };
+
+      async function fetchRetry(url, opts = {}, retries = 2) {
+        for (let i = 0; i <= retries; i++) {
+          try {
+            const res = await fetch(url, { cache: "no-store", ...opts });
+            if (!res.ok) throw new Error(res.status + " " + res.statusText);
+            return res;
+          } catch (e) {
+            if (i === retries) throw e;
+            await new Promise((r) => setTimeout(r, 500 * (i + 1)));
+          }
+        }
+      }
+
+      // ------------------ DOM ------------------
+      const reciterSel = $("#reciter");
+      const surahSel = $("#surah");
+      const ayahStartSel = $("#ayahStart");
+      const ayahEndSel = $("#ayahEnd");
+      const fontPicker = $("#fontPicker");
+      const textSize = $("#textSize");
+      const textSizeVal = $("#textSizeVal");
+
+      const bgColorInput = $("#bgColor");
+      const fontColorInput = $("#fontColor");
+
+      const creditDataChk = $("#creditData");
+      const creditCreatorChk = $("#creditCreator");
+      const madeByInput = $("#madeByInput");
+      const creditMadeByChk = $("#creditMadeBy");
+
+      const previewCanvas = $("#previewCanvas");
+      const pctx = previewCanvas.getContext("2d");
+
+      const buildPreviewBtn = $("#buildPreviewBtn");
+      const prevBtn = $("#prevBtn");
+      const playPauseBtn = $("#playPauseBtn");
+      const nextBtn = $("#nextBtn");
+      const downloadBtn = $("#downloadBtn");
+
+      const audio = $("#audioPlayer");
+      const statusEl = $("#status");
+      const recStatus = $("#recStatus");
+      const meterBar = $("#meterBar");
+
+      audio.crossOrigin = "anonymous"; // CORS hint for cross-origin audio
+
+      // ------------------ State ------------------
+      let meta = { surahs: [] };
+      let playlist = [];
+      let index = 0;
+      let isPlaying = false;
+
+      // text controls
+      let selectedFont = "Inter, sans-serif";
+      let sizePercent = 100; // 25–160
+
+      // drawing content
+      let currentText = "Centered English translation will appear here.";
+      let currentLabel = "—";
+      let bgColor = "#ffffff";
+      let fontColor = "#111111";
+
+      // credits (default ON)
+      let showCreditData = true;
+      let showCreditCreator = true;
+
+      // recording state
+      let audioCtx = null,
+        srcNode = null,
+        destNode = null,
+        mixedStream = null;
+      let recorder = null;
+      let chunks = [];
+      let recordingStarted = false;
+      let finalBlob = null;
+
+      // progress (visual meter)
+      let totalAyahs = 0;
+
+      // session info for filename
+      let sessionSurah = 1,
+        sessionSurahName = "Al-Fatihah",
+        sessionFrom = 1,
+        sessionTo = 1,
+        sessionReciterName = "Unknown";
+
+      // ------------------ Reset on input changes ------------------
+      function resetSessionUI() {
+        try {
+          if (recorder && recorder.state === "recording") recorder.stop();
+        } catch {}
+        recorder = null;
+        recordingStarted = false;
+        chunks = [];
+        finalBlob = null;
+        downloadBtn.disabled = true;
+        statusEl.textContent = "Ready.";
+        recStatus.textContent =
+          "Idle. Press “Load & Play” to preview & auto-record.";
+        meterBar.style.width = "0%";
+      }
+
+      function onAnyInputChange() {
+        resetSessionUI();
+        selectedFont = fontPicker.value;
+        sizePercent = parseInt(textSize.value, 10) || 100;
+        if (textSizeVal) textSizeVal.textContent = `(${sizePercent}%)`;
+        if (bgColorInput) bgColor = bgColorInput.value;
+        if (fontColorInput) fontColor = fontColorInput.value;
+        showCreditData = !!creditDataChk?.checked;
+        showCreditCreator = !!creditCreatorChk?.checked;
+      }
+
+      [
+        reciterSel,
+        surahSel,
+        ayahStartSel,
+        ayahEndSel,
+        fontPicker,
+        textSize,
+        creditDataChk,
+        creditCreatorChk,
+        bgColorInput,
+        fontColorInput,
+      ]
+        .filter(Boolean)
+        .forEach((el) => {
+          el.addEventListener("change", onAnyInputChange);
+          if (el === textSize) {
+            el.addEventListener("input", () => {
+              sizePercent = parseInt(textSize.value, 10) || 100;
+              if (textSizeVal) textSizeVal.textContent = `(${sizePercent}%)`;
+            });
+          }
+        });
+
+      // Live color preview
+      bgColorInput?.addEventListener("input", () => {
+        bgColor = bgColorInput.value;
+      });
+      fontColorInput?.addEventListener("input", () => {
+        fontColor = fontColorInput.value;
+      });
+
+      // ------------------ Metadata ------------------
+      async function loadMeta() {
+        try {
+          statusEl.textContent = "Loading surah list…";
+          const m = await (
+            await fetchRetry("https://api.alquran.cloud/v1/meta")
+          ).json();
+          const e = await (
+            await fetchRetry("https://api.quran.com/api/v4/chapters")
+          ).json();
+          const chapters = Array.isArray(e?.chapters) ? e.chapters : [];
+          const engById = new Map(chapters.map((c) => [c.id, c]));
+          const refs = m?.data?.surahs?.references || [];
+          meta.surahs = refs.map((s) => ({
+            number: s.number,
+            nameAr: s.name,
+            englishName:
+              engById.get(s.number)?.name_simple || s.englishName || s.name,
+            ayahCount: s.numberOfAyahs,
+          }));
+          if (!meta.surahs.length) throw new Error("Surah metadata missing");
+
+          surahSel.innerHTML = meta.surahs
+            .map(
+              (s) =>
+                `<option value="${s.number}">${s.number}. ${s.englishName} (${s.nameAr})</option>`
+            )
+            .join("");
+          updateAyahRange();
+          statusEl.textContent = "Ready.";
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent = "Failed to load metadata. Check your network.";
+        }
+      }
+
+      function updateAyahRange() {
+        const sNum = +surahSel.value || 1;
+        const s = meta.surahs.find((x) => x.number === sNum) || meta.surahs[0];
+        if (!s) return;
+        const opts = Array.from(
+          { length: s.ayahCount },
+          (_, i) => `<option value="${i + 1}">Ayah ${i + 1}</option>`
+        ).join("");
+        ayahStartSel.innerHTML = opts;
+        ayahEndSel.innerHTML = opts;
+        ayahStartSel.value = "1";
+        ayahEndSel.value = String(Math.min(5, s.ayahCount));
+        sessionSurahName = s.englishName;
+
+        const handler = () => {
+          if (+ayahEndSel.value < +ayahStartSel.value)
+            ayahEndSel.value = ayahStartSel.value;
+        };
+        ayahStartSel.addEventListener("change", handler, { once: true });
+        onAnyInputChange();
+      }
+      surahSel.addEventListener("change", updateAyahRange);
+
+      // ------------------ Text layout + drawing ------------------
+      function fitTextToBox(
+        ctx,
+        text,
+        maxW,
+        maxH,
+        startSize,
+        minSize,
+        lhRatio,
+        fontFamily,
+        weight = 700
+      ) {
+        let size = startSize;
+        while (size >= minSize) {
+          const lines = wrapText(
+            ctx,
+            text,
+            `${weight} ${size}px ${fontFamily}`,
+            maxW
+          );
+          const lineH = Math.round(size * lhRatio);
+          const totalH = lines.length * lineH;
+          if (totalH <= maxH)
+            return { fontSize: size, lines, lineHeight: lineH };
+          size -= 2;
+        }
+        return {
+          fontSize: minSize,
+          lines: wrapText(
+            ctx,
+            text,
+            `${weight} ${minSize}px ${fontFamily}`,
+            maxW
+          ),
+          lineHeight: Math.round(minSize * lhRatio),
+        };
+      }
+      function wrapText(ctx, text, font, maxW) {
+        ctx.font = font;
+        const words = String(text || "").split(/\s+/);
+        const lines = [];
+        let cur = "";
+        for (const w of words) {
+          const t = cur ? cur + " " + w : w;
+          if (ctx.measureText(t).width <= maxW) cur = t;
+          else {
+            if (cur) lines.push(cur);
+            if (ctx.measureText(w).width > maxW) {
+              let buf = "";
+              for (const ch of w) {
+                const test = buf + ch;
+                if (ctx.measureText(test).width <= maxW) buf = test;
+                else {
+                  lines.push(buf);
+                  buf = ch;
+                }
+              }
+              cur = buf;
+            } else cur = w;
+          }
+        }
+        if (cur) lines.push(cur);
+        return lines;
+      }
+
+      function drawRoundedRect(ctx, x, y, w, h, r) {
+        const rr = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + rr, y);
+        ctx.lineTo(x + w - rr, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+        ctx.lineTo(x + w, y + h - rr);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+        ctx.lineTo(x + rr, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+        ctx.lineTo(x, y + rr);
+        ctx.quadraticCurveTo(x, y, x + rr, y);
+        ctx.closePath();
+      }
+
+      function drawPreview() {
+        const W = previewCanvas.width,
+          H = previewCanvas.height;
+        pctx.fillStyle = bgColor;
+        pctx.fillRect(0, 0, W, H);
+
+        const marginX = 90,
+          marginY = 180;
+        const usableW = W - 2 * marginX,
+          usableH = H - 2 * marginY;
+
+        const scale = (sizePercent || 100) / 100; // 0.25–1.6
+        const baseStart = 72 * scale;
+        const baseMin = 34 * scale;
+
+        const spec = fitTextToBox(
+          pctx,
+          currentText,
+          usableW,
+          usableH,
+          baseStart,
+          baseMin,
+          1.25,
+          selectedFont,
+          700
+        );
+        const { fontSize, lines, lineHeight } = spec;
+
+        pctx.fillStyle = fontColor;
+        pctx.textAlign = "center";
+        pctx.textBaseline = "middle";
+        pctx.font = `700 ${fontSize}px ${selectedFont}`;
+
+        const totalH = lines.length * lineHeight;
+        let y = H / 2 - totalH / 2;
+
+        pctx.save();
+        pctx.shadowColor = "rgba(0,0,0,0.14)";
+        pctx.shadowBlur = 8;
+        lines.forEach((ln, i) => pctx.fillText(ln, W / 2, y + i * lineHeight));
+        pctx.restore();
+
+        // bottom label (ayah tag)
+        pctx.font = `600 ${Math.max(
+          30,
+          Math.round(36 * scale)
+        )}px ${selectedFont}`;
+        pctx.fillStyle = fontColor;
+        pctx.textAlign = "right";
+        pctx.fillText(currentLabel, W - 40, H - 60);
+
+        // --- Credits overlays ---
+        const badgePadX = 14,
+          badgePadY = 10,
+          badgeRadius = 14;
+        pctx.textAlign = "left";
+        pctx.textBaseline = "alphabetic";
+        const creditTextColor = fontColor;
+
+        if (showCreditCreator) {
+          const txt = "Quran Shorts — Editor by TheAAA";
+          pctx.font = `600 18px ${selectedFont}`;
+          const tw = pctx.measureText(txt).width;
+          const th = 24;
+          const bx = 40,
+            by = 60;
+          pctx.save();
+          pctx.globalAlpha = 0.12;
+          pctx.fillStyle = "#000";
+          drawRoundedRect(
+            pctx,
+            bx - badgePadX,
+            by - th - badgePadY + 6,
+            tw + badgePadX * 2,
+            th + badgePadY * 2,
+            badgeRadius
+          );
+          pctx.fill();
+          pctx.restore();
+          pctx.fillStyle = creditTextColor;
+          pctx.fillText(txt, bx, by);
+        }
+
+        // Made by (top-right)
+        const madeByNameNow = (madeByInput?.value || "").trim();
+        const showMadeByNow = !!creditMadeByChk?.checked;
+        if (showMadeByNow && madeByNameNow) {
+          pctx.font = `600 18px ${selectedFont}`;
+          let txt = `Made by ${madeByNameNow}`;
+          const th = 24;
+          const bx = W - 40,
+            by = 60;
+          while (pctx.measureText(txt).width > W - 120 && txt.length > 4) {
+            txt = txt.slice(0, -4) + "…";
+          }
+          const tw = pctx.measureText(txt).width;
+          pctx.save();
+          pctx.globalAlpha = 0.12;
+          pctx.fillStyle = "#000";
+          drawRoundedRect(
+            pctx,
+            bx - tw - badgePadX,
+            by - th - badgePadY + 6,
+            tw + badgePadX * 2,
+            th + badgePadY * 2,
+            badgeRadius
+          );
+          pctx.fill();
+          pctx.restore();
+          pctx.fillStyle = creditTextColor;
+          pctx.textAlign = "right";
+          pctx.fillText(txt, bx, by);
+          pctx.textAlign = "left";
+        }
+
+        if (showCreditData) {
+          let txt = "Data: Quran.com & AlQuran Cloud • Audio: EveryAyah.com";
+          pctx.font = `600 18px ${selectedFont}`;
+          const th = 24;
+          const bx = 40,
+            by = H - 60;
+          while (pctx.measureText(txt).width > W - 120 && txt.length > 4) {
+            txt = txt.slice(0, -4) + "…";
+          }
+          const tw = pctx.measureText(txt).width;
+          pctx.save();
+          pctx.globalAlpha = 0.12;
+          pctx.fillStyle = "#000";
+          drawRoundedRect(
+            pctx,
+            bx - badgePadX,
+            by - th - badgePadY + 6,
+            tw + badgePadX * 2,
+            th + badgePadY * 2,
+            badgeRadius
+          );
+          pctx.fill();
+          pctx.restore();
+          pctx.fillStyle = creditTextColor;
+          pctx.fillText(txt, bx, by);
+        }
+
+        requestAnimationFrame(drawPreview);
+      }
+
+      // ------------------ Recording setup ------------------
+      function ensureAudioGraph() {
+        if (audioCtx) return true;
+        try {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return false;
+          audioCtx = new AC();
+          srcNode = audioCtx.createMediaElementSource(audio);
+          destNode = audioCtx.createMediaStreamDestination();
+          srcNode.connect(audioCtx.destination);
+          srcNode.connect(destNode);
+          return true;
+        } catch (e) {
+          console.warn("Audio graph unavailable (CORS or browser):", e);
+          audioCtx = null;
+          srcNode = null;
+          destNode = null;
+          return false;
+        }
+      }
+      function buildMixedStream() {
+        const fps = 30;
+        const canvasStream = previewCanvas.captureStream(fps);
+        const ok = ensureAudioGraph();
+        if (ok && destNode) {
+          return new MediaStream([
+            ...canvasStream.getVideoTracks(),
+            ...destNode.stream.getAudioTracks(),
+          ]);
+        }
+        return new MediaStream([...canvasStream.getTracks()]);
+      }
+      function pickMime() {
+        const candidates = [
+          "video/webm;codecs=vp9,opus",
+          "video/webm;codecs=vp8,opus",
+          "video/webm",
+        ];
+        for (const m of candidates) {
+          if (
+            window.MediaRecorder &&
+            MediaRecorder.isTypeSupported &&
+            MediaRecorder.isTypeSupported(m)
+          )
+            return m;
+        }
+        return "";
+      }
+      function initRecorder() {
+        if (recorder) return;
+        mixedStream = buildMixedStream();
+        const mime = pickMime();
+        try {
+          recorder = new MediaRecorder(mixedStream, {
+            ...(mime ? { mimeType: mime } : {}),
+            videoBitsPerSecond: 5_000_000,
+          });
+        } catch (e) {
+          console.error("MediaRecorder init failed:", e);
+          statusEl.textContent = "MediaRecorder not supported by this browser.";
+          return;
+        }
+        chunks = [];
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size) chunks.push(e.data);
+        };
+        recorder.onstart = () => {
+          recStatus.textContent = "Recording in the background…";
+        };
+        recorder.onstop = () => {
+          finalBlob = new Blob(chunks, { type: mime || "video/webm" });
+          downloadBtn.disabled = false;
+          recStatus.textContent =
+            "Recording complete. You can download your Short.";
+          statusEl.textContent = "Recording complete. Click “Download (WebM)”.";
+        };
+      }
+      function startRecordingIfNeeded() {
+        if (!recorder) initRecorder();
+        if (!recorder) return;
+        if (!recordingStarted && recorder.state !== "recording") {
+          try {
+            recorder.start();
+            recordingStarted = true;
+            recStatus.textContent = "Recording in the background…";
+          } catch (e) {
+            console.error(e);
+            recStatus.textContent =
+              "Recording failed to start. Check browser permissions.";
+          }
+        }
+      }
+      function stopRecordingIfActive() {
+        if (recorder && recorder.state === "recording") {
+          try {
+            recorder.stop();
+          } catch {}
+        }
+      }
+
+      // ------------------ Playback controls ------------------
+      buildPreviewBtn.addEventListener("click", async () => {
+        resetSessionUI();
+        sessionSurah = +surahSel.value || 1;
+        const s =
+          meta.surahs.find((x) => x.number === sessionSurah) || meta.surahs[0];
+        sessionSurahName = s?.englishName || "Unknown";
+        sessionFrom = +ayahStartSel.value || 1;
+        sessionTo = +ayahEndSel.value || Math.min(5, s.ayahCount);
+        sessionReciterName =
+          reciterSel.options[reciterSel.selectedIndex]?.text || "Unknown";
+
+        selectedFont = fontPicker.value;
+        sizePercent = parseInt(textSize.value, 10) || 100;
+        showCreditData = !!creditDataChk?.checked;
+        showCreditCreator = !!creditCreatorChk?.checked;
+
+        if (
+          !s ||
+          isNaN(sessionFrom) ||
+          isNaN(sessionTo) ||
+          sessionFrom < 1 ||
+          sessionTo > s.ayahCount ||
+          sessionFrom > sessionTo
+        ) {
+          statusEl.textContent = "Invalid ayah range.";
+          return;
+        }
+        playlist = [];
+        for (let a = sessionFrom; a <= sessionTo; a++)
+          playlist.push({ surah: sessionSurah, ayah: a, sName: s.englishName });
+        index = 0;
+        totalAyahs = playlist.length;
+        meterBar.style.width = "0%";
+
+        statusEl.textContent = `Loaded: ${s.englishName} • Ayah ${sessionFrom}–${sessionTo}`;
+        await playIndex(index, true);
+      });
+
+      prevBtn.addEventListener("click", async () => {
+        if (!playlist.length) return;
+        index = Math.max(0, index - 1);
+        await playIndex(index, true);
+        updateMeter();
+      });
+      nextBtn.addEventListener("click", async () => {
+        if (!playlist.length) return;
+        index = Math.min(playlist.length - 1, index + 1);
+        await playIndex(index, true);
+        updateMeter();
+      });
+      playPauseBtn.addEventListener("click", () => {
+        if (!playlist.length) return;
+        if (isPlaying) audio.pause();
+        else audio.play().catch(() => {});
+      });
+
+      function updateMeter() {
+        if (!totalAyahs) {
+          meterBar.style.width = "0%";
+          return;
+        }
+        const denom = Math.max(1, totalAyahs - 1);
+        const pct = Math.min(100, Math.round((index / denom) * 100));
+        meterBar.style.width = pct + "%";
+      }
+
+      audio.addEventListener("play", () => {
+        isPlaying = true;
+        playPauseBtn.textContent = "Pause";
+        try {
+          audioCtx && audioCtx.resume && audioCtx.resume();
+        } catch {}
+        startRecordingIfNeeded();
+      });
+      audio.addEventListener("pause", () => {
+        isPlaying = false;
+        playPauseBtn.textContent = "Play";
+      });
+      audio.addEventListener("ended", async () => {
+        if (index < playlist.length - 1) {
+          index++;
+          updateMeter();
+          await playIndex(index, true);
+        } else {
+          isPlaying = false;
+          playPauseBtn.textContent = "Play";
+          updateMeter();
+          stopRecordingIfActive();
+          statusEl.textContent = "Playback finished. Finalizing recording…";
+        }
+      });
+
+      async function playIndex(i, autoplay = false) {
+        const it = playlist[i];
+        if (!it) return;
+        const s3 = pad3(it.surah),
+          a3 = pad3(it.ayah);
+
+        try {
+          const tRes = await fetchRetry(
+            `https://api.alquran.cloud/v1/ayah/${it.surah}:${it.ayah}/en.asad`
+          );
+          const t = await tRes.json();
+          currentText =
+            t && t.code === 200 && t.data && t.data.text
+              ? t.data.text
+              : "(Translation unavailable)";
+        } catch {
+          currentText = "(Failed to load translation)";
+        }
+
+        currentLabel = `${it.sName} • Ayah ${it.ayah}`;
+        const reciter = reciterSel.value;
+        audio.src = `https://everyayah.com/data/${reciter}/${s3}${a3}.mp3`;
+
+        if (!recorder) initRecorder();
+        if (autoplay) {
+          try {
+            await audio.play();
+          } catch {
+            statusEl.textContent = "Autoplay was blocked. Press Play to start.";
+          }
+        }
+      }
+
+      // ------------------ Download recorded WebM ------------------
+      downloadBtn.addEventListener("click", () => {
+        if (!finalBlob) {
+          statusEl.textContent = "No recording available yet.";
+          return;
+        }
+        const ts = timestampStr();
+        const filename = `Surah-${sessionSurah}-${safe(
+          sessionSurahName
+        )}_Ayah-${sessionFrom}-${sessionTo}_${safe(
+          sessionReciterName
+        )}_${ts}.webm`;
+        const url = URL.createObjectURL(finalBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          a.remove();
+        }, 1000);
+      });
+
+      // ------------------ Init ------------------
+      (async () => {
+        await loadMeta();
+        selectedFont = fontPicker.value;
+        sizePercent = parseInt(textSize.value, 10) || 100;
+        if (textSizeVal) textSizeVal.textContent = `(${sizePercent}%)`;
+        bgColor = bgColorInput.value;
+        fontColor = fontColorInput.value;
+        showCreditData = !!creditDataChk?.checked;
+        showCreditCreator = !!creditCreatorChk?.checked;
+        requestAnimationFrame(drawPreview);
+      })();
+    </script>
+  </body>
+</html>
