@@ -1,68 +1,3 @@
-// ------------------ Utils ------------------
-const $ = (s) => document.querySelector(s);
-const pad3 = (n) => String(Number(n) || 0).padStart(3, "0");
-const safe = (s) => (s || "").replace(/[^\w-]+/g, "_");
-const timestampStr = (d = new Date()) => {
-  const z = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}_${z(
-    d.getHours()
-  )}${z(d.getMinutes())}${z(d.getSeconds())}`;
-};
-
-// ------------------ Theme (dark / light) ------------------
-function applyTheme(theme) {
-  const t = theme === "light" ? "light" : "dark";
-  try {
-    document.documentElement.setAttribute("data-theme", t);
-  } catch (e) {}
-  const btn = document.getElementById("themeToggle");
-  if (btn) {
-    btn.textContent = t === "light" ? "☀️" : "🌙";
-    btn.setAttribute("aria-pressed", t === "light" ? "true" : "false");
-  }
-  try {
-    localStorage.setItem("theme", t);
-  } catch (e) {}
-}
-
-(function initTheme() {
-  try {
-    const saved = localStorage.getItem("theme");
-    const prefersLight =
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: light)").matches;
-    const theme = saved || (prefersLight ? "light" : "dark");
-    applyTheme(theme);
-  } catch (e) {
-    /* ignore */
-  }
-})();
-
-// Toggle via the button (delegated click handler)
-document.addEventListener("click", (ev) => {
-  const t = ev.target;
-  if (t && t.id === "themeToggle") {
-    const cur =
-      document.documentElement.getAttribute("data-theme") === "light"
-        ? "light"
-        : "dark";
-    applyTheme(cur === "light" ? "dark" : "light");
-  }
-});
-
-async function fetchRetry(url, opts = {}, retries = 2) {
-  for (let i = 0; i <= retries; i++) {
-    try {
-      const res = await fetch(url, { cache: "no-store", ...opts });
-      if (!res.ok) throw new Error(res.status + " " + res.statusText);
-      return res;
-    } catch (e) {
-      if (i === retries) throw e;
-      await new Promise((r) => setTimeout(r, 500 * (i + 1)));
-    }
-  }
-}
-
 // ------------------ DOM ------------------
 const reciterSel = $("#reciter");
 const surahSel = $("#surah");
@@ -108,65 +43,53 @@ const meterBar = $("#meterBar");
 audio.crossOrigin = "anonymous";
 
 // ------------------ State ------------------
-let meta = { surahs: [] };
-let playlist = [];
-let index = 0;
-let isPlaying = false;
+// Expose state variables to window for module access
+window.playlist = [];
+window.index = 0;
+window.isPlaying = false;
 
 // text controls
-let selectedFont = "Inter, sans-serif";
-let sizePercent = 100; // 25–160
-let translationEdition = "en.asad";
+window.selectedFont = "Inter, sans-serif";
+window.sizePercent = 100; // 25–160
+window.translationEdition = "en.asad";
 
 // drawing content
-let currentText = "Centered translation will appear here.";
-let currentLabel = "—";
+window.currentText = "Centered translation will appear here.";
+window.currentLabel = "—";
 
-// Background state
-let backgroundMode = "color"; // 'color' | 'media'
-let bgColor = "#ffffff";
-let fontColor = "#111111";
-let bgMediaList = []; // [{src, type, name?}]
-let selectedBg = null; // active media item
-const bgImg = new Image();
-bgImg.crossOrigin = "anonymous";
-const bgVideo = document.createElement("video");
-bgVideo.loop = true;
-bgVideo.muted = true;
-bgVideo.playsInline = true;
-bgVideo.crossOrigin = "anonymous";
+window.fontColor = "#111111";
 
 // credits
-let showCreditData = true;
-let showCreditCreator = true;
+window.showCreditData = true;
+window.showCreditCreator = true;
 
 // recording state
-let audioCtx = null,
-  srcNode = null,
-  gainNode = null,
-  destNode = null,
-  mixedStream = null,
-  connections = { toDest: false, toRecorder: false };
+window.audioCtx = null;
+window.srcNode = null;
+window.gainNode = null;
+window.destNode = null;
+window.mixedStream = null;
+window.connections = { toDest: false, toRecorder: false };
 
-let recorder = null;
-let chunks = [];
-let recordingStarted = false;
-let finalBlob = null;
-let hasAudioError = false;
-let wasDismissed = false;
+window.recorder = null;
+window.chunks = [];
+window.recordingStarted = false;
+window.finalBlob = null;
+window.hasAudioError = false;
+window.wasDismissed = false;
 
 // gate: only record when explicitly allowed
-let allowRecording = true;
+window.allowRecording = true;
 
 // progress
-let totalAyahs = 0;
+window.totalAyahs = 0;
 
 // session info for filename
-let sessionSurah = 1,
-  sessionSurahName = "Al-Fatihah",
-  sessionFrom = 1,
-  sessionTo = 1,
-  sessionReciterName = "Unknown";
+window.sessionSurah = 1;
+window.sessionSurahName = "Al-Fatihah";
+window.sessionFrom = 1;
+window.sessionTo = 1;
+window.sessionReciterName = "Unknown";
 
 // ------------------ UI toggle helper ------------------
 function setDuringRecordingUI(active) {
@@ -179,12 +102,13 @@ function setDuringRecordingUI(active) {
 // ------------------ Change handling ------------------
 function resetSessionUI() {
   try {
-    if (recorder && recorder.state === "recording") recorder.stop();
+    if (window.recorder && window.recorder.state === "recording")
+      window.recorder.stop();
   } catch {}
-  recorder = null;
-  recordingStarted = false;
-  chunks = [];
-  finalBlob = null;
+  window.recorder = null;
+  window.recordingStarted = false;
+  window.chunks = [];
+  window.finalBlob = null;
   downloadBtn.disabled = true;
   recStatus.textContent =
     "Press Play & Export to preview & auto-record. Avoid the right audio controller during recording.";
@@ -192,17 +116,26 @@ function resetSessionUI() {
   setDuringRecordingUI(false);
 }
 
+// Expose to window for audio module
+window.resetSessionUI = resetSessionUI;
+window.setDuringRecordingUI = setDuringRecordingUI;
+
 function onAnyInputChange() {
   resetSessionUI();
-  selectedFont = fontPicker.value;
-  sizePercent = parseInt(textSize.value, 10) || 100;
-  if (textSizeVal) textSizeVal.textContent = `(${sizePercent}%)`;
-  if (bgColorInput) bgColor = bgColorInput.value;
-  if (fontColorInput) fontColor = fontColorInput.value;
-  translationEdition = translationEditionSel?.value || "en.asad";
-  showCreditData = !!creditDataChk?.checked;
-  showCreditCreator = !!creditCreatorChk?.checked;
+  window.selectedFont = fontPicker.value;
+  window.sizePercent = parseInt(textSize.value, 10) || 100;
+  if (textSizeVal) textSizeVal.textContent = `(${window.sizePercent}%)`;
+  if (bgColorInput) {
+    window.backgroundModule.setBgColor(bgColorInput.value);
+  }
+  if (fontColorInput) window.fontColor = fontColorInput.value;
+  window.translationEdition = translationEditionSel?.value || "en.asad";
+  window.showCreditData = !!creditDataChk?.checked;
+  window.showCreditCreator = !!creditCreatorChk?.checked;
 }
+
+// Expose to window for metadata module
+window.onAnyInputChange = onAnyInputChange;
 
 [
   reciterSel,
@@ -222,198 +155,51 @@ function onAnyInputChange() {
     el.addEventListener("change", onAnyInputChange);
     if (el === textSize) {
       el.addEventListener("input", () => {
-        sizePercent = parseInt(textSize.value, 10) || 100;
-        if (textSizeVal) textSizeVal.textContent = `(${sizePercent}%)`;
+        window.sizePercent = parseInt(textSize.value, 10) || 100;
+        if (textSizeVal) textSizeVal.textContent = `(${window.sizePercent}%)`;
       });
     }
   });
 
 // Color preview
 bgColorInput?.addEventListener("input", () => {
-  bgColor = bgColorInput.value;
+  window.backgroundModule.setBgColor(bgColorInput.value);
 });
 fontColorInput?.addEventListener("input", () => {
-  fontColor = fontColorInput.value;
+  window.fontColor = fontColorInput.value;
 });
 
 // ------------------ Background mode toggles ------------------
-function applyBgModeUI() {
-  if (backgroundMode === "color") {
-    bgColorField.style.display = "block";
-    bgMediaField.style.display = "none";
-  } else {
-    bgColorField.style.display = "none";
-    bgMediaField.style.display = "block";
-  }
-}
 bgModeColor?.addEventListener("change", () => {
   if (bgModeColor.checked) {
-    backgroundMode = "color";
-    applyBgModeUI();
+    window.backgroundModule.setBackgroundMode("color");
+    window.backgroundModule.applyBgModeUI();
   }
 });
 bgModeMedia?.addEventListener("change", async () => {
   if (bgModeMedia.checked) {
-    backgroundMode = "media";
-    applyBgModeUI();
-    if (!bgMediaList.length) await loadBackgroundAssets();
+    window.backgroundModule.setBackgroundMode("media");
+    window.backgroundModule.applyBgModeUI();
+    if (!window.backgroundModule.bgMediaList.length)
+      await window.backgroundModule.loadBackgroundAssets();
   }
 });
 
-// ------------------ Metadata ------------------
-async function loadMeta() {
-  try {
-    const m = await (
-      await fetchRetry("https://api.alquran.cloud/v1/meta")
-    ).json();
-    const e = await (
-      await fetchRetry("https://api.quran.com/api/v4/chapters")
-    ).json();
-    const chapters = Array.isArray(e?.chapters) ? e.chapters : [];
-    const engById = new Map(chapters.map((c) => [c.id, c]));
-    const refs = m?.data?.surahs?.references || [];
-    meta.surahs = refs.map((s) => ({
-      number: s.number,
-      nameAr: s.name,
-      englishName:
-        engById.get(s.number)?.name_simple || s.englishName || s.name,
-      ayahCount: s.numberOfAyahs,
-    }));
-    if (!meta.surahs.length) throw new Error("Surah metadata missing");
+// Wire up background media select change
+bgMediaSelect.addEventListener("change", () => {
+  window.backgroundModule.onBgMediaChange();
+});
 
-    surahSel.innerHTML = meta.surahs
-      .map(
-        (s) =>
-          `<option value="${s.number}">${s.number}. ${s.englishName} (${s.nameAr})</option>`
-      )
-      .join("");
-    updateAyahRange();
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function updateAyahRange() {
-  const sNum = +surahSel.value || 1;
-  const s = meta.surahs.find((x) => x.number === sNum) || meta.surahs[0];
-  if (!s) return;
-  const opts = Array.from(
-    { length: s.ayahCount },
-    (_, i) => `<option value="${i + 1}">Ayah ${i + 1}</option>`
-  ).join("");
-  ayahStartSel.innerHTML = opts;
-  ayahEndSel.innerHTML = opts;
-  ayahStartSel.value = "1";
-  ayahEndSel.value = String(Math.min(5, s.ayahCount));
-  sessionSurahName = s.englishName;
-
-  const handler = () => {
-    if (+ayahEndSel.value < +ayahStartSel.value)
-      ayahEndSel.value = ayahStartSel.value;
-  };
-  ayahStartSel.addEventListener("change", handler, { once: true });
-  onAnyInputChange();
-}
-surahSel.addEventListener("change", updateAyahRange);
-
-// ------------------ Background assets (simplified) ------------------
-const ALLOWED_EXT = [
-  "png",
-  "jpg",
-  "jpeg",
-  "gif",
-  "bmp",
-  "webp",
-  "avif",
-  "mp4",
-  "webm",
-  "mov",
-  "m4v",
-];
-function inferTypeFromPath(src) {
-  const l = (src || "").toLowerCase();
-  return ["mp4", "webm", "mov", "m4v"].some((e) => l.endsWith("." + e))
-    ? "video"
-    : "image";
-}
-
-function populateSelectFromList(list) {
-  const combined = [
-    ...userUploads,
-    ...(list || []).filter(
-      (it) => it.src && (it.type === "image" || it.type === "video")
-    ),
-  ];
-
-  bgMediaList = combined;
-
-  if (!bgMediaList.length) {
-    bgMediaSelect.innerHTML = "";
-    bgMediaHint.textContent = "No media configured. Upload to get started.";
-    bgMediaSelect.disabled = true;
-    selectedBg = null;
-    return;
-  }
-
-  bgMediaSelect.innerHTML = bgMediaList
-    .map(
-      (it, i) =>
-        `<option value="${i}">${it.type === "video" ? "🎞️" : "🖼️"} ${
-          it.name || it.src
-        }</option>`
-    )
-    .join("");
-
-  bgMediaSelect.disabled = false;
-  bgMediaHint.textContent = `Available: ${bgMediaList.length} item(s). ${
-    userUploads.length ? `(${userUploads.length} from your uploads)` : ""
-  }`;
-  if (bgMediaSelect.value === "" || bgMediaSelect.value == null) {
-    bgMediaSelect.value = "0";
-  }
-  onBgMediaChange();
-}
-
-function handleUserFiles(fileList) {
-  if (!fileList || !fileList.length) return;
-
-  revokeUserUploadURLs();
-  userUploads = [];
-
-  for (const f of fileList) {
-    const url = URL.createObjectURL(f);
-    const isVideo = (f.type || "").startsWith("video");
-    const isImage = (f.type || "").startsWith("image");
-    if (!isVideo && !isImage) continue;
-
-    userUploads.push({
-      src: url,
-      type: isVideo ? "video" : "image",
-      name: `📥 ${f.name}`,
-      __blobUrl: true,
-    });
-  }
-
-  populateSelectFromList(bgMediaList);
-  if (bgModeMedia && !bgModeMedia.checked) {
-    bgModeMedia.checked = true;
-    backgroundMode = "media";
-    applyBgModeUI();
-  }
-
-  if (userUploads.length) {
-    const firstUploadIndex = 0;
-    bgMediaSelect.value = String(firstUploadIndex);
-    onBgMediaChange();
-  }
-}
-
+// Wire up background file upload
 bgUploadInput?.addEventListener("change", (e) => {
   handleUserFiles(e.target.files);
 });
 
-let userUploads = []; // [{ src, type, name, __blobUrl: true }]
-function revokeUserUploadURLs() {
+function handleUserFiles(fileList) {
+  if (!fileList || !fileList.length) return;
+
+  // Revoke old URLs
+  const userUploads = window.backgroundModule.userUploads || [];
   for (const item of userUploads) {
     if (item.__blobUrl && item.src) {
       try {
@@ -421,596 +207,62 @@ function revokeUserUploadURLs() {
       } catch {}
     }
   }
-}
-window.addEventListener("beforeunload", revokeUserUploadURLs);
+  window.backgroundModule.userUploads = [];
 
-const DEFAULT_BG_MEDIA = []; // fallback (optional)
+  // Create new uploads
+  for (const f of fileList) {
+    const url = URL.createObjectURL(f);
+    const isVideo = (f.type || "").startsWith("video");
+    const isImage = (f.type || "").startsWith("image");
+    if (!isVideo && !isImage) continue;
 
-async function loadBackgroundAssets() {
-  try {
-    bgMediaHint.textContent = "Loading background.json…";
-    const res = await fetchRetry("assets/background/background.json");
-    const raw = await res.json();
-
-    const normalized = (Array.isArray(raw) ? raw : [])
-      .map((it) => {
-        const src = it && it.src ? String(it.src) : "";
-        const ext = src.split(".").pop()?.toLowerCase() || "";
-        if (!ALLOWED_EXT.includes(ext)) return null;
-        return {
-          src,
-          name: it.name || src.split("/").pop(),
-          type: it.type ? it.type : inferTypeFromPath(src),
-        };
-      })
-      .filter(Boolean);
-
-    if (!normalized.length) {
-      if (DEFAULT_BG_MEDIA.length) {
-        bgMediaHint.textContent = "No items in JSON; using defaults.";
-        populateSelectFromList(DEFAULT_BG_MEDIA);
-      } else {
-        bgMediaHint.textContent = "No items found in background.json.";
-        populateSelectFromList([]);
-      }
-      return;
-    }
-
-    populateSelectFromList(normalized);
-    bgMediaHint.textContent = "Loaded";
-  } catch (e) {
-    console.warn("Failed to load background.json:", e);
-    if (DEFAULT_BG_MEDIA.length) {
-      bgMediaHint.textContent = "Failed to load JSON; using defaults.";
-      populateSelectFromList(DEFAULT_BG_MEDIA);
-    } else {
-      bgMediaHint.textContent = "Failed to load background.json.";
-      populateSelectFromList([]);
-    }
-  }
-}
-
-function onBgMediaChange() {
-  const idx = parseInt(bgMediaSelect.value, 10);
-  selectedBg = bgMediaList[idx] || null;
-  if (!selectedBg) return;
-  if (selectedBg.type === "image") {
-    bgImg.onload = () => {};
-    bgImg.src = selectedBg.src;
-  } else {
-    try {
-      bgVideo.src = selectedBg.src;
-      bgVideo.load();
-      bgVideo.play().catch(() => {});
-    } catch {}
-  }
-}
-bgMediaSelect.addEventListener("change", onBgMediaChange);
-
-// ------------------ Text layout + drawing ------------------
-function fitTextToBox(
-  ctx,
-  text,
-  maxW,
-  maxH,
-  startSize,
-  minSize,
-  lhRatio,
-  fontFamily,
-  weight = 700
-) {
-  let size = startSize;
-  while (size >= minSize) {
-    const lines = wrapText(
-      ctx,
-      text,
-      weight + " " + size + "px " + fontFamily,
-      maxW
-    );
-    const lineH = Math.round(size * lhRatio);
-    const totalH = lines.length * lineH;
-    if (totalH <= maxH) return { fontSize: size, lines, lineHeight: lineH };
-    size -= 2;
-  }
-  return {
-    fontSize: minSize,
-    lines: wrapText(
-      ctx,
-      text,
-      weight + " " + minSize + "px " + fontFamily,
-      maxW
-    ),
-    lineHeight: Math.round(minSize * lhRatio),
-  };
-}
-function wrapText(ctx, text, font, maxW) {
-  ctx.font = font;
-  const words = String(text || "")
-    .trim()
-    .split(/\s+/);
-  const lines = [];
-  let cur = "";
-  for (const w of words) {
-    const t = cur ? cur + " " + w : w;
-    if (ctx.measureText(t).width <= maxW) cur = t;
-    else {
-      if (cur) lines.push(cur);
-      if (ctx.measureText(w).width > maxW) {
-        let buf = "";
-        for (const ch of w) {
-          const test = buf + ch;
-          if (ctx.measureText(test).width <= maxW) buf = test;
-          else {
-            lines.push(buf);
-            buf = ch;
-          }
-        }
-        cur = buf;
-      } else cur = w;
-    }
-  }
-  if (cur) lines.push(cur);
-  return lines;
-}
-function drawRoundedRect(ctx, x, y, w, h, r) {
-  const rr = Math.min(r, w / 2, h / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + rr, y);
-  ctx.lineTo(x + w - rr, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
-  ctx.lineTo(x + w, y + h - rr);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
-  ctx.lineTo(x + rr, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
-  ctx.lineTo(x, y + rr);
-  ctx.quadraticCurveTo(x, y, x + rr, y);
-  ctx.closePath();
-}
-function drawMediaCover(ctx, mediaEl, W, H) {
-  const mw = mediaEl.videoWidth || mediaEl.naturalWidth;
-  const mh = mediaEl.videoHeight || mediaEl.naturalHeight;
-  if (!mw || !mh) return false;
-  const canvasAR = W / H;
-  const mediaAR = mw / mh;
-  let dw, dh, dx, dy;
-  if (mediaAR > canvasAR) {
-    dh = H;
-    dw = H * mediaAR;
-    dx = (W - dw) / 2;
-    dy = 0;
-  } else {
-    dw = W;
-    dh = W / mediaAR;
-    dx = 0;
-    dy = (H - dh) / 2;
-  }
-  ctx.drawImage(mediaEl, dx, dy, dw, dh);
-  return true;
-}
-function drawPreview() {
-  const W = previewCanvas.width,
-    H = previewCanvas.height;
-
-  // Background
-  if (backgroundMode === "media" && selectedBg) {
-    let drew = false;
-    if (selectedBg.type === "image" && bgImg.complete && bgImg.naturalWidth) {
-      drew = drawMediaCover(pctx, bgImg, W, H);
-    } else if (selectedBg.type === "video" && bgVideo.readyState >= 2) {
-      drew = drawMediaCover(pctx, bgVideo, W, H);
-    }
-    if (!drew) {
-      pctx.fillStyle = bgColor;
-      pctx.fillRect(0, 0, W, H);
-    }
-  } else {
-    pctx.fillStyle = bgColor;
-    pctx.fillRect(0, 0, W, H);
-  }
-
-  // Text
-  const marginX = 90,
-    marginY = 180;
-  const usableW = W - 2 * marginX,
-    usableH = H - 2 * marginY;
-  const scale = (sizePercent || 100) / 100;
-  const spec = fitTextToBox(
-    pctx,
-    currentText,
-    usableW,
-    usableH,
-    72 * scale,
-    34 * scale,
-    1.25,
-    selectedFont,
-    700
-  );
-  const { fontSize, lines, lineHeight } = spec;
-
-  pctx.fillStyle = fontColor;
-  pctx.textAlign = "center";
-  pctx.textBaseline = "middle";
-  pctx.font = `700 ${fontSize}px ${selectedFont}`;
-  const totalH = lines.length * lineHeight;
-  let y = H / 2 - totalH / 2;
-  pctx.save();
-  pctx.shadowColor = "rgba(0,0,0,0.14)";
-  pctx.shadowBlur = 8;
-  lines.forEach((ln, i) => pctx.fillText(ln, W / 2, y + i * lineHeight));
-  pctx.restore();
-
-  // Bottom label
-  pctx.font = `600 ${Math.max(30, Math.round(36 * scale))}px ${selectedFont}`;
-  pctx.fillStyle = fontColor;
-  pctx.textAlign = "right";
-  pctx.fillText(currentLabel, W - 40, H - 60);
-
-  // Credits
-  const badgePadX = 14,
-    badgePadY = 10,
-    badgeRadius = 14;
-  pctx.textAlign = "left";
-  pctx.textBaseline = "alphabetic";
-  const creditTextColor = fontColor;
-
-  if (showCreditCreator) {
-    const txt = "Quran Shorts — Editor by TheAAA";
-    pctx.font = `600 28px ${selectedFont}`;
-    const tw = pctx.measureText(txt).width;
-    const th = 24;
-    const bx = 40,
-      by = 60;
-    pctx.save();
-    pctx.globalAlpha = 0.12;
-    pctx.fillStyle = "#000";
-    drawRoundedRect(
-      pctx,
-      bx - badgePadX,
-      by - th - badgePadY + 6,
-      tw + badgePadX * 2,
-      th + badgePadY * 2,
-      badgeRadius
-    );
-    pctx.fill();
-    pctx.restore();
-    pctx.fillStyle = creditTextColor;
-    pctx.fillText(txt, bx, by);
-  }
-
-  const madeByNameNow = (madeByInput?.value || "").trim();
-  const showMadeByNow = !!creditMadeByChk?.checked;
-  if (showMadeByNow && madeByNameNow) {
-    pctx.font = `600 28px ${selectedFont}`;
-    let txt = `Made by ${madeByNameNow}`;
-    const th = 24;
-    const bx = W - 40,
-      by = 60;
-    while (pctx.measureText(txt).width > W - 120 && txt.length > 4) {
-      txt = txt.slice(0, -4) + "…";
-    }
-    const tw = pctx.measureText(txt).width;
-    pctx.save();
-    pctx.globalAlpha = 0.12;
-    pctx.fillStyle = "#000";
-    drawRoundedRect(
-      pctx,
-      bx - tw - badgePadX,
-      by - th - badgePadY + 6,
-      tw + badgePadX * 2,
-      th + badgePadY * 2,
-      badgeRadius
-    );
-    pctx.fill();
-    pctx.restore();
-    pctx.fillStyle = creditTextColor;
-    pctx.textAlign = "right";
-    pctx.fillText(txt, bx, by);
-    pctx.textAlign = "left";
-  }
-
-  if (showCreditData) {
-    let txt = "Data: Quran.com & AlQuran Cloud • Audio: EveryAyah.com";
-    pctx.font = `600 28px ${selectedFont}`;
-    const th = 24;
-    const bx = 40,
-      by = H - 60;
-    while (pctx.measureText(txt).width > W - 120 && txt.length > 4) {
-      txt = txt.slice(0, -4) + "…";
-    }
-    const tw = pctx.measureText(txt).width;
-    pctx.save();
-    pctx.globalAlpha = 0.12;
-    pctx.fillStyle = "#000";
-    drawRoundedRect(
-      pctx,
-      bx - badgePadX,
-      by - th - badgePadY - 46,
-      tw + badgePadX * 2,
-      th + badgePadY * 2,
-      badgeRadius
-    );
-    pctx.fill();
-    pctx.restore();
-    pctx.fillStyle = creditTextColor;
-    pctx.fillText(txt, bx, by - 48);
-  }
-
-  requestAnimationFrame(drawPreview);
-}
-
-// ------------------ Volume helpers ------------------
-function setVolumeFromSlider() {
-  const v = Math.max(0, Math.min(100, Number(volumeSlider?.value) || 0));
-  if (volumeVal) volumeVal.textContent = `${v}%`;
-  audio.volume = v / 100; // playback loudness
-  if (gainNode) gainNode.gain.value = v / 100; // recorded loudness
-}
-
-// ------------------ Audio graph + routing ------------------
-function ensureAudioGraph() {
-  if (audioCtx) return true;
-  try {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return false;
-    audioCtx = new AC();
-    srcNode = audioCtx.createMediaElementSource(audio);
-    gainNode = audioCtx.createGain();
-    destNode = audioCtx.createMediaStreamDestination();
-
-    // Start with slider value
-    gainNode.gain.value = (Number(volumeSlider?.value) || 100) / 100;
-
-    // Base connection
-    srcNode.connect(gainNode);
-
-    // We'll route to speakers/recorder via updateAudioRouting()
-    connections = { toDest: false, toRecorder: false };
-    updateAudioRouting();
-
-    return true;
-  } catch (e) {
-    console.warn("Audio graph unavailable (CORS or browser):", e);
-    audioCtx = null;
-    srcNode = null;
-    gainNode = null;
-    destNode = null;
-    // Fallback: element audio will be heard
-    // audio.muted = false;
-    audio.volume = (Number(volumeSlider?.value) || 100) / 100;
-    return false;
-  }
-}
-
-// Replace your entire updateAudioRouting() with this:
-function updateAudioRouting() {
-  if (!gainNode || !audioCtx) return;
-
-  // Safely connect/disconnect helpers
-  const connect = (node, target) => {
-    try {
-      node.connect(target);
-    } catch (_) {}
-  };
-  const disconnect = (node, target) => {
-    try {
-      node.disconnect(target);
-    } catch (_) {}
-  };
-
-  // Reset previous routes
-  if (audioCtx.destination) disconnect(gainNode, audioCtx.destination);
-  if (destNode) disconnect(gainNode, destNode);
-
-  // Always monitor to speakers
-  if (audioCtx.destination) connect(gainNode, audioCtx.destination);
-
-  // Additionally feed the recorder only when recording
-  if (allowRecording && destNode) connect(gainNode, destNode);
-}
-
-async function ensureGraphOnGesture() {
-  if (!audioCtx) {
-    const ok = ensureAudioGraph();
-    if (!ok) {
-      // audio.muted = false;
-      return false;
-    }
-  }
-  if (audioCtx.state === "suspended") {
-    try {
-      await audioCtx.resume();
-    } catch {}
-  }
-  // Always keep element audible
-  // audio.muted = false;
-  return true;
-}
-
-// ------------------ Recording setup ------------------
-function buildMixedStream() {
-  const fps = 30;
-  const canvasStream = previewCanvas.captureStream(fps);
-  const ok = ensureAudioGraph();
-  if (ok && destNode) {
-    return new MediaStream([
-      ...canvasStream.getVideoTracks(),
-      ...destNode.stream.getAudioTracks(),
-    ]);
-  }
-  // Fallback: no audio track if WebAudio not available/CORS-blocked
-  return new MediaStream([...canvasStream.getTracks()]);
-}
-
-function pickMime() {
-  const candidates = [
-    "video/webm;codecs=vp9,opus",
-    "video/webm;codecs=vp8,opus",
-    "video/webm",
-  ];
-  for (const m of candidates) {
-    if (
-      window.MediaRecorder &&
-      MediaRecorder.isTypeSupported &&
-      MediaRecorder.isTypeSupported(m)
-    )
-      return m;
-  }
-  return "";
-}
-
-function initRecorder() {
-  if (recorder) return;
-  mixedStream = buildMixedStream();
-  const mime = pickMime();
-  try {
-    recorder = new MediaRecorder(mixedStream, {
-      ...(mime ? { mimeType: mime } : {}),
-      videoBitsPerSecond: 5_000_000,
+    window.backgroundModule.userUploads.push({
+      src: url,
+      type: isVideo ? "video" : "image",
+      name: `📥 ${f.name}`,
+      __blobUrl: true,
     });
-  } catch (e) {
-    console.error("MediaRecorder init failed:", e);
-    return;
   }
-  chunks = [];
-  recorder.ondataavailable = (e) => {
-    if (e.data && e.data.size) chunks.push(e.data);
-  };
-  recorder.onstart = () => {
-    recStatus.textContent = "Recording in the background…";
-  };
-  recorder.onstop = () => {
-    finalBlob = new Blob(chunks, { type: mime || "video/webm" });
 
-    if (!hasAudioError && !wasDismissed) {
-      downloadBtn.disabled = false;
-      recStatus.textContent =
-        "Recording complete. You can download your Short.";
-    } else {
-      downloadBtn.disabled = true;
-      recStatus.textContent = wasDismissed
-        ? "Dismissed. Ready."
-        : "Recording incomplete due to audio error. Download disabled.";
-    }
-
-    setDuringRecordingUI(false);
-  };
-}
-
-function startRecordingIfNeeded() {
-  if (!allowRecording) return;
-
-  // Ensure recorder path is connected
-  if (audioCtx && gainNode) updateAudioRouting();
-
-  if (!recorder) initRecorder();
-  if (!recorder) return;
-  if (!recordingStarted && recorder.state !== "recording") {
-    try {
-      recorder.start();
-      recordingStarted = true;
-      recStatus.textContent = "Recording in the background…";
-    } catch (e) {
-      console.error(e);
-      recStatus.textContent =
-        "Recording failed to start. Check browser permissions.";
-    }
+  // Update the select with new uploads
+  window.backgroundModule.populateSelectFromList(
+    window.backgroundModule.bgMediaList
+  );
+  if (bgModeMedia && !bgModeMedia.checked) {
+    bgModeMedia.checked = true;
+    window.backgroundModule.setBackgroundMode("media");
+    window.backgroundModule.applyBgModeUI();
   }
-}
-function stopRecordingIfActive() {
-  if (recorder && recorder.state === "recording") {
-    try {
-      recorder.stop();
-    } catch {}
+
+  if (window.backgroundModule.userUploads.length) {
+    const firstUploadIndex = 0;
+    bgMediaSelect.value = String(firstUploadIndex);
+    window.backgroundModule.onBgMediaChange();
   }
 }
 
-// ------------------ Playback controls ------------------
-async function loadAndPlay({ record }) {
-  // Mode flag
-  allowRecording = !!record;
+// Note: populateSelectFromList is already exposed by background.js module
 
-  // UI & flags
-  resetSessionUI();
-  setDuringRecordingUI(!!record);
-  wasDismissed = false;
-  hasAudioError = false;
+// Wire up surah change to update ayah range
+surahSel.addEventListener("change", () => {
+  window.metadataModule.updateAyahRange();
+});
 
-  // Clear any prior audio error banner
-  const errorMessage = $("#audioErrorMessage");
-  if (errorMessage) {
-    errorMessage.textContent = "";
-    errorMessage.style.display = "none";
-  }
-
-  // Ensure WebAudio, wire routes, apply current volume (no muting anywhere)
-  await ensureGraphOnGesture();
-  updateAudioRouting();
-  setVolumeFromSlider(); // sets audio.volume and gainNode.gain to slider %
-
-  // Recorder buffers
-  stopRecordingIfActive();
-  recordingStarted = false;
-  chunks = [];
-  finalBlob = null;
-  downloadBtn.disabled = true;
-
-  // ---- Read selections ----
-  sessionSurah = +surahSel.value || 1;
-  const s =
-    meta.surahs.find((x) => x.number === sessionSurah) || meta.surahs[0];
-  sessionSurahName = s?.englishName || "Unknown";
-  sessionFrom = +ayahStartSel.value || 1;
-  sessionTo = +ayahEndSel.value || Math.min(5, s?.ayahCount || 5);
-  sessionReciterName =
-    reciterSel.options[reciterSel.selectedIndex]?.text || "Unknown";
-
-  selectedFont = fontPicker.value;
-  sizePercent = parseInt(textSize.value, 10) || 100;
-  translationEdition = translationEditionSel?.value || "en.asad";
-  showCreditData = !!creditDataChk?.checked;
-  showCreditCreator = !!creditCreatorChk?.checked;
-  backgroundMode = bgModeMedia.checked ? "media" : "color";
-
-  // ---- Validate ----
-  if (
-    !s ||
-    Number.isNaN(sessionFrom) ||
-    Number.isNaN(sessionTo) ||
-    sessionFrom < 1 ||
-    sessionTo > s.ayahCount ||
-    sessionFrom > sessionTo
-  ) {
-    recStatus.textContent = "Invalid ayah range. Please adjust the selection.";
-    setDuringRecordingUI(false);
-    return;
-  }
-
-  // ---- Playlist ----
-  playlist = [];
-  for (let a = sessionFrom; a <= sessionTo; a++) {
-    playlist.push({ surah: sessionSurah, ayah: a, sName: s.englishName });
-  }
-  index = 0;
-  totalAyahs = playlist.length;
-
-  meterBar.style.width = "0%";
-  await playIndex(index, true);
-}
-
+// Wire up playback buttons
 buildPreviewBtn.addEventListener("click", async () => {
-  await ensureGraphOnGesture();
-  allowRecording = true;
-  updateAudioRouting();
-  setVolumeFromSlider();
-  loadAndPlay({ record: true });
+  await window.audioModule.ensureGraphOnGesture();
+  window.allowRecording = true;
+  window.audioModule.updateAudioRouting();
+  window.audioModule.setVolumeFromSlider();
+  await window.audioModule.loadAndPlay({ record: true });
 });
 
 previewPlayBtn.addEventListener("click", async () => {
-  await ensureGraphOnGesture();
-  allowRecording = false;
-  updateAudioRouting();
-  setVolumeFromSlider();
-  loadAndPlay({ record: false });
+  await window.audioModule.ensureGraphOnGesture();
+  window.allowRecording = false;
+  window.audioModule.updateAudioRouting();
+  window.audioModule.setVolumeFromSlider();
+  await window.audioModule.loadAndPlay({ record: false });
 });
 
 // Stop button
@@ -1019,143 +271,46 @@ previewStopBtn.addEventListener("click", () => {
   if (audio) {
     audio.pause();
     audio.currentTime = 0;
-    index = 0;
-    updateMeter();
-    isPlaying = false;
-    if (recorder && recorder.state === "recording") {
-      stopRecordingIfActive();
+    window.index = 0;
+    window.audioModule.updateMeter();
+    window.isPlaying = false;
+    if (window.recorder && window.recorder.state === "recording") {
+      window.audioModule.stopRecordingIfActive();
     }
   }
 });
-
-function updateMeter() {
-  if (!totalAyahs) {
-    meterBar.style.width = "0%";
-    return;
-  }
-  const denom = Math.max(1, totalAyahs - 1);
-  const pct = Math.min(100, Math.round((index / denom) * 100));
-  meterBar.style.width = pct + "%";
-}
 
 audio.addEventListener("play", async () => {
-  isPlaying = true;
-  await ensureGraphOnGesture();
-  updateAudioRouting();
-  if (allowRecording) startRecordingIfNeeded();
+  window.isPlaying = true;
+  await window.audioModule.ensureGraphOnGesture();
+  window.audioModule.updateAudioRouting();
+  if (window.allowRecording) window.audioModule.startRecordingIfNeeded();
 });
 audio.addEventListener("pause", () => {
-  isPlaying = false;
+  window.isPlaying = false;
 });
 audio.addEventListener("ended", async () => {
-  if (index < playlist.length - 1) {
-    index++;
-    updateMeter();
-    await playIndex(index, true);
+  if (window.index < window.playlist.length - 1) {
+    window.index++;
+    window.audioModule.updateMeter();
+    await window.audioModule.playIndex(window.index, true);
   } else {
-    isPlaying = false;
-    updateMeter();
-    stopRecordingIfActive();
+    window.isPlaying = false;
+    window.audioModule.updateMeter();
+    window.audioModule.stopRecordingIfActive();
   }
 });
-
-async function playIndex(i, autoplay = false) {
-  const it = playlist[i];
-  if (!it) return;
-  const s3 = pad3(it.surah),
-    a3 = pad3(it.ayah);
-
-  // --- Translation fetch with fallback ---
-  async function fetchAyahText(editionId) {
-    try {
-      const tRes = await fetchRetry(
-        `https://api.alquran.cloud/v1/ayah/${it.surah}:${it.ayah}/${editionId}`
-      );
-      const t = await tRes.json();
-      if (t && t.code === 200 && t.data && t.data.text) {
-        return { ok: true, text: t.data.text };
-      }
-      return { ok: false, text: "" };
-    } catch {
-      return { ok: false, text: "" };
-    }
-  }
-
-  const chosenEdition = (
-    translationEditionSel?.value ||
-    translationEdition ||
-    "en.asad"
-  ).trim();
-  let tResult = await fetchAyahText(chosenEdition);
-
-  // Fallback to en.asad if the chosen edition fails
-  if (!tResult.ok && chosenEdition !== "en.asad") {
-    console.warn(`Edition "${chosenEdition}" failed; falling back to en.asad`);
-    tResult = await fetchAyahText("en.asad");
-  }
-
-  currentText = tResult.ok ? tResult.text : "(Translation unavailable)";
-
-  currentLabel = `${it.sName} • Ayah ${it.ayah}`;
-
-  // --- Audio setup (unchanged) ---
-  const reciter = reciterSel.value;
-  const audioUrl = `https://everyayah.com/data/${reciter}/${s3}${a3}.mp3`;
-
-  // Hide any previous error message
-  const errorMessage = $("#audioErrorMessage");
-  errorMessage.style.display = "none";
-
-  // Audio error handling
-  audio.onerror = () => {
-    const errorMessage = $("#audioErrorMessage");
-    errorMessage.textContent = `⚠️ Failed to load audio for Surah ${it.surah}, Ayah ${it.ayah}`;
-    errorMessage.style.display = "block";
-
-    hasAudioError = true;
-
-    if (recorder && recorder.state === "recording") {
-      try {
-        recorder.stop();
-      } catch {}
-      chunks = [];
-      finalBlob = null;
-    }
-
-    recordingStarted = false;
-    recorder = null;
-    downloadBtn.disabled = true;
-    isPlaying = false;
-
-    recStatus.textContent = "Recording stopped due to audio error.";
-    setDuringRecordingUI(false);
-  };
-
-  audio.src = audioUrl;
-
-  if (!recorder && allowRecording) initRecorder();
-  if (autoplay) {
-    try {
-      await audio.play();
-    } catch (err) {
-      console.warn("audio.play() was blocked:", err);
-      const errorMessage = $("#audioErrorMessage");
-      if (errorMessage) {
-        errorMessage.textContent = `⚠️ Failed to load audio for Surah ${it.surah}, Ayah ${it.ayah}`;
-        errorMessage.style.display = "block";
-      }
-    }
-  }
-}
 
 // ------------------ Download recorded WebM ------------------
 downloadBtn.addEventListener("click", () => {
-  if (!finalBlob) return;
+  if (!window.finalBlob) return;
   const ts = timestampStr();
-  const filename = `Surah-${sessionSurah}-${safe(
-    sessionSurahName
-  )}_Ayah-${sessionFrom}-${sessionTo}_${safe(sessionReciterName)}_${ts}.webm`;
-  const url = URL.createObjectURL(finalBlob);
+  const filename = `Surah-${window.sessionSurah}-${safe(
+    window.sessionSurahName
+  )}_Ayah-${window.sessionFrom}-${window.sessionTo}_${safe(
+    window.sessionReciterName
+  )}_${ts}.webm`;
+  const url = URL.createObjectURL(window.finalBlob);
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
@@ -1169,16 +324,16 @@ downloadBtn.addEventListener("click", () => {
 
 // ------------------ Dismiss behavior ------------------
 dismissBtn?.addEventListener("click", () => {
-  wasDismissed = true;
+  window.wasDismissed = true;
   try {
     if (audio) {
       audio.pause();
       audio.currentTime = 0;
     }
-    stopRecordingIfActive();
+    window.audioModule.stopRecordingIfActive();
   } catch {}
-  chunks = [];
-  finalBlob = null;
+  window.chunks = [];
+  window.finalBlob = null;
   downloadBtn.disabled = true;
   recStatus.textContent = "Dismissed. Ready.";
   setDuringRecordingUI(false);
@@ -1186,341 +341,38 @@ dismissBtn?.addEventListener("click", () => {
 
 // ------------------ Volume slider wiring ------------------
 volumeSlider?.addEventListener("input", async () => {
-  await ensureGraphOnGesture();
-  setVolumeFromSlider();
+  await window.audioModule.ensureGraphOnGesture();
+  window.audioModule.setVolumeFromSlider();
   // routing unchanged, element remains audible
 });
 
-// ===================================================================
-// ===================== RECITERS + DEDUP LOGIC ======================
-// ===================================================================
-
-// Complete list (can be extended later)
-const RECITERS = [
-  "AbdulSamad_64kbps_QuranExplorer.Com",
-  "Abdul_Basit_Mujawwad_128kbps",
-  "Abdul_Basit_Murattal_192kbps",
-  "Abdul_Basit_Murattal_64kbps",
-  "Abdullaah_3awwaad_Al-Juhaynee_128kbps",
-  "Abdullah_Basfar_192kbps",
-  "Abdullah_Basfar_32kbps",
-  "Abdullah_Basfar_64kbps",
-  "Abdullah_Matroud_128kbps",
-  "Abdurrahmaan_As-Sudais_192kbps",
-  "Abdurrahmaan_As-Sudais_64kbps",
-  "Abu Bakr Ash-Shaatree_128kbps",
-  "Abu_Bakr_Ash-Shaatree_128kbps",
-  "Abu_Bakr_Ash-Shaatree_64kbps",
-  "Ahmed_Neana_128kbps",
-  "Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net",
-  "Ahmed_ibn_Ali_al-Ajamy_64kbps_QuranExplorer.Com",
-  "Akram_AlAlaqimy_128kbps",
-  "Alafasy_128kbps",
-  "Alafasy_64kbps",
-  "Ali_Hajjaj_AlSuesy_128kbps",
-  "Ali_Jaber_64kbps",
-  "Ayman_Sowaid_64kbps",
-  "Fares_Abbad_64kbps",
-  "Ghamadi_40kbps",
-  "Hani_Rifai_192kbps",
-  "Hani_Rifai_64kbps",
-  "Hudhaify_128kbps",
-  "Hudhaify_32kbps",
-  "Hudhaify_64kbps",
-  "Husary_128kbps",
-  "Husary_128kbps_Mujawwad",
-  "Husary_64kbps",
-  "Husary_Muallim_128kbps",
-  "Husary_Mujawwad_64kbps",
-  "Ibrahim_Akhdar_32kbps",
-  "Ibrahim_Akhdar_64kbps",
-  "Karim_Mansoori_40kbps",
-  "Khaalid_Abdullaah_al-Qahtaanee_192kbps",
-  "MaherAlMuaiqly128kbps",
-  "Maher_AlMuaiqly_64kbps",
-  "Menshawi_16kbps",
-  "Menshawi_32kbps",
-  "Minshawy_Mujawwad_192kbps",
-  "Minshawy_Mujawwad_64kbps",
-  "Minshawy_Murattal_128kbps",
-  "Minshawy_Teacher_128kbps",
-  "Mohammad_al_Tablaway_128kbps",
-  "Mohammad_al_Tablaway_64kbps",
-  "Muhammad_AbdulKareem_128kbps",
-  "Muhammad_Ayyoub_128kbps",
-  "Muhammad_Ayyoub_32kbps",
-  "Muhammad_Ayyoub_64kbps",
-  "Muhammad_Jibreel_128kbps",
-  "Muhammad_Jibreel_64kbps",
-  "Muhsin_Al_Qasim_192kbps",
-  "Mustafa_Ismail_48kbps",
-  "Nabil_Rifa3i_48kbps",
-  "Nasser_Alqatami_128kbps",
-  "Parhizgar_48kbps",
-  "Sahl_Yassin_128kbps",
-  "Salaah_AbdulRahman_Bukhatir_128kbps",
-  "Salah_Al_Budair_128kbps",
-  "Saood bin Ibraaheem Ash-Shuraym_128kbps",
-  "Saood_ash-Shuraym_128kbps",
-  "Saood_ash-Shuraym_64kbps",
-  "Yaser_Salamah_128kbps",
-  "Yasser_Ad-Dussary_128kbps",
-  "ahmed_ibn_ali_al_ajamy_128kbps",
-  "aziz_alili_128kbps",
-  "khalefa_al_tunaiji_64kbps",
-  "mahmoud_ali_al_banna_32kbps",
-];
-
-// ---------- Reciter helpers: bitrate + normalization (FULL) ----------
-function parseBitrate(reciterId) {
-  // Finds "...128kbps" even without underscores (e.g., "MaherAlMuaiqly128kbps")
-  const m = String(reciterId)
-    .toLowerCase()
-    .match(/(\d+)\s*kbps/);
-  return m ? Number(m[1]) : 0;
-}
-
-function stripHostSuffix(str) {
-  // Remove known host/source suffixes that don't define identity
-  return String(str)
-    .replace(/_?QuranExplorer\.Com$/i, "")
-    .replace(/_?ketaballah\.net$/i, "");
-}
-
-function canonicalBase(reciterId) {
-  // 1) Remove host/source suffixes
-  let base = stripHostSuffix(reciterId);
-
-  // 2) Remove the bitrate token (`_128kbps`, `64kbps`, etc.) while keeping style words
-  base = base.replace(/_?\d+\s*kbps/gi, "");
-
-  // 3) Normalize underscores/spaces; trim any trailing separators
-  base = base
-    .replace(/\s+/g, " ")
-    .replace(/_+/g, "_")
-    .replace(/_+$/g, "")
-    .trim();
-
-  // Lower-case for grouping key (labeling handled separately)
-  return base.toLowerCase();
-}
-
-function humanizeReciterId(reciterId) {
-  // Make a readable label; drop hosts; keep style words (Mujawwad, Murattal, Teacher, etc.)
-  let label = stripHostSuffix(reciterId);
-
-  // Remove bitrate token from label text for a cleaner display
-  label = label.replace(/_?\d+\s*kbps/gi, "");
-
-  // Beautify
-  label = label.replace(/_/g, " ").replace(/\s+/g, " ").trim();
-
-  // Basic capitalization fixes for common tokens
-  label = label
-    .replace(/\bkbps\b/gi, "kbps")
-    .replace(/\bMurattal\b/gi, "Murattal")
-    .replace(/\bMujawwad\b/gi, "Mujawwad")
-    .replace(/\bTeacher\b/gi, "Teacher");
-
-  return label;
-}
-
-function pickHighestBitrateReciters(reciters) {
-  // Group by canonical base (same name/style), keep highest bitrate
-  const byBase = new Map();
-
-  for (const rid of reciters) {
-    const base = canonicalBase(rid);
-    const br = parseBitrate(rid);
-
-    const prev = byBase.get(base);
-    if (!prev) {
-      byBase.set(base, { id: rid, bitrate: br });
-      continue;
-    }
-
-    // Prefer the entry with higher bitrate; if tie, prefer the one without host suffix
-    if (br > prev.bitrate) {
-      byBase.set(base, { id: rid, bitrate: br });
-    } else if (br === prev.bitrate) {
-      const prevHasHost = /_?(QuranExplorer\.Com|ketaballah\.net)$/i.test(
-        prev.id
-      );
-      const curHasHost = /_?(QuranExplorer\.Com|ketaballah\.net)$/i.test(rid);
-      if (prevHasHost && !curHasHost) {
-        byBase.set(base, { id: rid, bitrate: br });
-      }
-    }
-  }
-
-  // Return the winning reciter IDs, sorted by readable label
-  const winners = Array.from(byBase.values()).map((v) => v.id);
-  winners.sort((a, b) =>
-    humanizeReciterId(a).localeCompare(humanizeReciterId(b))
-  );
-  return winners;
-}
-
-// ---------- Reciter loader (FULL) ----------
-function loadReciters() {
-  if (!reciterSel) return;
-
-  // Deduplicate by highest bitrate per reciter/style
-  const DEDUPED = pickHighestBitrateReciters(RECITERS);
-
-  const html = DEDUPED.map((rid) => {
-    const label = humanizeReciterId(rid);
-    return `<option value="${rid}">${label}</option>`;
-  }).join("");
-
-  reciterSel.innerHTML = html;
-
-  // Choose a sensible default (try these in order)
-  const preferredOrder = [
-    "Alafasy_128kbps",
-    "Abdurrahmaan_As-Sudais_192kbps",
-    "Maher_AlMuaiqly_64kbps",
-    "MaherAlMuaiqly128kbps",
-  ];
-  const preferred = preferredOrder.find((p) => DEDUPED.includes(p));
-
-  reciterSel.value = preferred || DEDUPED[0];
-
-  // Keep session reciter name aligned for filenames, etc.
-  const opt = reciterSel.options[reciterSel.selectedIndex];
-  sessionReciterName = opt ? opt.text : humanizeReciterId(reciterSel.value);
-}
-
 // ------------------ Init ------------------
 (async () => {
-  await loadMeta();
-  loadReciters(); // populate reciter list with highest-bitrate dedup
+  await window.metadataModule.loadMeta();
+  window.recitersModule.loadReciters(); // populate reciter list with highest-bitrate dedup
 
   // NEW: populate all translation editions
-  await loadTranslations();
+  await window.translationsModule.loadTranslations();
 
-  selectedFont = fontPicker.value;
-  sizePercent = parseInt(textSize.value, 10) || 100;
-  if (textSizeVal) textSizeVal.textContent = `(${sizePercent}%)`;
-  bgColor = bgColorInput.value;
-  fontColor = fontColorInput.value;
+  window.selectedFont = fontPicker.value;
+  window.sizePercent = parseInt(textSize.value, 10) || 100;
+  if (textSizeVal) textSizeVal.textContent = `(${window.sizePercent}%)`;
+  window.backgroundModule.setBgColor(bgColorInput.value);
+  window.fontColor = fontColorInput.value;
 
   // Keep state aligned with the <select>
-  translationEdition =
-    translationEditionSel?.value || translationEdition || "en.asad";
+  window.translationEdition =
+    translationEditionSel?.value || window.translationEdition || "en.asad";
 
-  showCreditData = !!creditDataChk?.checked;
-  showCreditCreator = !!creditCreatorChk?.checked;
-  applyBgModeUI();
-  await loadBackgroundAssets();
+  window.showCreditData = !!creditDataChk?.checked;
+  window.showCreditCreator = !!creditCreatorChk?.checked;
+  window.backgroundModule.applyBgModeUI();
+  await window.backgroundModule.loadBackgroundAssets();
   setDuringRecordingUI(false);
 
   // Volume UI defaults
   if (volumeVal) volumeVal.textContent = `${volumeSlider?.value || 100}%`;
   audio.volume = (Number(volumeSlider?.value) || 100) / 100;
 
-  requestAnimationFrame(drawPreview);
+  window.drawingModule.drawPreview();
 })();
-
-// ------------------ Translations (populate all editions) ------------------
-async function loadTranslations() {
-  // If there's no <select id="translationEdition">, nothing to do
-  if (!translationEditionSel) return;
-
-  // Temporary UI
-  translationEditionSel.disabled = true;
-  translationEditionSel.innerHTML = `<option value="">Loading translations…</option>`;
-
-  try {
-    // Pull ALL text translations from AlQuran Cloud
-    // Docs: https://api.alquran.cloud/v1/edition?format=text&type=translation
-    const res = await fetchRetry(
-      "https://api.alquran.cloud/v1/edition?format=text&type=translation"
-    );
-    const json = await res.json();
-
-    // The API sometimes returns `data` directly, sometimes nested as `data.editions`
-    const raw = Array.isArray(json?.data)
-      ? json.data
-      : Array.isArray(json?.data?.editions)
-      ? json.data.editions
-      : [];
-
-    // Normalize and sort (by language code, then translator/name)
-    const editions = raw
-      .map((e) => {
-        const id = String(e?.identifier || "").trim(); // e.g., "en.asad"
-        const lang = String(e?.language || "").trim(); // e.g., "en"
-        // Prefer englishName, fall back to name
-        const display = String(e?.englishName || e?.name || "").trim();
-        // Build a clean, informative label
-        // Example:  "EN — Asad (en.asad)"
-        const label = `${lang.toUpperCase()} — ${display || id} (${id})`;
-        return id ? { id, lang, label } : null;
-      })
-      .filter(Boolean)
-      .sort((a, b) =>
-        a.lang === b.lang
-          ? a.label.localeCompare(b.label)
-          : a.lang.localeCompare(b.lang)
-      );
-
-    if (!editions.length) {
-      throw new Error("No translation editions found.");
-    }
-
-    // Fill the <select>
-    translationEditionSel.innerHTML = editions
-      .map((ed) => `<option value="${ed.id}">${ed.label}</option>`)
-      .join("");
-
-    // Choose a sensible default:
-    // 1) Keep previously selected (if still present)
-    // 2) Prefer a known English edition (asad, sahih, muhsin, maududi)
-    // 3) Otherwise first item
-    const current = (
-      translationEditionSel.value ||
-      translationEdition ||
-      ""
-    ).trim();
-
-    const prefer = [
-      "en.asad",
-      "en.sahih",
-      "en.muhammadtaqiuddinkhan",
-      "en.pickthall",
-      "en.yusufali",
-      "en.maududi",
-      "en.mubarakpuri",
-    ];
-    let toSelect = "";
-
-    if (current && editions.some((e) => e.id === current)) {
-      toSelect = current;
-    } else {
-      toSelect =
-        prefer.find((p) => editions.some((e) => e.id === p)) ||
-        editions.find((e) => e.lang === "en")?.id ||
-        editions[0].id;
-    }
-
-    translationEditionSel.value = toSelect;
-    translationEdition = toSelect; // keep the state in sync
-  } catch (err) {
-    console.warn("Failed to load translations:", err);
-
-    // Hard fallback to a minimal set so app keeps working
-    const fallback = [
-      { id: "en.asad", label: "EN — Asad (en.asad)" },
-      { id: "en.sahih", label: "EN — Saheeh International (en.sahih)" },
-      { id: "en.yusufali", label: "EN — Yusuf Ali (en.yusufali)" },
-    ];
-    translationEditionSel.innerHTML = fallback
-      .map((f) => `<option value="${f.id}">${f.label}</option>`)
-      .join("");
-    translationEditionSel.value = "en.asad";
-    translationEdition = "en.asad";
-  } finally {
-    translationEditionSel.disabled = false;
-  }
-}

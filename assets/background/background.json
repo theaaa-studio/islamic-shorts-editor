@@ -1,36 +1,36 @@
 [
     {
-        "src": "assets/background/mecca.jpg",
+        "src": "./assets/background/mecca.jpg",
         "type": "image",
         "name": "Mecca"
     },
     {
-        "src": "assets/background/medina.jpg",
+        "src": "./assets/background/medina.jpg",
         "type": "image",
         "name": "Medina"
     },
     {
-        "src": "assets/background/mecca.mp4",
+        "src": "./assets/background/mecca.mp4",
         "type": "video",
         "name": "Mecca Video"
     },
     {
-        "src": "assets/background/medina.mp4",
+        "src": "./assets/background/medina.mp4",
         "type": "video",
         "name": "Medina Video"
     },
     {
-        "src": "assets/background/quran.mp4",
+        "src": "./assets/background/quran.mp4",
         "type": "video",
         "name": "Quran Video"
     },
     {
-        "src": "assets/background/salat.mp4",
+        "src": "./assets/background/salat.mp4",
         "type": "video",
         "name": "Salat Video"
     },
     {
-        "src": "assets/background/sejda.mp4",
+        "src": "./assets/background/sejda.mp4",
         "type": "video",
         "name": "Sejda Video"
     }
