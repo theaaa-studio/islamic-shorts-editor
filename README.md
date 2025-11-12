@@ -1,123 +1,242 @@
 # Quran Shorts – Editor
 
-Quran Shorts – Editor is a single-page, browser-only production assistant for crafting 9:16 Qur'an shorts that pair EveryAyah recitations with on-canvas translations. The app renders everything client-side (no build step), captures the canvas + audio via MediaRecorder, and exports a ready-to-upload WebM clip. The root document wires Google Fonts, CSS, and scripts in `index.html:1`, while UI panels are injected dynamically so the page stays lean.
+I started this project after noticing how many channels were beautifully sharing short clips of Qur’ān āyāt to spread dīn worldwide. It inspired me to think: _what if I could build an editor to make it easier for anyone to create these?_ Software development is simply the skill Allah blessed me with, and this is my small, humble effort to use it for His sake — to help others share His words with clarity and care.
+
+---
+
+## Table of Contents
+
+- [Highlights](#highlights)
+- [Tech & External Services](#tech--external-services)
+- [Repository Layout](#repository-layout)
+- [Requirements](#requirements)
+- [Quick Start](#quick-start)
+- [Using the Editor](#using-the-editor)
+- [Managing Background Media](#managing-background-media)
+- [Exported Files](#exported-files)
+- [Customization & Development Notes](#customization--development-notes)
+- [Troubleshooting](#troubleshooting)
+- [Respectful Usage & Credits](#respectful-usage--credits)
+- [License](#license)
+- [Note on Generated Videos & Data Source Licenses](#note-on-generated-videos--data-source-licenses)
+
+---
 
 ## Highlights
 
-- **Dynamic verse & translation data** – Surah metadata (English + Arabic names and ayah counts) is fetched from AlQuran Cloud and Quran.com as soon as the app loads, keeping the Surah/Ayah selectors in sync (`assets/js/metadata.js:4`, `assets/js/metadata.js:39`). The translation dropdown is populated with every available text edition with graceful fallbacks, so creators can target any supported language (`assets/js/translations.js:1`).
+- 🎚️ **Dynamic verse & translation data** — Surah metadata (English/Arabic names, ayah counts) is fetched at load from AlQuran Cloud and Quran.com to keep the Surah/Ayah selectors in sync (`assets/js/metadata.js:4`, `:39`). All available text editions populate the translation menu with graceful fallbacks (`assets/js/translations.js:1`).
 
-- **Audio curated for quality** – Hundreds of EveryAyah reciter folders are deduped and de-hosted so that only the highest bitrate rendition per style shows up in the UI, giving users a clean list without confusing duplicates (`assets/js/reciters.js:135`).
+- 🎙️ **Audio curated for quality** — Hundreds of EveryAyah reciter folders are deduped/de‑hosted; the UI lists only the highest‑bitrate rendition per style (`assets/js/reciters.js:135`).
 
-- **Backgrounds, typography, and credits in one place** – Sidebar panels define controls for color/media backgrounds, typography, and attribution badges (`assets/html/background-panel.html:1`, `assets/html/typography-panel.html:1`, `assets/html/credits-panel.html:1`). The corresponding modules merge those settings into the live canvas (`assets/js/background.js:52`, `assets/js/drawing.js:105`).
+- 🎨 **Backgrounds, typography, credits** — Sidebar panels control color/media backgrounds, font choices, and attribution badges (`assets/html/background-panel.html:1`, `assets/html/typography-panel.html:1`, `assets/html/credits-panel.html:1`). Modules merge these settings into the canvas (`assets/js/background.js:52`, `assets/js/drawing.js:105`).
 
-- **Canvas-first preview with live redraw** – A 1080×1920 canvas is redrawn every animation frame, applying the current translation text, selected font, badges, and either a color fill or media texture (`assets/js/drawing.js:105`). Background images/videos default to the curated JSON list but can also include in-session uploads handled in `assets/js/app.js:358`.
+- 🖼️ **Canvas‑first, live redraw** — A **1080×1920** canvas re‑renders every animation frame with current text, fonts, badges, and color/media fill. Curated media + in‑session uploads are supported (`assets/js/app.js:358`).
 
-- **One-click recording and export** – The MediaRecorder pipeline, built on top of the Web Audio graph and canvas capture stream, mixes the remote recitation with the rendered video frame-by-frame (`assets/js/audio.js:2`, `assets/js/audio.js:53`, `assets/js/audio.js:98`, `assets/js/audio.js:203`). Exports receive descriptive filenames that combine surah, ayah range, reciter, and timestamp (`assets/js/app.js:307`).
+- ⏺️ **One‑click recording & export** — Web Audio + `captureStream` feeds **MediaRecorder** to mix recitation and frames in sync (`assets/js/audio.js:2`, `:53`, `:98`, `:203`). Exports get descriptive filenames (surah, ayah range, reciter, timestamp) (`assets/js/app.js:307`).
 
-- **Modular HTML and theming** – Panels are plain HTML fragments stored under `assets/html/` and inserted with a lightweight partial loader (`assets/js/html-loader.js:3`, `assets/js/html-loader.js:17`). A simple dark/light toggle hooks into CSS variables so the editor works comfortably in bright and dim environments (`assets/js/theme.js:2`, `assets/css/theme.css:1`).
+- 🧩 **Modular HTML & theming** — UI panels are HTML partials loaded at runtime (`assets/js/html-loader.js:3`, `:17`). Light/dark toggle is a simple CSS‑variables switch with persistence (`assets/js/theme.js:2`, `assets/css/theme.css:1`).
+
+> The root page (`index.html:1`) wires Google Fonts, CSS, and all scripts. Panels are injected dynamically to keep markup lean.
+
+---
 
 ## Tech & External Services
 
-- Vanilla HTML + modular CSS (`assets/css/styles.css:1` imports the rest) and plain JavaScript—no bundler, transpiler, or package manager required.
+- Vanilla HTML + modular CSS (`assets/css/styles.css:1` imports the rest) + plain JavaScript — **no bundlers or package managers**.
 - Live data from:
-  - `https://api.alquran.cloud` (metadata + translations)
-  - `https://api.quran.com/api/v4/chapters` (English chapter names)
-  - `https://everyayah.com` (reciter MP3 files)
-- Google Fonts are included via `<link>` tags in `index.html:9`, covering both Latin and Arabic-friendly families.
-- Browser APIs used: `fetch`, `CanvasRenderingContext2D`, `MediaRecorder`, `captureStream`, and Web Audio (`AudioContext` + `MediaStreamDestination`).
+
+  - `https://api.alquran.cloud` — metadata & translations
+  - `https://api.quran.com/api/v4/chapters` — English chapter names
+  - `https://everyayah.com` — reciter MP3 files
+
+- Google Fonts via `<link>` in `index.html:9` (Latin + Arabic‑friendly families).
+- Browser APIs: `fetch`, `CanvasRenderingContext2D`, `MediaRecorder`, `HTMLCanvasElement.captureStream`, Web Audio (`AudioContext`, `MediaStreamDestination`).
+
+---
 
 ## Repository Layout
 
-| Path                                                                                    | Purpose                                                                                                                   |
-| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `index.html:1`                                                                          | Entry point; loads fonts, CSS bundles, HTML partial loader, and all app scripts.                                          |
-| `assets/css/`                                                                           | Layered styles (variables, layout, panels, preview, responsive tweaks). `assets/css/styles.css:1` stitches them together. |
-| `assets/html/*.html`                                                                    | Sidebar + preview fragments loaded at runtime so the markup stays modular.                                                |
-| `assets/js/app.js:25`                                                                   | DOM wiring, state management, and event listeners for every control.                                                      |
-| `assets/js/audio.js:203`                                                                | Playback engine, Web Audio routing, MediaRecorder handling, and playlist progression.                                     |
-| `assets/js/background.js:52`                                                            | Background mode, asset loading from JSON, and user-upload handling.                                                       |
-| `assets/js/drawing.js:105`                                                              | Canvas renderer for subtitles, labels, credits, and drop shadows.                                                         |
-| `assets/js/metadata.js:4` / `assets/js/translations.js:1` / `assets/js/reciters.js:135` | Data ingestion modules for surahs, translations, and reciters.                                                            |
-| `assets/background/background.json:1`                                                   | Source of curated background images/videos; edit to ship new media with the project.                                      |
-| `assets/background/*`                                                                   | Actual media files referenced by the JSON list (images + mp4 loops).                                                      |
-| `assets/js/utils.js:1`                                                                  | Helpers (`$`, `fetchRetry`, padding, timestamps) used across modules.                                                     |
+| Path                                                                                    | Purpose                                                                                                            |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `index.html:1`                                                                          | Entry point; loads fonts, CSS bundles, partial loader, and all app scripts.                                        |
+| `assets/css/`                                                                           | Layered styles (variables, layout, panels, preview, responsive). `assets/css/styles.css:1` stitches them together. |
+| `assets/html/*.html`                                                                    | Sidebar + preview fragments loaded at runtime to keep markup modular.                                              |
+| `assets/js/app.js:25`                                                                   | DOM wiring, state management, event listeners for controls.                                                        |
+| `assets/js/audio.js:203`                                                                | Playback engine, Web Audio routing, MediaRecorder handling, playlist progression.                                  |
+| `assets/js/background.js:52`                                                            | Background mode, asset loading from JSON, user‑upload handling.                                                    |
+| `assets/js/drawing.js:105`                                                              | Canvas renderer for subtitles, labels, credits, drop shadows.                                                      |
+| `assets/js/metadata.js:4` / `assets/js/translations.js:1` / `assets/js/reciters.js:135` | Data ingestion for surahs, translations, reciters.                                                                 |
+| `assets/background/background.json:1`                                                   | Curated background images/videos list.                                                                             |
+| `assets/background/*`                                                                   | Media files referenced by the JSON list (images + mp4 loops).                                                      |
+| `assets/js/utils.js:1`                                                                  | Helpers (`$`, `fetchRetry`, padding, timestamps).                                                                  |
+
+---
 
 ## Requirements
 
-1. A modern Chromium-based browser (Chrome/Edge 118+, Brave, Arc, etc.). Safari’s MediaRecorder is limited and may not export correctly.
-2. A local HTTP server (Python, Node, or any static server). Fetching HTML partials and JSON files will fail over `file://` URLs because of browser security (`assets/js/html-loader.js:3`).
-3. Stable network connection for API calls and reciter audio.
-4. Optional: FFmpeg or another transcoder if you plan to convert the exported WebM into MP4 for social platforms.
+1. A modern Chromium‑based browser (Chrome/Edge 118+, Brave, Arc, etc.). _Safari’s MediaRecorder is limited and may not export reliably._
+2. Serve locally over **HTTP** (Python/Node/any static server). Fetching partials/JSON fails on `file://` due to browser security (`assets/js/html-loader.js:3`).
+3. Stable network for API calls and reciter audio.
+4. Optional: **FFmpeg** to convert WebM → MP4 for platforms that prefer it.
+
+---
 
 ## Quick Start
 
-1. **Clone or download** the project.
-   ```bash
-   git clone https://github.com/<your-org>/quran-shorts-editor.git
-   cd quran-shorts-editor
-   Serve the folder over HTTP. Choose one of the examples below:
-   ```
+### 1) Clone & serve
 
+```bash
+# Clone
+git clone https://github.com/<your-org>/quran-shorts-editor.git
+cd quran-shorts-editor
+
+# Serve the folder over HTTP
 # Python 3 (Windows PowerShell)
-
 py -m http.server 4173
 
 # Python 3 (macOS/Linux)
-
 python3 -m http.server 4173
 
 # Node.js
-
 npx serve -l 4173
-Open the app at http://localhost:4173 and wait for the “htmlPartialsLoaded” event to populate the sidebar (watch the devtools console if something stays blank).
+```
 
-Grant autoplay/media permissions if prompted. The first click on “Play & Export” or “Load & Play” is the required user gesture so Web Audio can start (assets/js/audio.js (line 13)).
+Open [**http://localhost:4173**](http://localhost:4173) and wait for the `htmlPartialsLoaded` event to populate the sidebar (check DevTools console if anything stays blank).
 
-Optional: Replace or add background assets before serving by editing assets/background/background.json (line 1) and dropping new files under assets/background/.
+Grant autoplay/media permissions if prompted. The first click on **Play & Export** or **Load & Play** provides the user gesture Web Audio needs (`assets/js/audio.js:13`).
 
-Using the Editor
+> **Tip:** Want custom backgrounds? Edit `assets/background/background.json`, then drop files into `assets/background/` before serving.
 
-1. Choose verses & translations
-   Select a Surah, start Ayah, and end Ayah from the first panel (assets/html/input-panel.html (line 3)). The Ayah dropdown limits itself to the chosen Surah’s length (assets/js/metadata.js (line 39)).
-   Pick a reciter; the list already filters by highest bitrate (assets/js/reciters.js (line 135)).
-   Pick a translation edition from the auto-generated list (assets/js/translations.js (line 1)). If an API edition fails, the app falls back to en.asad.
-2. Design the visual layer
-   Background panel lets you switch between a solid color or curated media (assets/html/background-panel.html (line 1)). Color mode simply changes a fill value; media mode reads assets/background/background.json (line 1).
-   Use “Choose files” to add temporary images/videos; the files stay in-memory until you reload (assets/js/app.js (line 358)).
-   Typography panel exposes font, size (25–160% slider), and font color controls (assets/html/typography-panel.html (line 1)). Every change redraws the canvas in real time (assets/js/drawing.js (line 105)).
-3. Credits, theme, and branding
-   Toggle “Made by”, “Data Source”, and “Editor Developer” badges, and supply your name/channel (assets/html/credits-panel.html (line 1)). Badges render as semi-transparent pills in the corners of the canvas.
-   Switch between light/dark themes with the button in the brand header; it updates the data-theme attribute and persists to localStorage (assets/js/theme.js (line 2)).
-4. Playback, recording, and export
-   Play & Export builds the playlist and starts recording (assets/html/playback-panel.html (line 1), assets/js/audio.js (line 203)). The UI locks certain buttons via setDuringRecordingUI (assets/js/app.js (line 132)) so you don’t interrupt the capture.
-   Load & Play streams audio and draws frames without recording (useful for rehearsals).
-   Stop halts playback and resets the ayah index; Dismiss terminates a recording session and clears any pending blobs.
-   The progress meter reflects how many ayat are left (assets/js/audio.js (line 292)), and the status banner guides you through each phase.
-   Once the playlist finishes and MediaRecorder delivers a blob, the Download button activates, letting you save the WebM file (assets/js/app.js (line 307)).
-   Managing background media
-   Curated list: Update assets/background/background.json (line 1) with new { "src": "./assets/background/<file>", "type": "image|video", "name": "Label" } entries. Only the extensions listed in ALLOWED*EXT are accepted (assets/js/background.js (line 5)).
-   Bundled files: Place the actual .jpg / .mp4 files in assets/background/ so the relative paths stay valid.
-   Per-session uploads: Use the file picker in the Background panel. Uploaded blobs get object URLs tracked in window.backgroundModule.userUploads and cleaned up on refresh (assets/js/background.js (line 26), assets/js/app.js (line 358)).
-   Autoplay tips: Videos are muted and looped automatically. If autoplay is blocked, interact with the page once; the code retries playback in bgVideo.play().catch(...) (assets/js/background.js (line 133)).
-   Exported files
-   Format: video/webm (VP9/Opus by default; falls back to whatever MediaRecorder.isTypeSupported allows).
-   Naming pattern: Surah-<number>-<name>\_Ayah-<from>-<to>*<reciter>\_<timestamp>.webm (assets/js/app.js (line 307)).
-   To publish on platforms that prefer MP4, re-encode with FFmpeg: ffmpeg -i input.webm -c:v libx264 -c:a aac output.mp4.
-   Volume slider affects both playback and the recorded mix because it drives the <audio> element and the Web Audio gain node (assets/html/preview.html (line 15), assets/js/audio.js (line 2)).
-   Customization & development notes
-   Add fonts: Extend the <link> blocks in index.html (line 9) and populate more <option> tags in assets/html/typography-panel.html (line 5).
-   Add reciters: Append new identifiers to RECITERS in assets/js/reciters.js (line 6). The deduper will keep the highest bitrate variant automatically.
-   Change default credits/backgrounds: Update the default state around the global window assignments (assets/js/app.js (line 86)) and the initial background mode (assets/js/background.js (line 40)).
-   Extend styling: Each CSS concern has its own file (panels, forms, preview, layout). Add new rules in the relevant file and ensure it’s imported by assets/css/styles.css (line 1).
-   Add panels: Create a new fragment inside assets/html/, include it via loadHTMLPartial in assets/js/html-loader.js (line 13), and wire up the DOM node in initializeDOM (assets/js/app.js (line 25)).
-   Troubleshooting
-   Blank sidebar/preview: The partials likely failed to load because the page was opened via file://. Serve the directory over HTTP so fetch succeeds (assets/js/html-loader.js (line 3)).
-   Audio stalled or muted: Autoplay policies require a user gesture. Click anywhere (e.g., the preview canvas) before pressing Play & Export. Verify that the EveryAyah MP3 URL resolves (check devtools network tab for 403/404) (assets/js/audio.js (line 303)).
-   Download button never enables: MediaRecorder only fires onstop when every ayah in the playlist finishes. Shorten the ayah range or press Dismiss to abort and reset (assets/js/app.js (line 342)).
-   Translation text reads “Translation unavailable”: The selected edition returned a non-200 response. The code automatically tries en.asad; if that also fails, ensure api.alquran.cloud isn’t blocked (assets/js/audio.js (line 303)).
-   Browser not supported: If MediaRecorder or captureStream is undefined, switch to the latest Chrome/Edge or use a desktop instead of mobile. Safari 16 handles canvas capture but still lacks reliable audio mixing (assets/js/audio.js (line 98)).
-   Background uploads disappear: User uploads are stored in-memory only; reloads purge them intentionally to avoid retaining large blobs (assets/js/background.js (line 26)).
-   Respectful usage & credits
-   Audio recitations are streamed from EveryAyah and should be used in line with their terms. Always vet new background media so it remains respectful, as reminded in the upload tooltip (assets/html/background-panel.html (line 36)).
-   Translation and metadata providers (Quran.com, AlQuran Cloud) are credited automatically if you keep the “Data Source” toggle on (assets/html/credits-panel.html (line 11)).
-   Please add an explicit LICENSE file if you plan to open-source or distribute the project; none is present yet.
+---
+
+## Using the Editor
+
+### 1) Choose verses & translations
+
+- Pick a Surah, start Ayah, end Ayah (`assets/html/input-panel.html:3`). The Ayah dropdown constrains to the Surah’s length (`assets/js/metadata.js:39`).
+- Choose a reciter; the list is pre‑filtered to the highest bitrate per style (`assets/js/reciters.js:135`).
+- Select a translation edition (`assets/js/translations.js:1`). If the chosen API edition fails, it falls back to `en.asad`.
+
+### 2) Design the visual layer
+
+- Switch between **Color** and **Media** backgrounds (`assets/html/background-panel.html:1`). Color updates the canvas fill; Media reads `assets/background/background.json`.
+- Use **Choose files** to add temporary images/videos (in‑memory until reload) (`assets/js/app.js:358`).
+- Adjust fonts, size (25–160% slider), and color (`assets/html/typography-panel.html:1`). All changes redraw instantly (`assets/js/drawing.js:105`).
+
+### 3) Credits, theme, and branding
+
+- Toggle **Made by**, **Data Source**, **Editor Developer** badges and set your name/channel (`assets/html/credits-panel.html:1`). Badges render as semi‑transparent corner pills.
+- Light/dark theme button flips `data-theme` and persists to `localStorage` (`assets/js/theme.js:2`).
+
+### 4) Playback, recording, and export
+
+- **Play & Export** builds the playlist and starts recording (`assets/html/playback-panel.html:1`, `assets/js/audio.js:203`). During capture, the UI locks key buttons via `setDuringRecordingUI` (`assets/js/app.js:132`).
+- **Load & Play** previews without recording.
+- **Stop** halts playback; **Dismiss** aborts a recording session and clears pending blobs.
+- Progress shows remaining ayat (`assets/js/audio.js:292`). When `MediaRecorder` fires `onstop`, **Download** becomes available (`assets/js/app.js:307`).
+
+---
+
+## Managing Background Media
+
+**Curated list** — Add entries to `assets/background/background.json`:
+
+```json
+{ "src": "./assets/background/<file>", "type": "image|video", "name": "Label" }
+```
+
+Only extensions in `ALLOWED_EXT` are accepted (`assets/js/background.js:5`).
+
+**Bundled files** — Place `.jpg` / `.mp4` in `assets/background/` to keep relative paths valid.
+
+**Per‑session uploads** — Use the picker in the Background panel. Blobs get object URLs, tracked in `window.backgroundModule.userUploads`, and cleaned up on refresh (`assets/js/background.js:26`, `assets/js/app.js:358`).
+
+**Autoplay tips** — Videos are muted + looped. If autoplay is blocked, interact once; playback retries in `bgVideo.play().catch(...)` (`assets/js/background.js:133`).
+
+---
+
+## Exported Files
+
+- **Format:** `video/webm` (VP9/Opus by default; falls back per `MediaRecorder.isTypeSupported`).
+- **Filename:** `Surah-<number>-<name>_Ayah-<from>-<to>_<reciter>_<timestamp>.webm` (`assets/js/app.js:307`).
+- **Convert to MP4 (optional):**
+
+```bash
+ffmpeg -i input.webm -c:v libx264 -c:a aac output.mp4
+```
+
+- **Volume:** Slider affects playback **and** the recorded mix (drives `<audio>` + Web Audio gain) (`assets/html/preview.html:15`, `assets/js/audio.js:2`).
+
+---
+
+## Customization & Development Notes
+
+- **Add fonts** — Extend `<link>` tags in `index.html:9`; add more `<option>`s in `assets/html/typography-panel.html:5`.
+- **Add reciters** — Append identifiers to `RECITERS` in `assets/js/reciters.js:6`; the deduper keeps the highest bitrate.
+- **Change defaults** — Tweak global defaults (`assets/js/app.js:86`) and initial background mode (`assets/js/background.js:40`).
+- **Extend styling** — Each concern has its own CSS file; ensure imports flow through `assets/css/styles.css:1`.
+- **Add panels** — Create an HTML fragment in `assets/html/`, include via `loadHTMLPartial` (`assets/js/html-loader.js:13`), and wire in `initializeDOM` (`assets/js/app.js:25`).
+
+---
+
+## Troubleshooting
+
+- **Blank sidebar/preview** — Opened via `file://`? Serve over HTTP so `fetch` works (`assets/js/html-loader.js:3`).
+- **Audio stalled/muted** — Provide a user gesture (click the canvas) before **Play & Export**. Confirm the EveryAyah MP3 URL resolves (check for 403/404) (`assets/js/audio.js:303`).
+- **Download never enables** — `MediaRecorder` fires `onstop` only after all ayat finish. Shorten the range or use **Dismiss** to abort (`assets/js/app.js:342`).
+- **“Translation unavailable”** — Edition returned a non‑200. The app tries `en.asad`; if that fails, ensure `api.alquran.cloud` isn’t blocked (`assets/js/audio.js:303`).
+- **Browser not supported** — If `MediaRecorder`/`captureStream` is missing, try latest Chrome/Edge or desktop. Safari 16 captures canvas but audio mixing is unreliable (`assets/js/audio.js:98`).
+- **Background uploads disappear** — In‑memory by design; reload purges blobs (`assets/js/background.js:26`).
+
+---
+
+## Respectful Usage & Credits
+
+- Recitations stream from **EveryAyah** — follow their terms. Please vet background media for respectful presentation (see upload tooltip `assets/html/background-panel.html:36`).
+- Translation/metadata providers (**Quran.com**, **AlQuran Cloud**) are credited automatically when the **Data Source** toggle is on (`assets/html/credits-panel.html:11`).
+
+---
+
+## License
+
+**My intent (plain English):**
+
+- ✅ Anyone can **use, copy, modify, and share** this editor.
+- ✅ You can **contribute improvements** — please keep copyright and license notices intact.
+- ❌ **Do not sell** this software, offer it as a paid service, or repackage it and claim it as your own.
+- ❌ **No misrepresentation** of authorship.
+
+To reflect that intent, the code is licensed under the **PolyForm Noncommercial License 1.0.0**.
+
+> Add a `LICENSE` file at the repo root with the verbatim text: [https://polyformproject.org/licenses/noncommercial/1.0.0/](https://polyformproject.org/licenses/noncommercial/1.0.0/)
+>
+> Note: PolyForm Noncommercial is **not** OSI‑approved open source because it **disallows commercial use**. That’s intentional to prevent resale while still enabling broad community use and updates.
+
+### If you want a different policy later
+
+You can switch or dual‑license in the future (e.g., keep Noncommercial for most users and grant paid commercial licenses by exception). If you want to open it fully for businesses, consider one of the alternatives below.
+
+---
+
+### Common license options (quick guide)
+
+- **MIT / Apache‑2.0** → Most permissive for software. ✔ Commercial use and resale allowed (with attribution; Apache also includes patent terms). Use if you want maximum adoption, including commercial.
+- **GPL‑3.0** → Strong **copyleft**. ✔ Commercial use allowed, but **derivatives must also be open‑sourced under GPL**. Use if you want improvements to stay open.
+- **BSL 1.1 (Business Source)** → **Source‑available** with a time‑delayed switch to an OSI license; **production/commercial** use restricted until the change date. Use if you want a path to open source later.
+- **CC BY‑NC 4.0** → Good for **content** (not code). Non‑commercial only, attribution required. Use for bundled **media/templates**, not for the software itself.
+- **CC0 / Unlicense** → Public‑domain‑equivalent. ✔ Anything goes, including resale. Use only if you want zero restrictions.
+- **PolyForm Noncommercial 1.0.0** _(chosen)_ → **Non‑commercial** use, modification, and sharing allowed; **no selling** or paid services; keep notices and don’t misrepresent authorship.
+
+---
+
+## Note on Generated Videos & Data Source Licenses
+
+The **Noncommercial** license applies **only to this codebase**. Your exported videos include content from **EveryAyah**, **Quran.com**, and **AlQuran Cloud** and are governed by **their** licenses/policies.
+
+**In practice:**
+
+- ▶️ The editor’s Noncommercial clause does **not automatically** restrict your video outputs.
+- ⚖️ You **must** follow each source’s terms for redistribution, attribution, and monetization.
+- 💡 If the sources allow it, you **may publish or monetize** your exported videos — even though the editor itself is non‑commercial software.
+
+When in doubt, please review the current terms on EveryAyah, Quran.com, and AlQuran Cloud before publishing.
