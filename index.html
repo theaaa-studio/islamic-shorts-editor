@@ -34,6 +34,7 @@
     <script src="assets/js/reciters.js"></script>
     <script src="assets/js/translations.js"></script>
     <script src="assets/js/audio.js"></script>
+    <script src="assets/js/html-loader.js"></script>
     <script src="assets/js/app.js" defer></script>
   </head>
   <body>
@@ -42,373 +43,45 @@
       <aside class="sidebar">
         <!-- SECTION: Brand/Header -->
         <!-- Source: assets/html/brand.html -->
-        <div class="brand">
-          <div class="logo"></div>
-          <div>
-            <p class="title">Quran Shorts — Editor</p>
-            <p class="subtitle">Spread the message of Quran in short videos.</p>
-          </div>
-          <!-- Theme toggle placed on the same brand row, aligned to the right -->
-          <button
-            id="themeToggle"
-            class="theme-toggle"
-            title="Toggle light / dark theme"
-            aria-pressed="false"
-          >
-            🌙
-          </button>
+        <div id="brand-container">
+          <!-- Loading... -->
         </div>
 
         <!-- SECTION: Input Panel -->
         <!-- Source: assets/html/input-panel.html -->
-        <div class="panel">
-          <h3>Choose</h3>
-          <div class="three-col">
-            <div class="field">
-              <label class="small" for="surah">Surah</label>
-              <select id="surah"></select>
-            </div>
-            <div class="field">
-              <label class="small" for="ayahStart">Start Ayah</label>
-              <select id="ayahStart"></select>
-            </div>
-            <div class="field">
-              <label class="small" for="ayahEnd">End Ayah</label>
-              <select id="ayahEnd"></select>
-            </div>
-          </div>
-
-          <div class="two-col-inline">
-            <div class="field">
-              <label class="small" for="reciter">Reciter (Arabic)</label>
-              <select id="reciter">
-                <option value="Abdul_Basit_Mujawwad_128kbps">
-                  Abdul Basit — Mujawwad (Arabic)
-                </option>
-                <option value="Alafasy_128kbps">
-                  Mishary Alafasy (Arabic)
-                </option>
-                <option value="Husary_128kbps">
-                  Mahmoud Khalil Al-Husary (Arabic)
-                </option>
-                <option value="Hudhaify_128kbps">
-                  Ali Al-Hudhaify (Arabic)
-                </option>
-                <option value="Minshawi_Mujawwad_128kbps">
-                  Mohamed S. El-Minshawi (Arabic)
-                </option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label class="small" for="translationEdition"
-                >Translation (text)</label
-              >
-              <select id="translationEdition">
-                <option value="en.asad">English — Muhammad Asad</option>
-                <option value="en.sahih">English — Sahih International</option>
-                <option value="en.pickthall">English — Pickthall</option>
-                <option value="en.yusufali">English — Yusuf Ali</option>
-                <option value="bn.bengali">
-                  Bengali — Bengali Translation
-                </option>
-                <option value="ur.jalandhry">
-                  Urdu — Fateh Muhammad Jalandhry
-                </option>
-                <option value="id.indonesian">
-                  Indonesian — Bahasa Indonesia
-                </option>
-                <option value="fr.hamidullah">
-                  French — Muhammad Hamidullah
-                </option>
-              </select>
-            </div>
-          </div>
+        <div id="input-panel-container">
+          <!-- Loading... -->
         </div>
 
         <!-- SECTION: Background Panel -->
         <!-- Source: assets/html/background-panel.html -->
-        <div class="panel background-panel">
-          <h3>Background</h3>
-          <div class="inline-row">
-            <!-- Mode toggles -->
-            <label class="toggle" title="Use a solid background color">
-              <input
-                type="radio"
-                name="bgMode"
-                value="color"
-                id="bgModeColor"
-                checked
-              />
-              <span>Solid Color</span>
-            </label>
-
-            <label
-              class="toggle"
-              title="Use image/video from assets/background"
-            >
-              <input
-                type="radio"
-                name="bgMode"
-                value="media"
-                id="bgModeMedia"
-              />
-              <span>Media (image/video)</span>
-            </label>
-
-            <!-- Solid color picker (shown when 'color' is selected) -->
-            <div class="field" id="bgColorField">
-              <label class="small" for="bgColor">Background Color</label>
-              <input id="bgColor" type="color" value="#FBEEE8" />
-            </div>
-
-            <!-- Media selector (shown when 'media' is selected) -->
-            <div class="field" id="bgMediaField" style="display: none">
-              <label class="small" for="bgMediaSelect"
-                >Choose Background (Image/Video)</label
-              >
-              <select id="bgMediaSelect"></select>
-              <span class="hint" id="bgMediaHint"
-                >Using configured media list.</span
-              >
-
-              <label
-                for="bgUploadInput"
-                class="file-trigger"
-                title="Note: Do not upload anything that can disrespect Quran. Remember Allah is always watching."
-              >
-                <!-- tiny upload icon -->
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M12 3v12m0 0l-4-4m4 4l4-4"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                  <path
-                    d="M19 15v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                </svg>
-                Choose files
-              </label>
-
-              <!-- keep the same ID so existing JS continues to work -->
-              <input
-                id="bgUploadInput"
-                class="visually-hidden"
-                type="file"
-                accept="image/*,video/*"
-                multiple
-              />
-            </div>
-          </div>
+        <div id="background-panel-container">
+          <!-- Loading... -->
         </div>
 
         <!-- SECTION: Typography Panel -->
         <!-- Source: assets/html/typography-panel.html -->
-        <div class="panel">
-          <h3>Typography</h3>
-          <div class="four-col-inline">
-            <div class="field">
-              <label class="small" for="fontPicker">Font Style</label>
-              <select id="fontPicker">
-                <option value="Inter, sans-serif">Inter</option>
-                <option value="Poppins, sans-serif">Poppins</option>
-                <option value="Lora, serif">Lora</option>
-                <option value="Merriweather, serif">Merriweather</option>
-                <option value="Nunito, sans-serif">Nunito</option>
-                <option value="Roboto Slab, serif">Roboto Slab</option>
-
-                <option value="Montserrat, sans-serif">Montserrat</option>
-                <option value="Open Sans, sans-serif">Open Sans</option>
-                <option value="Source Sans 3, sans-serif">Source Sans 3</option>
-                <option value="Work Sans, sans-serif">Work Sans</option>
-                <option value="Raleway, sans-serif">Raleway</option>
-                <option value="Lato, sans-serif">Lato</option>
-                <option value="Oswald, sans-serif">Oswald</option>
-                <option value="Ubuntu, sans-serif">Ubuntu</option>
-                <option value="PT Sans, sans-serif">PT Sans</option>
-                <option value="Karla, sans-serif">Karla</option>
-                <option value="Rubik, sans-serif">Rubik</option>
-                <option value="Heebo, sans-serif">Heebo</option>
-                <option value="Barlow, sans-serif">Barlow</option>
-                <option value="Manrope, sans-serif">Manrope</option>
-                <option value="Space Grotesk, sans-serif">Space Grotesk</option>
-                <option value="Fira Sans, sans-serif">Fira Sans</option>
-
-                <option value="Playfair Display, serif">
-                  Playfair Display
-                </option>
-                <option value="DM Serif Text, serif">DM Serif Text</option>
-                <option value="Libre Baskerville, serif">
-                  Libre Baskerville
-                </option>
-                <option value="PT Serif, serif">PT Serif</option>
-
-                <option value="Quicksand, sans-serif">Quicksand</option>
-
-                <option value="Space Mono, monospace">Space Mono</option>
-                <option value="Fira Code, monospace">Fira Code</option>
-                <option value="JetBrains Mono, monospace">
-                  JetBrains Mono
-                </option>
-
-                <option value="Amiri, serif">Amiri</option>
-                <option value="Scheherazade New, serif">
-                  Scheherazade New
-                </option>
-                <option value="Cairo, sans-serif">Cairo</option>
-                <option value="Changa, sans-serif">Changa</option>
-                <option value="Reem Kufi, sans-serif">Reem Kufi</option>
-                <option value="Noto Naskh Arabic, serif">
-                  Noto Naskh Arabic
-                </option>
-                <option value="Noto Kufi Arabic, sans-serif">
-                  Noto Kufi Arabic
-                </option>
-                <option value="IBM Plex Sans Arabic, sans-serif">
-                  IBM Plex Sans Arabic
-                </option>
-                <option value="Tajawal, sans-serif">Tajawal</option>
-                <option value="El Messiri, sans-serif">El Messiri</option>
-                <option value="Markazi Text, serif">Markazi Text</option>
-                <option value="Lateef, serif">Lateef</option>
-                <option value="Harmattan, sans-serif">Harmattan</option>
-              </select>
-            </div>
-            <div class="field">
-              <label class="small" for="textSize"
-                >Font Size
-                <span id="textSizeVal" class="name-chip">(100%)</span></label
-              >
-              <input
-                id="textSize"
-                type="range"
-                min="25"
-                max="160"
-                step="5"
-                value="100"
-              />
-            </div>
-            <div class="field">
-              <label class="small" for="fontColor">Font Color</label>
-              <input id="fontColor" type="color" value="#1f1f1f" />
-            </div>
-          </div>
+        <div id="typography-panel-container">
+          <!-- Loading... -->
         </div>
 
         <!-- SECTION: Credits Panel -->
         <!-- Source: assets/html/credits-panel.html -->
-        <div class="panel">
-          <h3>Credits</h3>
-          <div class="four-col-inline">
-            <div class="field">
-              <label class="small" for="madeByInput">Made by (name)</label>
-              <input
-                id="madeByInput"
-                type="text"
-                placeholder="Your name or channel"
-                value=""
-              />
-            </div>
-            <label class="toggle" title="Show a Made by badge">
-              <input type="checkbox" id="creditMadeBy" checked />
-              <span>Made by</span>
-            </label>
-            <label
-              class="toggle"
-              title="Show attribution to data/audio providers"
-            >
-              <input type="checkbox" id="creditData" checked />
-              <span>Data Source</span>
-            </label>
-            <label class="toggle" title="Show your creator tag">
-              <input type="checkbox" id="creditCreator" checked />
-              <span>Editor Developer</span>
-            </label>
-          </div>
+        <div id="credits-panel-container">
+          <!-- Loading... -->
         </div>
 
         <!-- SECTION: Playback & Export Panel -->
         <!-- Source: assets/html/playback-panel.html -->
-        <div class="panel">
-          <h3>Playback & Export</h3>
-          <div class="transport">
-            <button id="buildPreviewBtn" class="btn ghost">
-              Play & Export
-            </button>
-            <!-- ✅ ADD: Dismiss button -->
-            <button id="dismissBtn" class="btn ghost" disabled>Dismiss</button>
-            <button id="downloadBtn" class="btn ghost" disabled>
-              Download (WebM)
-            </button>
-          </div>
-
-          <div class="two-col-inline">
-            <!-- <div class="status" id="status">Ready.</div> -->
-            <div class="status" id="recStatus">
-              Press Play & Export to preview & auto-record. Avoid the right
-              audio controller during recording.
-            </div>
-          </div>
-          <div class="meter"><span id="meterBar"></span></div>
+        <div id="playback-panel-container">
+          <!-- Loading... -->
         </div>
       </aside>
 
       <!-- SECTION: Preview Section -->
       <!-- Source: assets/html/preview.html -->
-      <main class="preview">
-        <div class="preview-stage">
-          <canvas
-            id="previewCanvas"
-            width="1080"
-            height="1920"
-            aria-label="Shorts Preview"
-          ></canvas>
-        </div>
-
-        <div class="preview-controls">
-          <div class="preview-buttons">
-            <button id="previewPlayBtn" class="btn ghost">Load & Play</button>
-            <button id="previewStopBtn" class="btn ghost">Stop</button>
-          </div>
-
-          <!-- ✅ ADD: Volume control row -->
-          <div class="preview-volume">
-            <label for="volumeSlider" class="small" style="color: var(--muted)"
-              >Volume</label
-            >
-            <input
-              id="volumeSlider"
-              type="range"
-              min="0"
-              max="100"
-              value="100"
-            />
-            <span id="volumeVal" class="small" style="color: var(--muted)"
-              >100%</span
-            >
-          </div>
-
-          <div id="audioErrorMessage" class="audio-error-message"></div>
-        </div>
-
-        <audio
-          id="audioPlayer"
-          controls
-          preload="metadata"
-          style="display: none"
-        ></audio>
-        <a
-          href="https://theaaa-studio.github.io/AAA_Personal_Portfolio/"
-          target="_blank"
-          class="version-info"
-        >
-          Version 1.0 • <span class="dev-name">Developed by TheAAA</span> • 2025
-        </a>
+      <main id="preview-container" class="preview">
+        <!-- Loading... -->
       </main>
     </div>
   </body>

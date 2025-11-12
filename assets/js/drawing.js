@@ -103,9 +103,10 @@ function drawMediaCover(ctx, mediaEl, W, H) {
 }
 
 function drawPreview() {
-  const previewCanvas = $("#previewCanvas");
+  const previewCanvas = window.previewCanvas || $("#previewCanvas");
   if (!previewCanvas) return;
-  const pctx = previewCanvas.getContext("2d");
+  const pctx = window.pctx || previewCanvas.getContext("2d");
+  if (!pctx) return;
   const W = previewCanvas.width,
     H = previewCanvas.height;
 

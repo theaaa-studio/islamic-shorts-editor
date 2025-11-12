@@ -1,46 +1,83 @@
 // ------------------ DOM ------------------
-const reciterSel = $("#reciter");
-const surahSel = $("#surah");
-const ayahStartSel = $("#ayahStart");
-const ayahEndSel = $("#ayahEnd");
-const fontPicker = $("#fontPicker");
-const textSize = $("#textSize");
-const textSizeVal = $("#textSizeVal");
+// DOM elements will be initialized after HTML partials are loaded
+let reciterSel,
+  surahSel,
+  ayahStartSel,
+  ayahEndSel,
+  fontPicker,
+  textSize,
+  textSizeVal;
+let bgColorInput, fontColorInput;
+let translationEditionSel;
+let creditDataChk, creditCreatorChk, madeByInput, creditMadeByChk;
+let bgModeColor,
+  bgModeMedia,
+  bgColorField,
+  bgMediaField,
+  bgMediaSelect,
+  bgMediaHint,
+  bgUploadInput;
+let previewCanvas, pctx;
+let buildPreviewBtn, downloadBtn, previewPlayBtn, dismissBtn;
+let volumeSlider, volumeVal;
+let audio, recStatus, meterBar;
 
-const bgColorInput = $("#bgColor");
-const fontColorInput = $("#fontColor");
+function initializeDOM() {
+  reciterSel = $("#reciter");
+  surahSel = $("#surah");
+  ayahStartSel = $("#ayahStart");
+  ayahEndSel = $("#ayahEnd");
+  fontPicker = $("#fontPicker");
+  textSize = $("#textSize");
+  textSizeVal = $("#textSizeVal");
 
-const translationEditionSel = $("#translationEdition");
+  bgColorInput = $("#bgColor");
+  fontColorInput = $("#fontColor");
 
-const creditDataChk = $("#creditData");
-const creditCreatorChk = $("#creditCreator");
-const madeByInput = $("#madeByInput");
-const creditMadeByChk = $("#creditMadeBy");
+  translationEditionSel = $("#translationEdition");
 
-const bgModeColor = $("#bgModeColor");
-const bgModeMedia = $("#bgModeMedia");
-const bgColorField = $("#bgColorField");
-const bgMediaField = $("#bgMediaField");
-const bgMediaSelect = $("#bgMediaSelect");
-const bgMediaHint = $("#bgMediaHint");
-const bgUploadInput = $("#bgUploadInput");
+  creditDataChk = $("#creditData");
+  creditCreatorChk = $("#creditCreator");
+  madeByInput = $("#madeByInput");
+  creditMadeByChk = $("#creditMadeBy");
 
-const previewCanvas = $("#previewCanvas");
-const pctx = previewCanvas.getContext("2d");
+  bgModeColor = $("#bgModeColor");
+  bgModeMedia = $("#bgModeMedia");
+  bgColorField = $("#bgColorField");
+  bgMediaField = $("#bgMediaField");
+  bgMediaSelect = $("#bgMediaSelect");
+  bgMediaHint = $("#bgMediaHint");
+  bgUploadInput = $("#bgUploadInput");
 
-const buildPreviewBtn = $("#buildPreviewBtn");
-const downloadBtn = $("#downloadBtn");
-const previewPlayBtn = $("#previewPlayBtn");
-const dismissBtn = $("#dismissBtn");
+  previewCanvas = $("#previewCanvas");
+  if (!previewCanvas) {
+    console.error("previewCanvas not found!");
+    return false;
+  }
+  pctx = previewCanvas.getContext("2d");
 
-// Volume UI
-const volumeSlider = $("#volumeSlider");
-const volumeVal = $("#volumeVal");
+  // Expose canvas and context to drawing module
+  window.previewCanvas = previewCanvas;
+  window.pctx = pctx;
 
-const audio = $("#audioPlayer");
-const recStatus = $("#recStatus");
-const meterBar = $("#meterBar");
-audio.crossOrigin = "anonymous";
+  buildPreviewBtn = $("#buildPreviewBtn");
+  downloadBtn = $("#downloadBtn");
+  previewPlayBtn = $("#previewPlayBtn");
+  dismissBtn = $("#dismissBtn");
+
+  // Volume UI
+  volumeSlider = $("#volumeSlider");
+  volumeVal = $("#volumeVal");
+
+  audio = $("#audioPlayer");
+  recStatus = $("#recStatus");
+  meterBar = $("#meterBar");
+  if (audio) {
+    audio.crossOrigin = "anonymous";
+  }
+
+  return true;
+}
 
 // ------------------ State ------------------
 // Expose state variables to window for module access
@@ -137,63 +174,186 @@ function onAnyInputChange() {
 // Expose to window for metadata module
 window.onAnyInputChange = onAnyInputChange;
 
-[
-  reciterSel,
-  surahSel,
-  ayahStartSel,
-  ayahEndSel,
-  fontPicker,
-  textSize,
-  creditDataChk,
-  creditCreatorChk,
-  bgColorInput,
-  fontColorInput,
-  translationEditionSel,
-]
-  .filter(Boolean)
-  .forEach((el) => {
-    el.addEventListener("change", onAnyInputChange);
-    if (el === textSize) {
-      el.addEventListener("input", () => {
-        window.sizePercent = parseInt(textSize.value, 10) || 100;
-        if (textSizeVal) textSizeVal.textContent = `(${window.sizePercent}%)`;
-      });
+function setupEventListeners() {
+  [
+    reciterSel,
+    surahSel,
+    ayahStartSel,
+    ayahEndSel,
+    fontPicker,
+    textSize,
+    creditDataChk,
+    creditCreatorChk,
+    bgColorInput,
+    fontColorInput,
+    translationEditionSel,
+  ]
+    .filter(Boolean)
+    .forEach((el) => {
+      el.addEventListener("change", onAnyInputChange);
+      if (el === textSize) {
+        el.addEventListener("input", () => {
+          window.sizePercent = parseInt(textSize.value, 10) || 100;
+          if (textSizeVal) textSizeVal.textContent = `(${window.sizePercent}%)`;
+        });
+      }
+    });
+
+  // Color preview
+  bgColorInput?.addEventListener("input", () => {
+    window.backgroundModule.setBgColor(bgColorInput.value);
+  });
+  fontColorInput?.addEventListener("input", () => {
+    window.fontColor = fontColorInput.value;
+  });
+
+  // ------------------ Background mode toggles ------------------
+  bgModeColor?.addEventListener("change", () => {
+    if (bgModeColor.checked) {
+      window.backgroundModule.setBackgroundMode("color");
+      window.backgroundModule.applyBgModeUI();
+    }
+  });
+  bgModeMedia?.addEventListener("change", async () => {
+    if (bgModeMedia.checked) {
+      window.backgroundModule.setBackgroundMode("media");
+      window.backgroundModule.applyBgModeUI();
+      if (!window.backgroundModule.bgMediaList.length)
+        await window.backgroundModule.loadBackgroundAssets();
     }
   });
 
-// Color preview
-bgColorInput?.addEventListener("input", () => {
-  window.backgroundModule.setBgColor(bgColorInput.value);
-});
-fontColorInput?.addEventListener("input", () => {
-  window.fontColor = fontColorInput.value;
-});
-
-// ------------------ Background mode toggles ------------------
-bgModeColor?.addEventListener("change", () => {
-  if (bgModeColor.checked) {
-    window.backgroundModule.setBackgroundMode("color");
-    window.backgroundModule.applyBgModeUI();
+  // Wire up background media select change
+  if (bgMediaSelect) {
+    bgMediaSelect.addEventListener("change", () => {
+      window.backgroundModule.onBgMediaChange();
+    });
   }
-});
-bgModeMedia?.addEventListener("change", async () => {
-  if (bgModeMedia.checked) {
-    window.backgroundModule.setBackgroundMode("media");
-    window.backgroundModule.applyBgModeUI();
-    if (!window.backgroundModule.bgMediaList.length)
-      await window.backgroundModule.loadBackgroundAssets();
+
+  // Wire up background file upload
+  bgUploadInput?.addEventListener("change", (e) => {
+    handleUserFiles(e.target.files);
+  });
+
+  // Wire up surah change to update ayah range
+  if (surahSel) {
+    surahSel.addEventListener("change", () => {
+      window.metadataModule.updateAyahRange();
+    });
   }
-});
 
-// Wire up background media select change
-bgMediaSelect.addEventListener("change", () => {
-  window.backgroundModule.onBgMediaChange();
-});
+  // Wire up playback buttons
+  if (buildPreviewBtn) {
+    buildPreviewBtn.addEventListener("click", async () => {
+      await window.audioModule.ensureGraphOnGesture();
+      window.allowRecording = true;
+      window.audioModule.updateAudioRouting();
+      window.audioModule.setVolumeFromSlider();
+      await window.audioModule.loadAndPlay({ record: true });
+    });
+  }
 
-// Wire up background file upload
-bgUploadInput?.addEventListener("change", (e) => {
-  handleUserFiles(e.target.files);
-});
+  if (previewPlayBtn) {
+    previewPlayBtn.addEventListener("click", async () => {
+      await window.audioModule.ensureGraphOnGesture();
+      window.allowRecording = false;
+      window.audioModule.updateAudioRouting();
+      window.audioModule.setVolumeFromSlider();
+      await window.audioModule.loadAndPlay({ record: false });
+    });
+  }
+
+  // Stop button
+  const previewStopBtn = $("#previewStopBtn");
+  if (previewStopBtn) {
+    previewStopBtn.addEventListener("click", () => {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+        window.index = 0;
+        window.audioModule.updateMeter();
+        window.isPlaying = false;
+        if (window.recorder && window.recorder.state === "recording") {
+          window.audioModule.stopRecordingIfActive();
+        }
+      }
+    });
+  }
+
+  if (audio) {
+    audio.addEventListener("play", async () => {
+      window.isPlaying = true;
+      await window.audioModule.ensureGraphOnGesture();
+      window.audioModule.updateAudioRouting();
+      if (window.allowRecording) window.audioModule.startRecordingIfNeeded();
+    });
+    audio.addEventListener("pause", () => {
+      window.isPlaying = false;
+    });
+    audio.addEventListener("ended", async () => {
+      if (window.index < window.playlist.length - 1) {
+        window.index++;
+        window.audioModule.updateMeter();
+        await window.audioModule.playIndex(window.index, true);
+      } else {
+        window.isPlaying = false;
+        window.audioModule.updateMeter();
+        window.audioModule.stopRecordingIfActive();
+      }
+    });
+  }
+
+  // ------------------ Download recorded WebM ------------------
+  if (downloadBtn) {
+    downloadBtn.addEventListener("click", () => {
+      if (!window.finalBlob) return;
+      const ts = timestampStr();
+      const filename = `Surah-${window.sessionSurah}-${safe(
+        window.sessionSurahName
+      )}_Ayah-${window.sessionFrom}-${window.sessionTo}_${safe(
+        window.sessionReciterName
+      )}_${ts}.webm`;
+      const url = URL.createObjectURL(window.finalBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        a.remove();
+      }, 1000);
+    });
+  }
+
+  // ------------------ Dismiss behavior ------------------
+  if (dismissBtn) {
+    dismissBtn.addEventListener("click", () => {
+      window.wasDismissed = true;
+      try {
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+        window.audioModule.stopRecordingIfActive();
+      } catch {}
+      window.chunks = [];
+      window.finalBlob = null;
+      if (downloadBtn) downloadBtn.disabled = true;
+      if (recStatus) recStatus.textContent = "Dismissed. Ready.";
+      setDuringRecordingUI(false);
+    });
+  }
+
+  // ------------------ Volume slider wiring ------------------
+  if (volumeSlider) {
+    volumeSlider.addEventListener("input", async () => {
+      await window.audioModule.ensureGraphOnGesture();
+      window.audioModule.setVolumeFromSlider();
+      // routing unchanged, element remains audible
+    });
+  }
+}
 
 function handleUserFiles(fileList) {
   if (!fileList || !fileList.length) return;
@@ -243,111 +403,19 @@ function handleUserFiles(fileList) {
 
 // Note: populateSelectFromList is already exposed by background.js module
 
-// Wire up surah change to update ayah range
-surahSel.addEventListener("change", () => {
-  window.metadataModule.updateAyahRange();
-});
-
-// Wire up playback buttons
-buildPreviewBtn.addEventListener("click", async () => {
-  await window.audioModule.ensureGraphOnGesture();
-  window.allowRecording = true;
-  window.audioModule.updateAudioRouting();
-  window.audioModule.setVolumeFromSlider();
-  await window.audioModule.loadAndPlay({ record: true });
-});
-
-previewPlayBtn.addEventListener("click", async () => {
-  await window.audioModule.ensureGraphOnGesture();
-  window.allowRecording = false;
-  window.audioModule.updateAudioRouting();
-  window.audioModule.setVolumeFromSlider();
-  await window.audioModule.loadAndPlay({ record: false });
-});
-
-// Stop button
-const previewStopBtn = $("#previewStopBtn");
-previewStopBtn.addEventListener("click", () => {
-  if (audio) {
-    audio.pause();
-    audio.currentTime = 0;
-    window.index = 0;
-    window.audioModule.updateMeter();
-    window.isPlaying = false;
-    if (window.recorder && window.recorder.state === "recording") {
-      window.audioModule.stopRecordingIfActive();
-    }
-  }
-});
-
-audio.addEventListener("play", async () => {
-  window.isPlaying = true;
-  await window.audioModule.ensureGraphOnGesture();
-  window.audioModule.updateAudioRouting();
-  if (window.allowRecording) window.audioModule.startRecordingIfNeeded();
-});
-audio.addEventListener("pause", () => {
-  window.isPlaying = false;
-});
-audio.addEventListener("ended", async () => {
-  if (window.index < window.playlist.length - 1) {
-    window.index++;
-    window.audioModule.updateMeter();
-    await window.audioModule.playIndex(window.index, true);
-  } else {
-    window.isPlaying = false;
-    window.audioModule.updateMeter();
-    window.audioModule.stopRecordingIfActive();
-  }
-});
-
-// ------------------ Download recorded WebM ------------------
-downloadBtn.addEventListener("click", () => {
-  if (!window.finalBlob) return;
-  const ts = timestampStr();
-  const filename = `Surah-${window.sessionSurah}-${safe(
-    window.sessionSurahName
-  )}_Ayah-${window.sessionFrom}-${window.sessionTo}_${safe(
-    window.sessionReciterName
-  )}_${ts}.webm`;
-  const url = URL.createObjectURL(window.finalBlob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-    a.remove();
-  }, 1000);
-});
-
-// ------------------ Dismiss behavior ------------------
-dismissBtn?.addEventListener("click", () => {
-  window.wasDismissed = true;
-  try {
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-    }
-    window.audioModule.stopRecordingIfActive();
-  } catch {}
-  window.chunks = [];
-  window.finalBlob = null;
-  downloadBtn.disabled = true;
-  recStatus.textContent = "Dismissed. Ready.";
-  setDuringRecordingUI(false);
-});
-
-// ------------------ Volume slider wiring ------------------
-volumeSlider?.addEventListener("input", async () => {
-  await window.audioModule.ensureGraphOnGesture();
-  window.audioModule.setVolumeFromSlider();
-  // routing unchanged, element remains audible
-});
-
 // ------------------ Init ------------------
-(async () => {
+async function initializeApp() {
+  // Wait for HTML partials to be loaded
+  if (!initializeDOM()) {
+    console.error(
+      "Failed to initialize DOM elements. Waiting for HTML partials..."
+    );
+    return;
+  }
+
+  // Set up all event listeners after DOM is ready
+  setupEventListeners();
+
   await window.metadataModule.loadMeta();
   window.recitersModule.loadReciters(); // populate reciter list with highest-bitrate dedup
 
@@ -372,7 +440,21 @@ volumeSlider?.addEventListener("input", async () => {
 
   // Volume UI defaults
   if (volumeVal) volumeVal.textContent = `${volumeSlider?.value || 100}%`;
-  audio.volume = (Number(volumeSlider?.value) || 100) / 100;
+  if (audio) audio.volume = (Number(volumeSlider?.value) || 100) / 100;
 
   window.drawingModule.drawPreview();
-})();
+}
+
+// Wait for HTML partials to load before initializing
+if (document.readyState === "loading") {
+  window.addEventListener("htmlPartialsLoaded", initializeApp);
+} else {
+  // If DOM is already loaded, wait a bit for partials or try immediately
+  window.addEventListener("htmlPartialsLoaded", initializeApp);
+  // Also try after a short delay in case event already fired
+  setTimeout(() => {
+    if (document.getElementById("previewCanvas")) {
+      initializeApp();
+    }
+  }, 100);
+}
