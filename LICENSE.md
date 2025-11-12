@@ -28,7 +28,7 @@ This project (including its source code, documentation, and generated content) i
 
 Any video, animation, or other media generated using this software must include visible or textual credit such as:
 
-> “Generated using software by **Abid Al Aqib / XQube Studio**  
+> “Generated using software by **Abid Al Aqib / THE AAA**  
 > Data sources used within this software contributed to the output.”
 
 If the video is distributed publicly, the attribution must appear in the video description or credits.
