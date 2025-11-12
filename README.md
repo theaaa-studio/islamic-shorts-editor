@@ -4,7 +4,7 @@ I started this project after noticing how many channels were beautifully sharing
 
 ---
 
-## Table of Contents (Reordered)
+## Table of Contents
 
 - [Quick Start](#quick-start)
 - [Using the Editor](#using-the-editor)
