@@ -17,7 +17,6 @@ I started this project after noticing how many channels were beautifully sharing
 - [Customization & Development Notes](#customization--development-notes)
 - [Troubleshooting](#troubleshooting)
 - [Respectful Usage & Credits](#respectful-usage--credits)
-- [License](#license)
 - [Note on Generated Videos & Data Source Licenses](#note-on-generated-videos--data-source-licenses)
 
 ---
