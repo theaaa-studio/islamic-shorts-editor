@@ -2,7 +2,7 @@
 
 ## Creative Commons Attribution–NonCommercial 4.0 International (CC BY-NC 4.0)
 
-Copyright © 2025 Abid Al Aqib / XQube Studio
+Copyright © 2025 Abid Al Aqib / THE AAA
 
 This project (including its source code, documentation, and generated content) is licensed under the **Creative Commons Attribution–NonCommercial 4.0 International License (CC BY-NC 4.0)**.
 
@@ -15,7 +15,7 @@ This project (including its source code, documentation, and generated content) i
 
 **Under the following terms:**
 
-1. **Attribution** — You must give appropriate credit to **Abid Al Aqib / XQube Studio**, provide a link to this license, and indicate if changes were made.  
+1. **Attribution** — You must give appropriate credit to **Abid Al Aqib / The AAA**, provide a link to this license, and indicate if changes were made.  
    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
 
 2. **NonCommercial** — You may **not** use the material for **commercial purposes**, including selling, sublicensing, paid distribution, or monetized platforms.
