@@ -13,6 +13,7 @@
   border-right: 1px solid var(--line);
   padding: 18px;
   display: grid;
+  counter-reset: panel-step;
   grid-template-rows: auto auto auto auto auto auto 1fr;
   /* brand, input, background, typography, credits, playback, spacer */
   gap: 16px;
@@ -29,4 +30,3 @@
   grid-template-rows: 1fr auto;
   gap: 16px;
 }
-

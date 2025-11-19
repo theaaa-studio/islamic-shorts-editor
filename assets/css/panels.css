@@ -15,6 +15,23 @@
   margin: 0 0 8px;
   font-size: 14px;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel h3::before {
+  counter-increment: panel-step;
+  content: counter(panel-step);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-1);
+  color: #fff;
+  font-size: 11px;
+  border-radius: 50%;
 }
 
 .field {
@@ -71,4 +88,3 @@ label.small {
   width: 16px;
   height: 16px;
 }
-

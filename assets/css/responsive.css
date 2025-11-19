@@ -27,128 +27,172 @@
 @media (max-width: 900px) {
 
   /* 1) Layout: stack panels, generous spacing */
+  /* 1) Layout: stack panels, generous spacing */
+  /* 1) Layout: stack panels, generous spacing */
   .app {
-    grid-template-columns: 1fr;
-    /* stack sidebar then preview */
+    display: flex;
+    flex-direction: column-reverse;
+    height: 100vh;
+    overflow: hidden;
   }
 
   .sidebar {
     position: relative;
-    height: auto;
-    padding: 14px;
-    gap: 14px;
+    height: 30vh;
+    /* Fixed 30% height */
+    padding: 8px;
+    gap: 8px;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    width: 100%;
+    flex: 0 0 30vh;
+    /* Don't grow/shrink */
+    scroll-snap-type: x mandatory;
+    background: var(--panel);
+    align-items: stretch;
+  }
+
+  /* Direct children of sidebar (the containers) */
+  .sidebar>div {
+    flex: 0 0 95%;
+    /* Slightly wider to use space */
+    scroll-snap-align: center;
+    height: 100%;
+    overflow-y: auto;
+    /* Fallback */
+    padding-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Center vertically if space allows */
   }
 
   .panel {
-    padding: 12px;
-    gap: 10px;
+    padding: 10px;
+    gap: 8px;
+    height: 100%;
+    /* Fill the slide */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    /* Scroll inside panel if needed */
   }
 
-  /* 2) Readability + tap targets */
+  /* 2) Readability + tap targets (Compact for "No Scroll") */
   body {
-    font-size: 16px;
-    /* base text a bit larger on phones */
+    font-size: 14px;
+    /* Back to smaller size to fit */
   }
 
   label.small {
-    font-size: 13px;
+    font-size: 11px;
+    margin-bottom: 2px;
   }
 
   .btn,
   button {
-    min-height: 44px;
-    /* comfortable touch size */
-    font-size: 15px;
+    min-height: 36px;
+    /* Compact */
+    font-size: 13px;
+    padding: 6px 10px;
   }
 
   .toggle {
-    padding: 12px;
-    /* bigger toggle hit area */
-  }
-
-  /* 3) Form controls fill the width */
-  .three-col,
-  .four-col-inline,
-  .two-col-inline {
-    grid-template-columns: 1fr;
-    /* one per row on mobile */
-    gap: 10px;
+    padding: 8px;
   }
 
   select,
   input[type="text"],
-  input[type="range"],
-  .file-trigger {
-    width: 100%;
+  input[type="range"] {
+    padding: 6px 8px;
+    /* Compact padding */
+    font-size: 13px;
+    height: 36px;
   }
 
-  /* 4) Background panel: keep options readable, no horizontal scroll */
-  .background-panel .inline-row {
-    flex-wrap: wrap;
-    overflow-x: visible;
-    gap: 10px;
-  }
-
-  .background-panel .inline-row .toggle,
-  .background-panel .inline-row .field {
-    flex: 1 1 100%;
-  }
-
-  /* Ensure the media chooser shows names properly on phones */
-  #bgMediaField select {
-    width: 100%;
-    min-width: 0;
-    /* allow shrinking */
-  }
-
-  #bgMediaField .file-trigger {
-    width: 100%;
-    justify-content: center;
-  }
-
-  #bgMediaHint {
-    width: 100%;
-  }
-
-  /* 5) Transport / preview controls: easy to reach */
-  .transport {
+  /* 3) Form controls: Grid instead of Stack to save vertical space */
+  .three-col,
+  .four-col-inline,
+  .two-col-inline {
+    display: grid;
     grid-template-columns: 1fr 1fr;
+    /* 2 columns on mobile */
     gap: 8px;
   }
 
-  .transport .btn {
-    width: 100%;
+  /* Specific overrides for very small items */
+  .field {
+    gap: 2px;
   }
 
+  /* 4) Background panel: keep options readable */
+  .background-panel .inline-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* 5) Preview: Smaller to give space to controls */
+  /* 5) Preview: Smaller to give space to controls */
   .preview {
-    padding: 12px;
-    gap: 12px;
+    padding: 8px;
+    gap: 8px;
+    flex: 1;
+    /* Take remaining space (approx 80%) */
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .preview-stage {
-    min-height: auto;
+    flex: 1;
+    min-height: 0;
+    /* Allow shrinking */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   #previewCanvas {
-    width: min(100%, 420px);
-    /* a bit larger on modern phones */
-    height: auto;
-    border-radius: 18px;
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  /* Better Mobile Controls */
+  .preview-controls {
+    background: var(--panel-2);
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    gap: 10px;
+    width: 100%;
   }
 
   .preview-buttons {
-    flex-wrap: wrap;
+    display: flex;
     gap: 8px;
+    width: 100%;
+  }
+
+  .preview-buttons button {
+    flex: 1;
+    justify-content: center;
   }
 
   .preview-volume {
     width: 100%;
     gap: 8px;
+    justify-content: space-between;
+    padding: 0 4px;
   }
 
   #volumeSlider {
-    width: 100%;
-    max-width: 360px;
+    flex: 1;
+    width: auto;
+    max-width: none;
   }
 
   /* 6) Header tweak: keep theme button nicely placed */
@@ -163,4 +207,3 @@
     width: 100%;
   }
 }
-
