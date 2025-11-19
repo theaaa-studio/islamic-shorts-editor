@@ -48,11 +48,15 @@
   .version-info {
     order: 3;
     width: 100%;
-    padding: 8px;
+    padding: 2px;
+    /* Minimal padding */
     background: var(--panel);
     /* Match sidebar bg */
     border-top: 1px solid var(--line);
     flex: 0 0 auto;
+    font-size: 10px;
+    /* Smaller font */
+    margin-top: 5px;
   }
 
   .sidebar {
