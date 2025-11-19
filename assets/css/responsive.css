@@ -29,11 +29,30 @@
   /* 1) Layout: stack panels, generous spacing */
   /* 1) Layout: stack panels, generous spacing */
   /* 1) Layout: stack panels, generous spacing */
+  /* 1) Layout: stack panels, generous spacing */
   .app {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     height: 100vh;
     overflow: hidden;
+  }
+
+  .preview {
+    order: 1;
+  }
+
+  .sidebar {
+    order: 2;
+  }
+
+  .version-info {
+    order: 3;
+    width: 100%;
+    padding: 8px;
+    background: var(--panel);
+    /* Match sidebar bg */
+    border-top: 1px solid var(--line);
+    flex: 0 0 auto;
   }
 
   .sidebar {

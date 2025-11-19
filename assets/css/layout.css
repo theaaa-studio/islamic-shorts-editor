@@ -30,3 +30,24 @@
   grid-template-rows: 1fr auto;
   gap: 16px;
 }
+
+.version-info {
+  grid-column: 2;
+  align-self: end;
+  justify-self: center;
+  padding-bottom: 12px;
+  text-align: center;
+  opacity: 0.7;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.version-info .dev-name {
+  text-decoration: underline;
+}
+
+.version-info:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
