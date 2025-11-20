@@ -24,7 +24,7 @@
   counter-reset: panel-step;
   grid-template-rows: auto auto auto auto auto auto 1fr;
   /* brand, input, background, typography, credits, playback, spacer */
-  gap: 16px;
+  gap: 5px;
   position: sticky;
   top: 0;
   height: 100vh;
