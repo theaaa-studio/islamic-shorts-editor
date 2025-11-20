@@ -443,6 +443,52 @@ async function initializeApp() {
   if (audio) audio.volume = (Number(volumeSlider?.value) || 100) / 100;
 
   window.drawingModule.drawPreview();
+  setupMobileNav();
+}
+
+function setupMobileNav() {
+  const navBtns = document.querySelectorAll(".nav-btn");
+  const sidebarPanels = document.querySelectorAll(".sidebar > div");
+
+  if (!navBtns.length) return;
+
+  // Function to switch panel
+  function switchPanel(targetId) {
+    // Update buttons
+    navBtns.forEach((btn) => {
+      if (btn.dataset.target === targetId) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+
+    // Update panels
+    sidebarPanels.forEach((panel) => {
+      if (panel.id === targetId) {
+        panel.classList.add("active");
+      } else {
+        panel.classList.remove("active");
+      }
+    });
+  }
+
+  // Add click listeners
+  navBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.target;
+      if (target) switchPanel(target);
+    });
+  });
+
+  // Initialize first panel as active if none are active
+  const activeBtn = document.querySelector(".nav-btn.active");
+  if (activeBtn) {
+    switchPanel(activeBtn.dataset.target);
+  } else if (navBtns.length > 0) {
+    // Default to first if no active class
+    switchPanel(navBtns[0].dataset.target);
+  }
 }
 
 // Wait for HTML partials to load before initializing

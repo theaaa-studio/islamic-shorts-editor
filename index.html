@@ -24,6 +24,8 @@
       rel="stylesheet"
     />
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <link rel="stylesheet" href="assets/css/styles.css" />
     <!-- Scripts in dependency order -->
     <script src="assets/js/utils.js"></script>
@@ -83,6 +85,27 @@
       <main id="preview-container" class="preview">
         <!-- Loading... -->
       </main>
+
+      <nav class="mobile-nav">
+        <button class="nav-btn active" data-target="brand-container">
+          <i class="fas fa-home"></i> <span>Brand</span>
+        </button>
+        <button class="nav-btn" data-target="input-panel-container">
+          <i class="fas fa-pen"></i> <span>Input</span>
+        </button>
+        <button class="nav-btn" data-target="background-panel-container">
+          <i class="fas fa-image"></i> <span>Bg</span>
+        </button>
+        <button class="nav-btn" data-target="typography-panel-container">
+          <i class="fas fa-font"></i> <span>Text</span>
+        </button>
+        <button class="nav-btn" data-target="credits-panel-container">
+          <i class="fas fa-copyright"></i> <span>Credit</span>
+        </button>
+        <button class="nav-btn" data-target="playback-panel-container">
+          <i class="fas fa-play"></i> <span>Export</span>
+        </button>
+      </nav>
 
       <a
         href="https://theaaa-studio.github.io/AAA_Personal_Portfolio/"

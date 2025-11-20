@@ -10,6 +10,10 @@
   /* Row for content, Row for version */
 }
 
+.mobile-nav {
+  display: none;
+}
+
 /* Sidebar (left 70%) */
 .sidebar {
   grid-row: 1 / -1;
