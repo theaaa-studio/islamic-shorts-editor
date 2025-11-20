@@ -76,6 +76,14 @@ const RECITERS = [
   "aziz_alili_128kbps",
   "khalefa_al_tunaiji_64kbps",
   "mahmoud_ali_al_banna_32kbps",
+  // Non-Arabic Language Translations
+  "English/Sahih_Intnl_Ibrahim_Walk_192kbps",
+  "translations/urdu_shamshad_ali_khan_46kbps",
+  "translations/urdu_farhat_hashmi",
+  "translations/Makarem_Kabiri_16Kbps",
+  "translations/Fooladvand_Hedayatfar_40Kbps",
+  "translations/besim_korkut_ajet_po_ajet",
+  "translations/azerbaijani/balayev",
 ];
 
 // ---------- Reciter helpers: bitrate + normalization (FULL) ----------
@@ -119,8 +127,63 @@ function humanizeReciterId(reciterId) {
   // Remove bitrate token from label text for a cleaner display
   label = label.replace(/_?\d+\s*kbps/gi, "");
 
-  // Beautify
-  label = label.replace(/_/g, " ").replace(/\s+/g, " ").trim();
+  // Handle translation paths: extract language and reciter name
+  if (label.includes("/")) {
+    // Check for English translations
+    if (label.includes("English/")) {
+      label = label.replace("English/", "");
+      // Handle specific formats like "Sahih_Intnl_Ibrahim_Walk"
+      if (label.includes("Sahih_Intnl")) {
+        label = label.replace("Sahih_Intnl_", "");
+        label = label.replace(/_/g, " ").trim();
+        label = `${label} (English - Sahih International)`;
+      } else {
+        label = label.replace(/_/g, " ").trim();
+        label = `${label} (English)`;
+      }
+    }
+    // Handle Urdu translations
+    else if (label.includes("urdu")) {
+      label = label.replace(/translations\/urdu[_-]?/gi, "");
+      label = label.replace(/_/g, " ").trim();
+      label = `${label} (Urdu)`;
+    }
+    // Handle Persian translations
+    else if (label.includes("Makarem") || label.includes("Fooladvand")) {
+      label = label.replace(/translations\//gi, "");
+      label = label.replace(/_/g, " ").trim();
+      label = `${label} (Persian)`;
+    }
+    // Handle Bosnian translations
+    else if (label.includes("besim_korkut")) {
+      label = "Besim Korkut (Bosnian)";
+    }
+    // Handle Azerbaijani translations
+    else if (label.includes("azerbaijani")) {
+      label = label.replace(/translations\/azerbaijani\//gi, "");
+      label = label.replace(/_/g, " ").trim();
+      label = `${label} (Azerbaijani)`;
+    }
+    // Handle MultiLanguage
+    else if (label.includes("MultiLanguage")) {
+      label = label.replace("MultiLanguage/", "");
+      label = label.replace(/_/g, " ").trim();
+    }
+    // Handle Warsh recitations
+    else if (label.includes("warsh/")) {
+      label = label.replace("warsh/warsh_", "");
+      label = label.replace(/_/g, " ").trim();
+      label = `${label} (Warsh)`;
+    }
+    // Generic handler for other paths
+    else {
+      label = label.replace(/translations\//gi, "");
+      label = label.replace(/_/g, " ").trim();
+    }
+  } else {
+    // Beautify standard names
+    label = label.replace(/_/g, " ").replace(/\s+/g, " ").trim();
+  }
 
   // Basic capitalization fixes for common tokens
   label = label
