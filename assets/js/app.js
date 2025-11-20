@@ -103,7 +103,7 @@ window.isPlaying = false;
 window.selectedFont = "Inter, sans-serif";
 window.selectedArabicFont = "Inter, sans-serif";
 window.sizePercent = 100; // 25–160
-window.translationEdition = "en.daryabadi";
+window.translationEdition = "en.sahih";
 
 // drawing content
 window.currentText = "In the name of Allah, the Most Gracious, the Most Merciful";
@@ -391,7 +391,7 @@ function onAnyInputChange() {
   }
   if (fontColorInput) window.fontColor = fontColorInput.value;
   if (arabicFontColorInput) window.arabicFontColor = arabicFontColorInput.value;
-  window.translationEdition = translationEditionSel?.value || "en.daryabadi";
+  window.translationEdition = translationEditionSel?.value || "en.sahih";
   window.showCreditData = !!creditDataChk?.checked;
   window.showCreditCreator = !!creditCreatorChk?.checked;
 }
@@ -670,7 +670,7 @@ async function initializeApp() {
 
   // Keep state aligned with the <select>
   window.translationEdition =
-    translationEditionSel?.value || window.translationEdition || "en.daryabadi";
+    translationEditionSel?.value || window.translationEdition || "en.sahih";
 
   window.showCreditData = !!creditDataChk?.checked;
   window.showCreditCreator = !!creditCreatorChk?.checked;

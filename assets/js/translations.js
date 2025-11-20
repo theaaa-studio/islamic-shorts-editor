@@ -4,6 +4,9 @@ async function loadTranslations() {
   const translationEditionSel = $("#translationEdition");
   if (!translationEditionSel) return;
 
+  // Capture the current value BEFORE we wipe it with "Loading..."
+  const initialVal = translationEditionSel.value;
+
   // Temporary UI
   translationEditionSel.disabled = true;
   translationEditionSel.innerHTML = `<option value="">Loading translations…</option>`;
@@ -53,18 +56,20 @@ async function loadTranslations() {
 
     // Choose a sensible default:
     // 1) Keep previously selected (if still present)
-    // 2) Prefer a known English edition (asad, sahih, muhsin, maududi)
+    // 2) Prefer a known English edition (sahih, daryabadi, etc.)
     // 3) Otherwise first item
     const current = (
-      translationEditionSel.value ||
-      translationEdition ||
+      initialVal ||
+      window.translationEdition ||
       ""
     ).trim();
+    
+    console.log("Current translation setting:", current);
 
     const prefer = [
+      "en.sahih",
       "en.daryabadi",
       "en.asad",
-      "en.sahih",
       "en.muhammadtaqiuddinkhan",
       "en.pickthall",
       "en.yusufali",
@@ -75,11 +80,13 @@ async function loadTranslations() {
 
     if (current && editions.some((e) => e.id === current)) {
       toSelect = current;
+      console.log("Restoring current selection:", toSelect);
     } else {
       toSelect =
         prefer.find((p) => editions.some((e) => e.id === p)) ||
         editions.find((e) => e.lang === "en")?.id ||
         editions[0].id;
+      console.log("Using preferred/default selection:", toSelect);
     }
 
     translationEditionSel.value = toSelect;
@@ -91,17 +98,17 @@ async function loadTranslations() {
 
     // Hard fallback to a minimal set so app keeps working
     const fallback = [
+      { id: "en.sahih", label: "EN — Saheeh International (en.sahih)" },
       { id: "en.daryabadi", label: "EN — Daryabadi (en.daryabadi)" },
       { id: "en.asad", label: "EN — Asad (en.asad)" },
-      { id: "en.sahih", label: "EN — Saheeh International (en.sahih)" },
       { id: "en.yusufali", label: "EN — Yusuf Ali (en.yusufali)" },
     ];
     translationEditionSel.innerHTML = fallback
       .map((f) => `<option value="${f.id}">${f.label}</option>`)
       .join("");
-    translationEditionSel.value = "en.daryabadi";
+    translationEditionSel.value = "en.sahih";
     if (window.translationEdition !== undefined) {
-      window.translationEdition = "en.daryabadi";
+      window.translationEdition = "en.sahih";
     }
   } finally {
     translationEditionSel.disabled = false;
