@@ -333,15 +333,23 @@ async function playIndex(i, autoplay = false) {
     window.translationEdition ||
     "en.asad"
   ).trim();
-  let tResult = await fetchAyahText(chosenEdition);
+  
+  // Fetch Translation and Arabic in parallel
+  const [tResult, aResult] = await Promise.all([
+    fetchAyahText(chosenEdition),
+    fetchAyahText("quran-uthmani")
+  ]);
+
+  let finalTranslation = tResult;
 
   // Fallback to en.asad if the chosen edition fails
-  if (!tResult.ok && chosenEdition !== "en.asad") {
+  if (!finalTranslation.ok && chosenEdition !== "en.asad") {
     console.warn(`Edition "${chosenEdition}" failed; falling back to en.asad`);
-    tResult = await fetchAyahText("en.asad");
+    finalTranslation = await fetchAyahText("en.asad");
   }
 
-  window.currentText = tResult.ok ? tResult.text : "(Translation unavailable)";
+  window.currentText = finalTranslation.ok ? finalTranslation.text : "(Translation unavailable)";
+  window.currentArabicText = aResult.ok ? aResult.text : "";
   window.currentLabel = `${it.sName} • Ayah ${it.ayah}`;
 
   // --- Audio setup (unchanged) ---

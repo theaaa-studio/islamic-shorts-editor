@@ -169,7 +169,8 @@
   /* 3) Form controls: Grid instead of Stack to save vertical space */
   .three-col,
   .four-col-inline,
-  .two-col-inline {
+  .two-col-inline,
+  .typography-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     /* 2 columns on mobile */

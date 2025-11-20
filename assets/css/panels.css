@@ -66,6 +66,12 @@ label.small {
   gap: 12px;
 }
 
+.typography-grid {
+  display: grid;
+  grid-template-columns: 0.5fr 1fr 1fr 0.5fr 1fr 1fr;
+  gap: 12px;
+}
+
 .two-col-inline {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

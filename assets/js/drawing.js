@@ -112,8 +112,8 @@ function drawPreview() {
 
   // Access global variables from app.js via window
   const currentText =
-    window.currentText || "Centered translation will appear here.";
-  const currentLabel = window.currentLabel || "—";
+    window.currentText || "In the name of Allah, the Most Gracious, the Most Merciful";
+  const currentLabel = window.currentLabel || "Al-Fatiha 1:1";
   const selectedFont = window.selectedFont || "Inter, sans-serif";
   const sizePercent = window.sizePercent || 100;
   const fontColor = window.fontColor || "#111111";
@@ -166,35 +166,107 @@ function drawPreview() {
   }
 
   // Text
+  // Text
   const marginX = 90,
     marginY = 180;
   const usableW = W - 2 * marginX,
     usableH = H - 2 * marginY;
   const scale = (sizePercent || 100) / 100;
-  const spec = fitTextToBox(
-    pctx,
-    currentText,
-    usableW,
-    usableH,
-    72 * scale,
-    34 * scale,
-    1.25,
-    selectedFont,
-    700
-  );
-  const { fontSize, lines, lineHeight } = spec;
+  const arabicScale = (window.arabicSizePercent || 100) / 100;
 
-  pctx.fillStyle = fontColor;
-  pctx.textAlign = "center";
-  pctx.textBaseline = "middle";
-  pctx.font = `700 ${fontSize}px ${selectedFont}`;
-  const totalH = lines.length * lineHeight;
-  let y = H / 2 - totalH / 2;
-  pctx.save();
-  pctx.shadowColor = "rgba(0,0,0,0.14)";
-  pctx.shadowBlur = 8;
-  lines.forEach((ln, i) => pctx.fillText(ln, W / 2, y + i * lineHeight));
-  pctx.restore();
+  const currentArabic = window.currentArabicText || "";
+
+  if (currentArabic) {
+    // Split space: Arabic at top, Translation centered
+    const arabicH = usableH * 0.3; // Reserve top 30% for Arabic
+    const translationMaxH = usableH * 0.7; // Use up to 70% for translation
+
+    // --- 1. Arabic Text ---
+    const arabicFont = window.selectedArabicFont || "Amiri, serif";
+    const arabicSpec = fitTextToBox(
+      pctx,
+      currentArabic,
+      usableW,
+      arabicH,
+      80 * arabicScale,
+      34 * arabicScale,
+      1.6, // Higher line-height for Arabic
+      arabicFont,
+      700
+    );
+
+    pctx.fillStyle = window.arabicFontColor || fontColor;
+    pctx.textAlign = "center";
+    pctx.textBaseline = "middle";
+    pctx.font = `700 ${arabicSpec.fontSize}px ${arabicFont}`;
+    
+    const arabicTotalH = arabicSpec.lines.length * arabicSpec.lineHeight;
+    // Center in its allocated box (top portion)
+    let arabicY = marginY + (arabicH - arabicTotalH) / 2 + arabicSpec.lineHeight / 2;
+
+    pctx.save();
+    pctx.shadowColor = "rgba(0,0,0,0.14)";
+    pctx.shadowBlur = 8;
+    arabicSpec.lines.forEach((ln, i) => {
+      pctx.fillText(ln, W / 2, arabicY + i * arabicSpec.lineHeight - arabicSpec.lineHeight / 2);
+    });
+    pctx.restore();
+
+    // --- 2. Translation Text ---
+    const transSpec = fitTextToBox(
+      pctx,
+      currentText,
+      usableW,
+      translationMaxH,
+      72 * scale,
+      34 * scale,
+      1.25,
+      selectedFont,
+      700
+    );
+
+    pctx.fillStyle = fontColor;
+    pctx.font = `700 ${transSpec.fontSize}px ${selectedFont}`;
+    const transTotalH = transSpec.lines.length * transSpec.lineHeight;
+    
+    // Center in the entire screen (H)
+    let transY = H / 2 - transTotalH / 2 + transSpec.lineHeight / 2;
+
+    pctx.save();
+    pctx.shadowColor = "rgba(0,0,0,0.14)";
+    pctx.shadowBlur = 8;
+    transSpec.lines.forEach((ln, i) => {
+      pctx.fillText(ln, W / 2, transY + i * transSpec.lineHeight - transSpec.lineHeight / 2);
+    });
+    pctx.restore();
+
+  } else {
+    // Original single-text logic
+    const spec = fitTextToBox(
+      pctx,
+      currentText,
+      usableW,
+      usableH,
+      72 * scale,
+      34 * scale,
+      1.25,
+      selectedFont,
+      700
+    );
+    const { fontSize, lines, lineHeight } = spec;
+
+    pctx.fillStyle = fontColor;
+    pctx.textAlign = "center";
+    pctx.textBaseline = "middle";
+    pctx.font = `700 ${fontSize}px ${selectedFont}`;
+    const totalH = lines.length * lineHeight;
+    let y = H / 2 - totalH / 2;
+    pctx.save();
+    pctx.shadowColor = "rgba(0,0,0,0.14)";
+    pctx.shadowBlur = 8;
+    lines.forEach((ln, i) => pctx.fillText(ln, W / 2, y + i * lineHeight));
+    pctx.restore();
+  }
 
   // Bottom label
   pctx.font = `600 ${Math.max(30, Math.round(36 * scale))}px ${selectedFont}`;

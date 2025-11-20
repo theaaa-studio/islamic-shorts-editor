@@ -62,6 +62,7 @@ async function loadTranslations() {
     ).trim();
 
     const prefer = [
+      "en.daryabadi",
       "en.asad",
       "en.sahih",
       "en.muhammadtaqiuddinkhan",
@@ -90,6 +91,7 @@ async function loadTranslations() {
 
     // Hard fallback to a minimal set so app keeps working
     const fallback = [
+      { id: "en.daryabadi", label: "EN — Daryabadi (en.daryabadi)" },
       { id: "en.asad", label: "EN — Asad (en.asad)" },
       { id: "en.sahih", label: "EN — Saheeh International (en.sahih)" },
       { id: "en.yusufali", label: "EN — Yusuf Ali (en.yusufali)" },
@@ -97,9 +99,9 @@ async function loadTranslations() {
     translationEditionSel.innerHTML = fallback
       .map((f) => `<option value="${f.id}">${f.label}</option>`)
       .join("");
-    translationEditionSel.value = "en.asad";
+    translationEditionSel.value = "en.daryabadi";
     if (window.translationEdition !== undefined) {
-      window.translationEdition = "en.asad";
+      window.translationEdition = "en.daryabadi";
     }
   } finally {
     translationEditionSel.disabled = false;
