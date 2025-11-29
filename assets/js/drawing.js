@@ -177,42 +177,12 @@ function drawPreview() {
   const currentArabic = window.currentArabicText || "";
 
   if (currentArabic) {
-    // Split space: Arabic at top, Translation centered
-    const arabicH = usableH * 0.3; // Reserve top 30% for Arabic
-    const translationMaxH = usableH * 0.7; // Use up to 70% for translation
-
-    // --- 1. Arabic Text ---
-    const arabicFont = window.selectedArabicFont || "Amiri, serif";
-    const arabicSpec = fitTextToBox(
-      pctx,
-      currentArabic,
-      usableW,
-      arabicH,
-      80 * arabicScale,
-      34 * arabicScale,
-      1.6, // Higher line-height for Arabic
-      arabicFont,
-      700
-    );
-
-    pctx.fillStyle = window.arabicFontColor || fontColor;
-    pctx.textAlign = "center";
-    pctx.textBaseline = "middle";
-    pctx.font = `700 ${arabicSpec.fontSize}px ${arabicFont}`;
+    // Split space: We want Translation CENTERED, and Arabic stacked ABOVE it.
     
-    const arabicTotalH = arabicSpec.lines.length * arabicSpec.lineHeight;
-    // Center in its allocated box (top portion)
-    let arabicY = marginY + (arabicH - arabicTotalH) / 2 + arabicSpec.lineHeight / 2;
-
-    pctx.save();
-    pctx.shadowColor = "rgba(0,0,0,0.14)";
-    pctx.shadowBlur = 8;
-    arabicSpec.lines.forEach((ln, i) => {
-      pctx.fillText(ln, W / 2, arabicY + i * arabicSpec.lineHeight - arabicSpec.lineHeight / 2);
-    });
-    pctx.restore();
-
-    // --- 2. Translation Text ---
+    // --- 1. Calculate Translation Layout (First, to determine center) ---
+    // We'll allow it to take up to ~60% of height to leave room for Arabic
+    const translationMaxH = usableH * 0.6; 
+    
     const transSpec = fitTextToBox(
       pctx,
       currentText,
@@ -225,18 +195,80 @@ function drawPreview() {
       700
     );
 
-    pctx.fillStyle = fontColor;
-    pctx.font = `700 ${transSpec.fontSize}px ${selectedFont}`;
     const transTotalH = transSpec.lines.length * transSpec.lineHeight;
-    
-    // Center in the entire screen (H)
+    // Center Translation in the entire screen (H)
+    // This is our anchor point.
     let transY = H / 2 - transTotalH / 2 + transSpec.lineHeight / 2;
 
+
+    // --- 2. Calculate Arabic Layout ---
+    // Arabic gets whatever space is reasonable, but we position it relative to Translation.
+    // We'll limit it to ~35% of height so it doesn't get too huge.
+    const arabicMaxH = usableH * 0.35;
+    const arabicFont = window.selectedArabicFont || "Amiri, serif";
+    
+    const arabicSpec = fitTextToBox(
+      pctx,
+      currentArabic,
+      usableW,
+      arabicMaxH,
+      80 * arabicScale,
+      34 * arabicScale,
+      1.6, // Higher line-height for Arabic
+      arabicFont,
+      700
+    );
+    
+    const arabicTotalH = arabicSpec.lines.length * arabicSpec.lineHeight;
+
+    // Position Arabic ABOVE Translation
+    // Gap between bottom of Arabic and top of Translation
+    const gap = 40 * scale; 
+    
+    // Arabic Y position:
+    // Top of Translation block = (transY - transSpec.lineHeight / 2)
+    // Bottom of Arabic block should be at (Top of Translation - gap)
+    // Arabic Y (center of first line) needs to be calculated.
+    // Top of Arabic block = (Top of Translation - gap - arabicTotalH)
+    // First line Y = Top of Arabic block + arabicSpec.lineHeight / 2
+    
+    const transTop = transY - transSpec.lineHeight / 2;
+    const arabicBottom = transTop - gap;
+    const arabicTop = arabicBottom - arabicTotalH;
+    let arabicY = arabicTop + arabicSpec.lineHeight / 2;
+    
+    // If Arabic goes off-screen top, we might need to push everything down or just clamp.
+    // For now, let's just clamp the top margin if it's too high, pushing Translation down if needed?
+    // Actually, user asked for "Arabic always just top based on translation". 
+    // So if translation is centered, Arabic rides on top. 
+    // If that pushes Arabic off screen, so be it (or user can resize). 
+    // But let's add a small safety check to not go above marginY if possible, 
+    // effectively pushing the whole group down if needed? 
+    // For simplicity and strict adherence to "centered translation", we'll stick to the anchor.
+    
+    // --- Draw Arabic ---
+    pctx.fillStyle = window.arabicFontColor || fontColor;
+    pctx.textAlign = "center";
+    pctx.textBaseline = "middle";
+    pctx.font = `700 ${arabicSpec.fontSize}px ${arabicFont}`;
+    
+    pctx.save();
+    pctx.shadowColor = "rgba(0,0,0,0.14)";
+    pctx.shadowBlur = 8;
+    arabicSpec.lines.forEach((ln, i) => {
+      pctx.fillText(ln, W / 2, arabicY + i * arabicSpec.lineHeight);
+    });
+    pctx.restore();
+
+    // --- Draw Translation ---
+    pctx.fillStyle = fontColor;
+    pctx.font = `700 ${transSpec.fontSize}px ${selectedFont}`;
+    
     pctx.save();
     pctx.shadowColor = "rgba(0,0,0,0.14)";
     pctx.shadowBlur = 8;
     transSpec.lines.forEach((ln, i) => {
-      pctx.fillText(ln, W / 2, transY + i * transSpec.lineHeight - transSpec.lineHeight / 2);
+      pctx.fillText(ln, W / 2, transY + i * transSpec.lineHeight);
     });
     pctx.restore();
 
