@@ -255,15 +255,14 @@ function drawPreview() {
     
     const totalVisualH = relInkBottom - relInkTop;
     
-    // --- Center on Screen ---
-    // We want the visual center of the ink to be at H/2.
-    // Or simpler: We want the Ink Top to be at (H - totalVisualH) / 2.
-    const screenInkTop = (H - totalVisualH) / 2;
+    // --- Center on Screen (including label) ---
+    const labelGap = 30;
+    const labelHeight = 36;
+    const totalGroupH = totalVisualH + labelGap + labelHeight;
+    const screenGroupTop = (H - totalGroupH) / 2;
     
     // Calculate the offset to apply to our relative coordinates
-    // screenInkTop = (relInkTop + offset)
-    // offset = screenInkTop - relInkTop
-    const yOffset = screenInkTop - relInkTop;
+    const yOffset = screenGroupTop - relInkTop;
     
     // Final Y positions
     let arabicY = relArabicY + yOffset;
@@ -287,13 +286,18 @@ function drawPreview() {
         if (w > maxLineWidth) maxLineWidth = w;
     });
 
+    // Measure label width
+    pctx.font = `600 36px ${selectedFont}`;
+    const labelW = pctx.measureText(currentLabel).width;
+    if (labelW > maxLineWidth) maxLineWidth = labelW;
+
     const boxPadX = 50 * scale;
     const boxPadY = 50 * scale;
     const boxW = maxLineWidth + boxPadX * 2;
     
-    // Box dimensions based on text content only (label is outside)
-    const boxTop = screenInkTop - boxPadY;
-    const boxH = totalVisualH + boxPadY * 2;
+    // Box dimensions including label
+    const boxTop = screenGroupTop - boxPadY;
+    const boxH = totalGroupH + boxPadY * 2;
     
     pctx.save();
     pctx.globalAlpha = window.backgroundModule.getTextBoxOpacity() || 0.12;
@@ -335,12 +339,14 @@ function drawPreview() {
     });
     pctx.restore();
 
-    // --- Draw Label (Ayah Number) ---
+    // --- Draw Label (Ayah Number) inside box ---
+    const absInkBottom = relInkBottom + yOffset;
+    const labelY = absInkBottom + labelGap + (labelHeight / 2);
+    
     pctx.font = `600 36px ${selectedFont}`;
-    pctx.fillStyle = fontColor; // Use translation text color
+    pctx.fillStyle = fontColor;
     pctx.textAlign = "center";
-    // Position below the box
-    const labelY = boxTop + boxH + 50; // 50px below the box
+    pctx.textBaseline = "middle";
     pctx.fillText(currentLabel, W / 2, labelY);
 
   } else {
@@ -360,7 +366,7 @@ function drawPreview() {
 
     // --- Calculate dimensions for background box ---
     const labelHeight = 36;
-    const labelGap = 20;
+    const labelGap = 30;
     const boxPadX = 50 * scale;
     const boxPadY = 50 * scale;
     
@@ -372,11 +378,17 @@ function drawPreview() {
       if (w > maxLineWidth) maxLineWidth = w;
     });
     
+    // Measure label width
+    pctx.font = `600 36px ${selectedFont}`;
+    const labelW = pctx.measureText(currentLabel).width;
+    if (labelW > maxLineWidth) maxLineWidth = labelW;
+    
     const boxW = maxLineWidth + boxPadX * 2;
     const totalH = lines.length * lineHeight;
+    const totalGroupH = totalH + labelGap + labelHeight;
     
-    // Center the text content only (label is outside)
-    let y = (H - totalH) / 2;
+    // Center the entire group (text + label)
+    let startY = (H - totalGroupH) / 2;
     
     // --- Draw Background Box ---
     pctx.save();
@@ -385,9 +397,9 @@ function drawPreview() {
     drawRoundedRect(
       pctx,
       (W - boxW) / 2,
-      y - boxPadY,
+      startY - boxPadY,
       boxW,
-      totalH + boxPadY * 2,
+      totalGroupH + boxPadY * 2,
       20
     );
     pctx.fill();
@@ -401,16 +413,16 @@ function drawPreview() {
     pctx.save();
     pctx.shadowColor = "rgba(0,0,0,0.14)";
     pctx.shadowBlur = 8;
-    lines.forEach((ln, i) => pctx.fillText(ln, W / 2, y + i * lineHeight));
+    lines.forEach((ln, i) => pctx.fillText(ln, W / 2, startY + i * lineHeight));
     pctx.restore();
 
-    // --- Draw Label (Ayah Number) ---
+    // --- Draw Label (Ayah Number) inside box ---
+    const labelY = startY + totalH + labelGap + (labelHeight / 2);
+    
     pctx.font = `600 36px ${selectedFont}`;
-    pctx.fillStyle = fontColor; // Use translation text color
+    pctx.fillStyle = fontColor;
     pctx.textAlign = "center";
-    // Position below the box
-    const boxBottom = y - boxPadY + totalH + boxPadY * 2;
-    const labelY = boxBottom + 50; // 50px below the box
+    pctx.textBaseline = "middle";
     pctx.fillText(currentLabel, W / 2, labelY);
   }
 
@@ -445,7 +457,7 @@ logoImg.src = 'assets/quran.png';
 
     const th = 30;
     const bx = 40,
-      by = 60;
+      by = 80;
       
     pctx.save();
     // pctx.globalAlpha = 0.12;
@@ -473,7 +485,7 @@ logoImg.src = 'assets/quran.png';
     let txt = `Made by ${madeByNameNow}`;
     const th = 30;
     const bx = W - 40,
-      by = 60;
+      by = 80;
     while (pctx.measureText(txt).width > W - 120 && txt.length > 4) {
       txt = txt.slice(0, -4) + "…";
     }
@@ -492,7 +504,7 @@ logoImg.src = 'assets/quran.png';
     pctx.font = `600 28px ${selectedFont}`;
     const th = 30;
     const bx = 40,
-      by = H - 60;
+      by = H - 10;
     while (pctx.measureText(txt).width > W - 120 && txt.length > 4) {
       txt = txt.slice(0, -4) + "…";
     }
