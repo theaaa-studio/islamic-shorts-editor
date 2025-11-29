@@ -51,6 +51,22 @@ bgVideo.loop = true;
 bgVideo.muted = true;
 bgVideo.playsInline = true;
 bgVideo.crossOrigin = "anonymous";
+bgVideo.preload = "auto"; // Ensure video is fully buffered
+bgVideo.setAttribute("playsinline", ""); // Better mobile support
+
+// Track video state for smooth looping
+let videoIsStable = false;
+bgVideo.addEventListener("canplaythrough", () => {
+  videoIsStable = true;
+});
+bgVideo.addEventListener("seeking", () => {
+  // Video is seeking (e.g., looping back to start)
+  // Don't mark as unstable to prevent flashing
+});
+bgVideo.addEventListener("seeked", () => {
+  // Seeking complete, video ready again
+  videoIsStable = true;
+});
 
 function populateSelectFromList(list) {
   const bgMediaSelect = $("#bgMediaSelect");
@@ -270,6 +286,11 @@ function onBgMediaChange() {
       bgVideo.muted = true;
       bgVideo.playsInline = true;
 
+      // Reset video buffer when changing videos
+      if (window.resetVideoBuffer) {
+        window.resetVideoBuffer();
+      }
+
       // Set source and load
       bgVideo.src = selectedBg.src;
       bgVideo.load();
@@ -325,6 +346,7 @@ window.backgroundModule = {
   setTextBoxOpacity: (opacity) => {
     textBoxOpacity = opacity;
   },
+  getVideoIsStable: () => videoIsStable,
   loadBackgroundAssets,
   applyBgModeUI,
   populateSelectFromList,

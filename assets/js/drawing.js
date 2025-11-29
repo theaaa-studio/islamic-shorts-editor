@@ -102,6 +102,86 @@ function drawMediaCover(ctx, mediaEl, W, H) {
   return true;
 }
 
+// ------------------ Double Buffering System for Video ------------------
+let videoOffscreenCanvas = null;
+let videoOffscreenCtx = null;
+let lastVideoFrameValid = false;
+let videoBufferInitialized = false;
+
+function initVideoBuffer(width, height) {
+  try {
+    // Use OffscreenCanvas if available (better performance)
+    if (typeof OffscreenCanvas !== 'undefined') {
+      videoOffscreenCanvas = new OffscreenCanvas(width, height);
+      videoOffscreenCtx = videoOffscreenCanvas.getContext('2d', { 
+        alpha: false,
+        desynchronized: true // Better performance for animations
+      });
+    } else {
+      // Fallback to regular canvas
+      videoOffscreenCanvas = document.createElement('canvas');
+      videoOffscreenCanvas.width = width;
+      videoOffscreenCanvas.height = height;
+      videoOffscreenCtx = videoOffscreenCanvas.getContext('2d', { alpha: false });
+    }
+    videoBufferInitialized = true;
+    lastVideoFrameValid = false;
+  } catch (e) {
+    console.warn('Failed to create offscreen canvas:', e);
+    videoBufferInitialized = false;
+  }
+}
+
+function updateVideoBuffer(bgVideo, W, H) {
+  if (!videoBufferInitialized || !videoOffscreenCtx) {
+    initVideoBuffer(W, H);
+  }
+  
+  // Ensure buffer size matches canvas size
+  if (videoOffscreenCanvas && 
+      (videoOffscreenCanvas.width !== W || videoOffscreenCanvas.height !== H)) {
+    videoOffscreenCanvas.width = W;
+    videoOffscreenCanvas.height = H;
+  }
+  
+  // Try to capture current video frame
+  if (bgVideo.readyState >= 2 && bgVideo.videoWidth > 0) {
+    try {
+      const success = drawMediaCover(videoOffscreenCtx, bgVideo, W, H);
+      if (success) {
+        lastVideoFrameValid = true;
+        return true;
+      }
+    } catch (e) {
+      console.warn('Failed to update video buffer:', e);
+    }
+  }
+  
+  return false;
+}
+
+function drawBufferedVideo(ctx, W, H) {
+  if (lastVideoFrameValid && videoOffscreenCanvas) {
+    try {
+      ctx.drawImage(videoOffscreenCanvas, 0, 0, W, H);
+      return true;
+    } catch (e) {
+      console.warn('Failed to draw buffered video:', e);
+    }
+  }
+  return false;
+}
+
+function resetVideoBuffer() {
+  lastVideoFrameValid = false;
+  videoBufferInitialized = false;
+  videoOffscreenCanvas = null;
+  videoOffscreenCtx = null;
+}
+
+// Export buffer reset for when video changes
+window.resetVideoBuffer = resetVideoBuffer;
+
 function drawPreview() {
   const previewCanvas = window.previewCanvas || $("#previewCanvas");
   if (!previewCanvas) return;
@@ -143,17 +223,22 @@ function drawPreview() {
         pctx.fillRect(0, 0, W, H);
       }
     } else if (selBg.type === "video") {
-      // Check if video has loaded enough data and is playing
-      if (bgVideo.readyState >= 2 && bgVideo.videoWidth > 0) {
-        // Ensure video is playing
-        if (bgVideo.paused) {
-          bgVideo.play().catch(() => {});
-        }
-        drew = drawMediaCover(pctx, bgVideo, W, H);
-      } else if (bgVideo.src && bgVideo.src !== "") {
-        // Video is loading, show background color as fallback
+      // Use double buffering for smooth video playback
+      // First, try to update the buffer with the latest frame
+      const bufferUpdated = updateVideoBuffer(bgVideo, W, H);
+      
+      // Then draw from the buffer (will use last valid frame during transitions)
+      drew = drawBufferedVideo(pctx, W, H);
+      
+      // If we've never drawn a valid frame, show fallback
+      if (!drew && !lastVideoFrameValid) {
         pctx.fillStyle = bgCol;
         pctx.fillRect(0, 0, W, H);
+      }
+      
+      // Ensure video is playing
+      if (bgVideo.paused && bgVideo.src) {
+        bgVideo.play().catch(() => {});
       }
     }
     if (!drew && (!selBg.type || (!bgImg.src && !bgVideo.src))) {
