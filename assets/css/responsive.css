@@ -188,6 +188,21 @@
     gap: 6px;
   }
 
+  /* Mobile layout for background panel color controls */
+  .background-panel .field[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .background-panel .field[style*="display: flex"]>div {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  .background-panel .field[style*="display: flex"]>div>div {
+    flex-wrap: wrap;
+  }
+
   /* 5) Preview: Smaller to give space to controls */
   /* 5) Preview: Smaller to give space to controls */
   .preview {
