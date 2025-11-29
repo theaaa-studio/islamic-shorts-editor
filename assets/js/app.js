@@ -10,11 +10,16 @@ let reciterSel,
   textSizeVal,
   arabicTextSize,
   arabicTextSizeVal;
-  arabicTextSizeVal;
-let bgColorInput, fontColorInput, arabicFontColorInput, creditColorInput, textBoxColorInput, textBoxOpacitySlider, textBoxOpacityVal;
+arabicTextSizeVal;
+let bgColorInput,
+  fontColorInput,
+  arabicFontColorInput,
+  creditColorInput,
+  textBoxColorInput,
+  textBoxOpacitySlider,
+  textBoxOpacityVal;
 let creditDataChk, creditCreatorChk, madeByInput, creditMadeByChk;
 let bgModeColor,
-
   bgModeMedia,
   bgColorField,
   bgMediaField,
@@ -61,11 +66,11 @@ function initializeDOM() {
   bgMediaSelect = $("#bgMediaSelect");
   bgMediaHint = $("#bgMediaHint");
   bgUploadInput = $("#bgUploadInput");
-  
+
   console.log("DOM Elements found:", {
     bgModeMedia: !!bgModeMedia,
     bgMediaSelect: !!bgMediaSelect,
-    bgUploadInput: !!bgUploadInput
+    bgUploadInput: !!bgUploadInput,
   });
 
   previewCanvas = $("#previewCanvas");
@@ -111,7 +116,8 @@ window.sizePercent = 100; // 25–160
 window.translationEdition = "en.sahih";
 
 // drawing content
-window.currentText = "In the name of Allah, the Most Gracious, the Most Merciful";
+window.currentText =
+  "In the name of Allah, the Most Gracious, the Most Merciful";
 window.currentArabicText = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ";
 window.currentLabel = "Al-Fatiha 1:1";
 
@@ -153,205 +159,313 @@ window.sessionReciterName = "Unknown";
 // ------------------ Font mapping by language ------------------
 const fontsByLanguage = {
   // Western/Latin languages
-  en: { // English
-    fonts: ['Inter, sans-serif', 'Poppins, sans-serif', 'Lora, serif', 'Merriweather, serif', 
-            'Nunito, sans-serif', 'Roboto Slab, serif', 'Montserrat, sans-serif', 'Open Sans, sans-serif',
-            'Source Sans 3, sans-serif', 'Work Sans, sans-serif', 'Raleway, sans-serif', 'Lato, sans-serif',
-            'Oswald, sans-serif', 'Ubuntu, sans-serif', 'PT Sans, sans-serif', 'Karla, sans-serif',
-            'Rubik, sans-serif', 'Heebo, sans-serif', 'Barlow, sans-serif', 'Manrope, sans-serif',
-            'Space Grotesk, sans-serif', 'Fira Sans, sans-serif', 'Playfair Display, serif',
-            'DM Serif Text, serif', 'Libre Baskerville, serif', 'PT Serif, serif', 'Quicksand, sans-serif',
-            'Space Mono, monospace', 'Fira Code, monospace', 'JetBrains Mono, monospace'],
-    default: 'Inter, sans-serif'
+  en: {
+    // English
+    fonts: [
+      "Inter, sans-serif",
+      "Poppins, sans-serif",
+      "Lora, serif",
+      "Merriweather, serif",
+      "Nunito, sans-serif",
+      "Roboto Slab, serif",
+      "Montserrat, sans-serif",
+      "Open Sans, sans-serif",
+      "Source Sans 3, sans-serif",
+      "Work Sans, sans-serif",
+      "Raleway, sans-serif",
+      "Lato, sans-serif",
+      "Oswald, sans-serif",
+      "Ubuntu, sans-serif",
+      "PT Sans, sans-serif",
+      "Karla, sans-serif",
+      "Rubik, sans-serif",
+      "Heebo, sans-serif",
+      "Barlow, sans-serif",
+      "Manrope, sans-serif",
+      "Space Grotesk, sans-serif",
+      "Fira Sans, sans-serif",
+      "Playfair Display, serif",
+      "DM Serif Text, serif",
+      "Libre Baskerville, serif",
+      "PT Serif, serif",
+      "Quicksand, sans-serif",
+      "Space Mono, monospace",
+      "Fira Code, monospace",
+      "JetBrains Mono, monospace",
+    ],
+    default: "Inter, sans-serif",
   },
-  
+
   // Arabic
   ar: {
-    fonts: ['Amiri, serif', 'Scheherazade New, serif', 'Cairo, sans-serif', 'Changa, sans-serif',
-            'Reem Kufi, sans-serif', 'Noto Naskh Arabic, serif', 'Noto Kufi Arabic, sans-serif',
-            'IBM Plex Sans Arabic, sans-serif', 'Tajawal, sans-serif', 'El Messiri, sans-serif',
-            'Markazi Text, serif', 'Lateef, serif', 'Harmattan, sans-serif', 'Aref Ruqaa, serif',
-            'Katibeh, cursive', 'Lalezar, cursive', 'Rakkas, cursive', 'Mada, sans-serif', 'Almarai, sans-serif'],
-    default: 'Amiri, serif'
+    fonts: [
+      "Amiri, serif",
+      "Scheherazade New, serif",
+      "Cairo, sans-serif",
+      "Changa, sans-serif",
+      "Reem Kufi, sans-serif",
+      "Noto Naskh Arabic, serif",
+      "Noto Kufi Arabic, sans-serif",
+      "IBM Plex Sans Arabic, sans-serif",
+      "Tajawal, sans-serif",
+      "El Messiri, sans-serif",
+      "Markazi Text, serif",
+      "Lateef, serif",
+      "Harmattan, sans-serif",
+      "Aref Ruqaa, serif",
+      "Katibeh, cursive",
+      "Lalezar, cursive",
+      "Rakkas, cursive",
+      "Mada, sans-serif",
+      "Almarai, sans-serif",
+    ],
+    default: "Amiri, serif",
   },
-  
+
   // Bengali/Bangla
   bn: {
-    fonts: ['Hind Siliguri, sans-serif', 'Noto Sans Bengali, sans-serif', 'Noto Serif Bengali, serif',
-            'Baloo Da 2, cursive', 'Mukta, sans-serif'],
-    default: 'Noto Sans Bengali, sans-serif'
+    fonts: [
+      "Hind Siliguri, sans-serif",
+      "Noto Sans Bengali, sans-serif",
+      "Noto Serif Bengali, serif",
+      "Baloo Da 2, cursive",
+      "Mukta, sans-serif",
+    ],
+    default: "Noto Sans Bengali, sans-serif",
   },
-  
+
   // Hindi/Devanagari
   hi: {
-    fonts: ['Noto Sans Devanagari, sans-serif', 'Noto Serif Devanagari, serif', 'Poppins, sans-serif',
-            'Hind, sans-serif', 'Tiro Devanagari Hindi, serif'],
-    default: 'Noto Sans Devanagari, sans-serif'
+    fonts: [
+      "Noto Sans Devanagari, sans-serif",
+      "Noto Serif Devanagari, serif",
+      "Poppins, sans-serif",
+      "Hind, sans-serif",
+      "Tiro Devanagari Hindi, serif",
+    ],
+    default: "Noto Sans Devanagari, sans-serif",
   },
-  
+
   // Urdu (uses Arabic script)
   ur: {
-    fonts: ['Amiri, serif', 'Scheherazade New, serif', 'Noto Naskh Arabic, serif', 'Noto Kufi Arabic, sans-serif',
-            'Jameel Noori Nastaleeq, cursive', 'Lateef, serif'],
-    default: 'Noto Naskh Arabic, serif'
+    fonts: [
+      "Amiri, serif",
+      "Scheherazade New, serif",
+      "Noto Naskh Arabic, serif",
+      "Noto Kufi Arabic, sans-serif",
+      "Jameel Noori Nastaleeq, cursive",
+      "Lateef, serif",
+    ],
+    default: "Noto Naskh Arabic, serif",
   },
-  
+
   // Indonesian (uses Latin script)
   id: {
-    fonts: ['Inter, sans-serif', 'Poppins, sans-serif', 'Lora, serif', 'Nunito, sans-serif',
-            'Open Sans, sans-serif', 'Roboto, sans-serif'],
-    default: 'Poppins, sans-serif'
+    fonts: [
+      "Inter, sans-serif",
+      "Poppins, sans-serif",
+      "Lora, serif",
+      "Nunito, sans-serif",
+      "Open Sans, sans-serif",
+      "Roboto, sans-serif",
+    ],
+    default: "Poppins, sans-serif",
   },
-  
+
   // French (Latin)
   fr: {
-    fonts: ['Inter, sans-serif', 'Poppins, sans-serif', 'Lora, serif', 'Merriweather, serif',
-            'Montserrat, sans-serif', 'Playfair Display, serif'],
-    default: 'Merriweather, serif'
+    fonts: [
+      "Inter, sans-serif",
+      "Poppins, sans-serif",
+      "Lora, serif",
+      "Merriweather, serif",
+      "Montserrat, sans-serif",
+      "Playfair Display, serif",
+    ],
+    default: "Merriweather, serif",
   },
-  
+
   // Chinese Simplified
   zh: {
-    fonts: ['Noto Sans SC, sans-serif', 'Noto Serif SC, serif', 'Ma Shan Zheng, cursive'],
-    default: 'Noto Sans SC, sans-serif'
+    fonts: [
+      "Noto Sans SC, sans-serif",
+      "Noto Serif SC, serif",
+      "Ma Shan Zheng, cursive",
+    ],
+    default: "Noto Sans SC, sans-serif",
   },
-  
+
   // Japanese
   ja: {
-    fonts: ['Noto Sans JP, sans-serif', 'Noto Serif JP, serif', 'M PLUS Rounded 1c, sans-serif'],
-    default: 'Noto Sans JP, sans-serif'
+    fonts: [
+      "Noto Sans JP, sans-serif",
+      "Noto Serif JP, serif",
+      "M PLUS Rounded 1c, sans-serif",
+    ],
+    default: "Noto Sans JP, sans-serif",
   },
-  
+
   // Korean
   ko: {
-    fonts: ['Noto Sans KR, sans-serif', 'Noto Serif KR, serif', 'Black Han Sans, sans-serif'],
-    default: 'Noto Sans KR, sans-serif'
+    fonts: [
+      "Noto Sans KR, sans-serif",
+      "Noto Serif KR, serif",
+      "Black Han Sans, sans-serif",
+    ],
+    default: "Noto Sans KR, sans-serif",
   },
-  
+
   // Thai
   th: {
-    fonts: ['Noto Sans Thai, sans-serif', 'Noto Serif Thai, serif', 'Prompt, sans-serif'],
-    default: 'Noto Sans Thai, sans-serif'
+    fonts: [
+      "Noto Sans Thai, sans-serif",
+      "Noto Serif Thai, serif",
+      "Prompt, sans-serif",
+    ],
+    default: "Noto Sans Thai, sans-serif",
   },
-  
+
   // Vietnamese (Latin with diacritics)
   vi: {
-    fonts: ['Noto Sans, sans-serif', 'Be Vietnam Pro, sans-serif', 'Inter, sans-serif', 'Poppins, sans-serif'],
-    default: 'Be Vietnam Pro, sans-serif'
+    fonts: [
+      "Noto Sans, sans-serif",
+      "Be Vietnam Pro, sans-serif",
+      "Inter, sans-serif",
+      "Poppins, sans-serif",
+    ],
+    default: "Be Vietnam Pro, sans-serif",
   },
-  
+
   // Russian/Cyrillic
   ru: {
-    fonts: ['Roboto, sans-serif', 'Noto Sans, sans-serif', 'PT Sans, sans-serif', 'Montserrat, sans-serif'],
-    default: 'Roboto, sans-serif'
+    fonts: [
+      "Roboto, sans-serif",
+      "Noto Sans, sans-serif",
+      "PT Sans, sans-serif",
+      "Montserrat, sans-serif",
+    ],
+    default: "Roboto, sans-serif",
   },
-  
+
   // Turkish (Latin)
   tr: {
-    fonts: ['Inter, sans-serif', 'Poppins, sans-serif', 'Roboto, sans-serif', 'Open Sans, sans-serif'],
-    default: 'Inter, sans-serif'
+    fonts: [
+      "Inter, sans-serif",
+      "Poppins, sans-serif",
+      "Roboto, sans-serif",
+      "Open Sans, sans-serif",
+    ],
+    default: "Inter, sans-serif",
   },
-  
+
   // Persian/Farsi (uses Arabic script)
   fa: {
-    fonts: ['Amiri, serif', 'Scheherazade New, serif', 'Noto Naskh Arabic, serif', 'Lateef, serif'],
-    default: 'Amiri, serif'
-  }
+    fonts: [
+      "Amiri, serif",
+      "Scheherazade New, serif",
+      "Noto Naskh Arabic, serif",
+      "Lateef, serif",
+    ],
+    default: "Amiri, serif",
+  },
 };
 
 // Map font values to display names
 const fontDisplayNames = {
-  'Inter, sans-serif': 'Inter',
-  'Poppins, sans-serif': 'Poppins',
-  'Lora, serif': 'Lora',
-  'Merriweather, serif': 'Merriweather',
-  'Nunito, sans-serif': 'Nunito',
-  'Roboto Slab, serif': 'Roboto Slab',
-  'Montserrat, sans-serif': 'Montserrat',
-  'Open Sans, sans-serif': 'Open Sans',
-  'Source Sans 3, sans-serif': 'Source Sans 3',
-  'Work Sans, sans-serif': 'Work Sans',
-  'Raleway, sans-serif': 'Raleway',
-  'Lato, sans-serif': 'Lato',
-  'Oswald, sans-serif': 'Oswald',
-  'Ubuntu, sans-serif': 'Ubuntu',
-  'PT Sans, sans-serif': 'PT Sans',
-  'Karla, sans-serif': 'Karla',
-  'Rubik, sans-serif': 'Rubik',
-  'Heebo, sans-serif': 'Heebo',
-  'Barlow, sans-serif': 'Barlow',
-  'Manrope, sans-serif': 'Manrope',
-  'Space Grotesk, sans-serif': 'Space Grotesk',
-  'Fira Sans, sans-serif': 'Fira Sans',
-  'Playfair Display, serif': 'Playfair Display',
-  'DM Serif Text, serif': 'DM Serif Text',
-  'Libre Baskerville, serif': 'Libre Baskerville',
-  'PT Serif, serif': 'PT Serif',
-  'Quicksand, sans-serif': 'Quicksand',
-  'Space Mono, monospace': 'Space Mono',
-  'Fira Code, monospace': 'Fira Code',
-  'JetBrains Mono, monospace': 'JetBrains Mono',
-  'Amiri, serif': 'Amiri',
-  'Scheherazade New, serif': 'Scheherazade New',
-  'Cairo, sans-serif': 'Cairo',
-  'Changa, sans-serif': 'Changa',
-  'Reem Kufi, sans-serif': 'Reem Kufi',
-  'Noto Naskh Arabic, serif': 'Noto Naskh Arabic',
-  'Noto Kufi Arabic, sans-serif': 'Noto Kufi Arabic',
-  'IBM Plex Sans Arabic, sans-serif': 'IBM Plex Sans Arabic',
-  'Tajawal, sans-serif': 'Tajawal',
-  'El Messiri, sans-serif': 'El Messiri',
-  'Markazi Text, serif': 'Markazi Text',
-  'Lateef, serif': 'Lateef',
-  'Harmattan, sans-serif': 'Harmattan',
-  'Aref Ruqaa, serif': 'Aref Ruqaa',
-  'Katibeh, cursive': 'Katibeh',
-  'Lalezar, cursive': 'Lalezar',
-  'Rakkas, cursive': 'Rakkas',
-  'Mada, sans-serif': 'Mada',
-  'Almarai, sans-serif': 'Almarai',
-  'Hind Siliguri, sans-serif': 'Hind Siliguri',
-  'Noto Sans Bengali, sans-serif': 'Noto Sans Bengali',
-  'Noto Serif Bengali, serif': 'Noto Serif Bengali',
-  'Baloo Da 2, cursive': 'Baloo Da 2',
-  'Mukta, sans-serif': 'Mukta',
-  'Noto Sans Devanagari, sans-serif': 'Noto Sans Devanagari',
-  'Noto Serif Devanagari, serif': 'Noto Serif Devanagari',
-  'Hind, sans-serif': 'Hind',
-  'Tiro Devanagari Hindi, serif': 'Tiro Devanagari',
-  'Noto Sans SC, sans-serif': 'Noto Sans SC (Chinese Simplified)',
-  'Noto Sans TC, sans-serif': 'Noto Sans TC (Chinese Traditional)',
-  'Noto Serif SC, serif': 'Noto Serif SC',
-  'Ma Shan Zheng, cursive': 'Ma Shan Zheng',
-  'Noto Sans JP, sans-serif': 'Noto Sans JP',
-  'Noto Serif JP, serif': 'Noto Serif JP',
-  'M PLUS Rounded 1c, sans-serif': 'M PLUS Rounded 1c',
-  'Noto Sans KR, sans-serif': 'Noto Sans KR',
-  'Noto Serif KR, serif': 'Noto Serif KR',
-  'Black Han Sans, sans-serif': 'Black Han Sans',
-  'Noto Sans Thai, sans-serif': 'Noto Sans Thai',
-  'Noto Serif Thai, serif': 'Noto Serif Thai',
-  'Prompt, sans-serif': 'Prompt',
-  'Noto Sans, sans-serif': 'Noto Sans',
-  'Be Vietnam Pro, sans-serif': 'Be Vietnam Pro',
-  'Roboto, sans-serif': 'Roboto'
+  "Inter, sans-serif": "Inter",
+  "Poppins, sans-serif": "Poppins",
+  "Lora, serif": "Lora",
+  "Merriweather, serif": "Merriweather",
+  "Nunito, sans-serif": "Nunito",
+  "Roboto Slab, serif": "Roboto Slab",
+  "Montserrat, sans-serif": "Montserrat",
+  "Open Sans, sans-serif": "Open Sans",
+  "Source Sans 3, sans-serif": "Source Sans 3",
+  "Work Sans, sans-serif": "Work Sans",
+  "Raleway, sans-serif": "Raleway",
+  "Lato, sans-serif": "Lato",
+  "Oswald, sans-serif": "Oswald",
+  "Ubuntu, sans-serif": "Ubuntu",
+  "PT Sans, sans-serif": "PT Sans",
+  "Karla, sans-serif": "Karla",
+  "Rubik, sans-serif": "Rubik",
+  "Heebo, sans-serif": "Heebo",
+  "Barlow, sans-serif": "Barlow",
+  "Manrope, sans-serif": "Manrope",
+  "Space Grotesk, sans-serif": "Space Grotesk",
+  "Fira Sans, sans-serif": "Fira Sans",
+  "Playfair Display, serif": "Playfair Display",
+  "DM Serif Text, serif": "DM Serif Text",
+  "Libre Baskerville, serif": "Libre Baskerville",
+  "PT Serif, serif": "PT Serif",
+  "Quicksand, sans-serif": "Quicksand",
+  "Space Mono, monospace": "Space Mono",
+  "Fira Code, monospace": "Fira Code",
+  "JetBrains Mono, monospace": "JetBrains Mono",
+  "Amiri, serif": "Amiri",
+  "Scheherazade New, serif": "Scheherazade New",
+  "Cairo, sans-serif": "Cairo",
+  "Changa, sans-serif": "Changa",
+  "Reem Kufi, sans-serif": "Reem Kufi",
+  "Noto Naskh Arabic, serif": "Noto Naskh Arabic",
+  "Noto Kufi Arabic, sans-serif": "Noto Kufi Arabic",
+  "IBM Plex Sans Arabic, sans-serif": "IBM Plex Sans Arabic",
+  "Tajawal, sans-serif": "Tajawal",
+  "El Messiri, sans-serif": "El Messiri",
+  "Markazi Text, serif": "Markazi Text",
+  "Lateef, serif": "Lateef",
+  "Harmattan, sans-serif": "Harmattan",
+  "Aref Ruqaa, serif": "Aref Ruqaa",
+  "Katibeh, cursive": "Katibeh",
+  "Lalezar, cursive": "Lalezar",
+  "Rakkas, cursive": "Rakkas",
+  "Mada, sans-serif": "Mada",
+  "Almarai, sans-serif": "Almarai",
+  "Hind Siliguri, sans-serif": "Hind Siliguri",
+  "Noto Sans Bengali, sans-serif": "Noto Sans Bengali",
+  "Noto Serif Bengali, serif": "Noto Serif Bengali",
+  "Baloo Da 2, cursive": "Baloo Da 2",
+  "Mukta, sans-serif": "Mukta",
+  "Noto Sans Devanagari, sans-serif": "Noto Sans Devanagari",
+  "Noto Serif Devanagari, serif": "Noto Serif Devanagari",
+  "Hind, sans-serif": "Hind",
+  "Tiro Devanagari Hindi, serif": "Tiro Devanagari",
+  "Noto Sans SC, sans-serif": "Noto Sans SC (Chinese Simplified)",
+  "Noto Sans TC, sans-serif": "Noto Sans TC (Chinese Traditional)",
+  "Noto Serif SC, serif": "Noto Serif SC",
+  "Ma Shan Zheng, cursive": "Ma Shan Zheng",
+  "Noto Sans JP, sans-serif": "Noto Sans JP",
+  "Noto Serif JP, serif": "Noto Serif JP",
+  "M PLUS Rounded 1c, sans-serif": "M PLUS Rounded 1c",
+  "Noto Sans KR, sans-serif": "Noto Sans KR",
+  "Noto Serif KR, serif": "Noto Serif KR",
+  "Black Han Sans, sans-serif": "Black Han Sans",
+  "Noto Sans Thai, sans-serif": "Noto Sans Thai",
+  "Noto Serif Thai, serif": "Noto Serif Thai",
+  "Prompt, sans-serif": "Prompt",
+  "Noto Sans, sans-serif": "Noto Sans",
+  "Be Vietnam Pro, sans-serif": "Be Vietnam Pro",
+  "Roboto, sans-serif": "Roboto",
 };
 
 function updateFontPickerForLanguage(langCode) {
   if (!fontPicker) return;
-  
+
   // Get font list for this language, fallback to English if not found
-  const langFonts = fontsByLanguage[langCode] || fontsByLanguage['en'];
-  
+  const langFonts = fontsByLanguage[langCode] || fontsByLanguage["en"];
+
   // Clear and repopulate the font picker
   fontPicker.innerHTML = langFonts.fonts
-    .map(font => `<option value="${font}">${fontDisplayNames[font] || font}</option>`)
-    .join('');
-  
+    .map(
+      (font) =>
+        `<option value="${font}">${fontDisplayNames[font] || font}</option>`
+    )
+    .join("");
+
   // Set default font for this language
   fontPicker.value = langFonts.default;
   window.selectedFont = langFonts.default;
-  
+
   // Trigger update
   onAnyInputChange();
 }
@@ -438,32 +552,34 @@ function setupEventListeners() {
         el.addEventListener("input", () => {
           if (el === textSize) {
             window.sizePercent = parseInt(textSize.value, 10) || 100;
-            if (textSizeVal) textSizeVal.textContent = `(${window.sizePercent}%)`;
+            if (textSizeVal)
+              textSizeVal.textContent = `(${window.sizePercent}%)`;
           }
           if (el === arabicTextSize) {
-            window.arabicSizePercent = parseInt(arabicTextSize.value, 10) || 100;
+            window.arabicSizePercent =
+              parseInt(arabicTextSize.value, 10) || 100;
             if (arabicTextSizeVal)
               arabicTextSizeVal.textContent = `(${window.arabicSizePercent}%)`;
           }
           onAnyInputChange();
         });
       }
-      
+
       // Special handling for translation edition changes
       if (el === translationEditionSel) {
         el.addEventListener("change", async () => {
           const edition = translationEditionSel.value;
           if (!edition) return;
-          
+
           // Extract language code (e.g., "en" from "en.asad")
-          const langCode = edition.split('.')[0].toLowerCase();
-          
+          const langCode = edition.split(".")[0].toLowerCase();
+
           // Update font picker based on language
           updateFontPickerForLanguage(langCode);
-          
+
           // Load translation preview
           await loadTranslationPreview(edition);
-          
+
           onAnyInputChange();
         });
       }
@@ -520,17 +636,17 @@ function setupEventListeners() {
       console.log("Delegated change event on bgUploadInput", e.target.files);
       if (e.target.files && e.target.files.length) {
         window.backgroundModule.handleUserUploads(e.target.files);
-        
+
         const bgModeMedia = document.getElementById("bgModeMedia");
         const bgMediaSelect = document.getElementById("bgMediaSelect");
-        
+
         // Switch to media mode if not already
         if (bgModeMedia && !bgModeMedia.checked) {
           bgModeMedia.checked = true;
           window.backgroundModule.setBackgroundMode("media");
           window.backgroundModule.applyBgModeUI();
         }
-        
+
         // Select the first item (which is the user upload)
         if (bgMediaSelect) {
           console.log("Setting bgMediaSelect value to 0");
@@ -661,8 +777,6 @@ function setupEventListeners() {
   }
 }
 
-
-
 // Note: populateSelectFromList is already exposed by background.js module
 
 // ------------------ Init ------------------
@@ -707,8 +821,9 @@ async function initializeApp() {
   if (audio) audio.volume = (Number(volumeSlider?.value) || 100) / 100;
 
   window.drawingModule.drawPreview();
+  setPanelNumbers();
   setupMobileNav();
-  
+
   // Load initial translation preview (Bismillah)
   if (translationEditionSel?.value) {
     loadTranslationPreview(translationEditionSel.value);
@@ -717,12 +832,14 @@ async function initializeApp() {
 
 async function loadTranslationPreview(edition) {
   if (!edition) return;
-  
+
   try {
     // Fetch Al-Fatiha 1:1 (Bismillah) in the selected language
-    const response = await fetch(`https://api.alquran.cloud/v1/ayah/1/${edition}`);
+    const response = await fetch(
+      `https://api.alquran.cloud/v1/ayah/1/${edition}`
+    );
     const data = await response.json();
-    
+
     if (data?.data?.text) {
       window.currentText = data.data.text;
       window.currentLabel = "Al-Fatiha 1:1";
@@ -730,6 +847,16 @@ async function loadTranslationPreview(edition) {
   } catch (error) {
     console.warn("Failed to fetch translation preview:", error);
   }
+}
+
+function setPanelNumbers() {
+  const panels = document.querySelectorAll(".panel");
+  panels.forEach((panel, index) => {
+    const heading = panel.querySelector("h3");
+    if (heading) {
+      heading.setAttribute("data-panel-number", index + 1);
+    }
+  });
 }
 
 function setupMobileNav() {

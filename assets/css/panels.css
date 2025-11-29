@@ -9,6 +9,7 @@
   border-radius: var(--radius);
   padding: 14px;
   background: #0e131a;
+  counter-increment: panel-step;
 }
 
 .panel h3 {
@@ -21,8 +22,7 @@
 }
 
 .panel h3::before {
-  counter-increment: panel-step;
-  content: counter(panel-step);
+  content: attr(data-panel-number);
   display: inline-flex;
   align-items: center;
   justify-content: center;
