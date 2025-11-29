@@ -336,6 +336,18 @@ function drawPreview() {
     });
     pctx.restore();
 
+    // --- Draw Label (Ayah Number) ---
+    pctx.font = `600 36px ${selectedFont}`;
+    pctx.fillStyle = fontColor;
+    pctx.textAlign = "center";
+    // Position below the last line of translation
+    // transY is the middle of the first line.
+    // Last line Y = transY + (lines - 1) * lh
+    // We want to be below that.
+    const lastTransLineY = transY + (transSpec.lines.length - 1) * transSpec.lineHeight;
+    const labelY = lastTransLineY + transSpec.lineHeight + 20; 
+    pctx.fillText(currentLabel, W / 2, labelY);
+
   } else {
     // Original single-text logic
     const spec = fitTextToBox(
@@ -362,13 +374,21 @@ function drawPreview() {
     pctx.shadowBlur = 8;
     lines.forEach((ln, i) => pctx.fillText(ln, W / 2, y + i * lineHeight));
     pctx.restore();
+
+    // --- Draw Label (Ayah Number) ---
+    pctx.font = `600 36px ${selectedFont}`;
+    pctx.fillStyle = fontColor;
+    // Position below the last line
+    const lastLineY = y + (lines.length - 1) * lineHeight;
+    const labelY = lastLineY + lineHeight + 20;
+    pctx.fillText(currentLabel, W / 2, labelY);
   }
 
-  // Bottom label
-  pctx.font = `600 ${Math.max(30, Math.round(36 * scale))}px ${selectedFont}`;
-  pctx.fillStyle = fontColor;
-  pctx.textAlign = "right";
-  pctx.fillText(currentLabel, W - 40, H - 60);
+  // Bottom label (Removed)
+  // pctx.font = `600 ${Math.max(30, Math.round(36 * scale))}px ${selectedFont}`;
+  // pctx.fillStyle = fontColor;
+  // pctx.textAlign = "right";
+  // pctx.fillText(currentLabel, W - 40, H - 60);
 
   // Credits
   const badgePadX = 14,
@@ -376,30 +396,44 @@ function drawPreview() {
     badgeRadius = 14;
   pctx.textAlign = "left";
   pctx.textBaseline = "alphabetic";
-  const creditTextColor = fontColor;
+  const creditTextColor = window.creditColor || fontColor;
+
+// Load logo image
+const logoImg = new Image();
+logoImg.src = 'assets/quran.png';
+
+// ... (rest of the file)
 
   if (showCreditCreator) {
-    const txt = "Quran Shorts — Editor by TheAAA";
-    pctx.font = `600 28px ${selectedFont}`;
+    const txt = " by TheAAA";
+    pctx.font = `600 36px ${selectedFont}`;
     const tw = pctx.measureText(txt).width;
+    
+    const logoSize = 56;
+    const logoPad = 10;
+    const totalContentW = logoSize + logoPad + tw;
+
     const th = 30;
     const bx = 40,
       by = 60;
+      
     pctx.save();
-    pctx.globalAlpha = 0.12;
-    pctx.fillStyle = "#000";
-    drawRoundedRect(
-      pctx,
-      bx - badgePadX,
-      by - th - badgePadY + 6,
-      tw + badgePadX * 2,
-      th + badgePadY * 2,
-      badgeRadius
-    );
-    pctx.fill();
+    // pctx.globalAlpha = 0.12;
+    // pctx.fillStyle = "#000";
+    // drawRoundedRect(...) removed
+    // pctx.fill();
     pctx.restore();
+    
+    // Draw Logo
+    if (logoImg.complete && logoImg.naturalWidth > 0) {
+        const rectY = by - th - badgePadY + 6;
+        const rectH = th + badgePadY * 2;
+        const centerY = rectY + rectH / 2;
+        pctx.drawImage(logoImg, bx, centerY - logoSize / 2, logoSize, logoSize);
+    }
+
     pctx.fillStyle = creditTextColor;
-    pctx.fillText(txt, bx, by);
+    pctx.fillText(txt, bx + logoSize + logoPad, by);
   }
 
   const madeByNameNow = (madeByInput?.value || "").trim();
@@ -415,17 +449,7 @@ function drawPreview() {
     }
     const tw = pctx.measureText(txt).width;
     pctx.save();
-    pctx.globalAlpha = 0.12;
-    pctx.fillStyle = "#000";
-    drawRoundedRect(
-      pctx,
-      bx - tw - badgePadX,
-      by - th - badgePadY + 6,
-      tw + badgePadX * 2,
-      th + badgePadY * 2,
-      badgeRadius
-    );
-    pctx.fill();
+    // Background box removed
     pctx.restore();
     pctx.fillStyle = creditTextColor;
     pctx.textAlign = "right";
@@ -444,17 +468,7 @@ function drawPreview() {
     }
     const tw = pctx.measureText(txt).width;
     pctx.save();
-    pctx.globalAlpha = 0.12;
-    pctx.fillStyle = "#000";
-    drawRoundedRect(
-      pctx,
-      bx - badgePadX,
-      by - th - badgePadY - 46,
-      tw + badgePadX * 2,
-      th + badgePadY * 2,
-      badgeRadius
-    );
-    pctx.fill();
+    // Background box removed
     pctx.restore();
     pctx.fillStyle = creditTextColor;
     pctx.fillText(txt, bx, by - 48);

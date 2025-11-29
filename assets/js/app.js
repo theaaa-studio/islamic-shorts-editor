@@ -10,10 +10,11 @@ let reciterSel,
   textSizeVal,
   arabicTextSize,
   arabicTextSizeVal;
-let bgColorInput, fontColorInput, arabicFontColorInput, textBoxColorInput, textBoxOpacitySlider, textBoxOpacityVal;
-let translationEditionSel;
+  arabicTextSizeVal;
+let bgColorInput, fontColorInput, arabicFontColorInput, creditColorInput, textBoxColorInput, textBoxOpacitySlider, textBoxOpacityVal;
 let creditDataChk, creditCreatorChk, madeByInput, creditMadeByChk;
 let bgModeColor,
+
   bgModeMedia,
   bgColorField,
   bgMediaField,
@@ -41,6 +42,7 @@ function initializeDOM() {
   bgColorInput = $("#bgColor");
   fontColorInput = $("#fontColor");
   arabicFontColorInput = $("#arabicFontColor");
+  creditColorInput = $("#creditColor");
   textBoxColorInput = $("#textBoxColor");
   textBoxOpacitySlider = $("#textBoxOpacity");
   textBoxOpacityVal = $("#textBoxOpacityVal");
@@ -394,6 +396,7 @@ function onAnyInputChange() {
   }
   if (fontColorInput) window.fontColor = fontColorInput.value;
   if (arabicFontColorInput) window.arabicFontColor = arabicFontColorInput.value;
+  if (creditColorInput) window.creditColor = creditColorInput.value;
   window.translationEdition = translationEditionSel?.value || "en.sahih";
   window.showCreditData = !!creditDataChk?.checked;
   window.showCreditCreator = !!creditCreatorChk?.checked;
@@ -417,6 +420,7 @@ function setupEventListeners() {
     bgColorInput,
     fontColorInput,
     arabicFontColorInput,
+    creditColorInput,
     textBoxColorInput,
     translationEditionSel,
   ]
@@ -428,7 +432,8 @@ function setupEventListeners() {
         el === textSize ||
         el === arabicTextSize ||
         el === fontColorInput ||
-        el === arabicFontColorInput
+        el === arabicFontColorInput ||
+        el === creditColorInput
       ) {
         el.addEventListener("input", () => {
           if (el === textSize) {
@@ -470,6 +475,12 @@ function setupEventListeners() {
   });
   fontColorInput?.addEventListener("input", () => {
     window.fontColor = fontColorInput.value;
+  });
+  creditColorInput?.addEventListener("input", () => {
+    window.creditColor = creditColorInput.value;
+  });
+  arabicFontColorInput?.addEventListener("input", () => {
+    window.arabicFontColor = arabicFontColorInput.value;
   });
   textBoxColorInput?.addEventListener("input", () => {
     window.backgroundModule.setTextBoxColor(textBoxColorInput.value);
@@ -679,6 +690,7 @@ async function initializeApp() {
   if (textSizeVal) textSizeVal.textContent = `(${window.sizePercent}%)`;
   window.backgroundModule.setBgColor(bgColorInput.value);
   window.fontColor = fontColorInput.value;
+  window.creditColor = creditColorInput?.value || "#1f1f1f";
 
   // Keep state aligned with the <select>
   window.translationEdition =

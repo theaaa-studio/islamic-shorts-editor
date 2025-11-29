@@ -25,3 +25,11 @@ body {
   color: var(--text);
 }
 
+
+.credit-logo {
+  width: 20px;
+  height: auto;
+  vertical-align: middle;
+  margin-right: 8px;
+  display: inline-block;
+}
