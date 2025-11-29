@@ -22,12 +22,19 @@
     <!-- Color pickers in horizontal layout -->
     <div class="field" style="display: flex; gap: 1rem; align-items: flex-start;">
       <div style="flex: 1;" id="bgColorField">
-        <label class="small" for="bgColor">Background Color</label>
+        <label class="small" for="bgColor" style="white-space: nowrap;">Background Color</label>
         <input id="bgColor" type="color" value="#FBEEE8" />
       </div>
       <div style="flex: 1;">
-        <label class="small" for="textBoxColor">Ayah Box Color</label>
-        <input id="textBoxColor" type="color" value="#000000" />
+        <label class="small" style="white-space: nowrap;">Ayah Box Color</label>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input id="textBoxColor" type="color" value="#000000" style="width: 50px; height: 50px;" />
+          <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem; min-width: 150px;">
+            <label class="small" for="textBoxOpacity" style="white-space: nowrap; margin: 0; font-size: 0.75rem;">Opacity:</label>
+            <input id="textBoxOpacity" type="range" min="0" max="100" value="12" style="flex: 1; min-width: 80px;" />
+            <span id="textBoxOpacityVal" class="small" style="min-width: 3ch; font-size: 0.75rem;">12%</span>
+          </div>
+        </div>
       </div>
     </div>
 

@@ -10,7 +10,7 @@ let reciterSel,
   textSizeVal,
   arabicTextSize,
   arabicTextSizeVal;
-let bgColorInput, fontColorInput, arabicFontColorInput, textBoxColorInput;
+let bgColorInput, fontColorInput, arabicFontColorInput, textBoxColorInput, textBoxOpacitySlider, textBoxOpacityVal;
 let translationEditionSel;
 let creditDataChk, creditCreatorChk, madeByInput, creditMadeByChk;
 let bgModeColor,
@@ -42,6 +42,8 @@ function initializeDOM() {
   fontColorInput = $("#fontColor");
   arabicFontColorInput = $("#arabicFontColor");
   textBoxColorInput = $("#textBoxColor");
+  textBoxOpacitySlider = $("#textBoxOpacity");
+  textBoxOpacityVal = $("#textBoxOpacityVal");
 
   translationEditionSel = $("#translationEdition");
 
@@ -471,6 +473,11 @@ function setupEventListeners() {
   });
   textBoxColorInput?.addEventListener("input", () => {
     window.backgroundModule.setTextBoxColor(textBoxColorInput.value);
+  });
+  textBoxOpacitySlider?.addEventListener("input", () => {
+    const opacityPercent = parseInt(textBoxOpacitySlider.value, 10);
+    if (textBoxOpacityVal) textBoxOpacityVal.textContent = `${opacityPercent}%`;
+    window.backgroundModule.setTextBoxOpacity(opacityPercent / 100);
   });
 
   // ------------------ Background mode toggles ------------------

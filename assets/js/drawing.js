@@ -297,7 +297,7 @@ function drawPreview() {
     const boxH = totalVisualH;
     
     pctx.save();
-    pctx.globalAlpha = 0.12; // Same as credit box
+    pctx.globalAlpha = window.backgroundModule.getTextBoxOpacity() || 0.12;
     pctx.fillStyle = window.backgroundModule.getTextBoxColor() || "#000";
     drawRoundedRect(
         pctx,

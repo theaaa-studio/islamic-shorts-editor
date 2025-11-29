@@ -41,6 +41,7 @@ const DEFAULT_BG_MEDIA = []; // fallback (optional)
 let backgroundMode = "color"; // 'color' | 'media'
 let bgColor = "#ffffff";
 let textBoxColor = "#000000"; // Color for text background box
+let textBoxOpacity = 0.12; // Opacity for text background box (0-1)
 let bgMediaList = []; // [{src, type, name?}]
 let selectedBg = null; // active media item
 const bgImg = new Image();
@@ -262,6 +263,7 @@ window.backgroundModule = {
   backgroundMode,
   bgColor,
   textBoxColor,
+  textBoxOpacity,
   bgImg,
   bgVideo,
   selectedBg,
@@ -278,6 +280,10 @@ window.backgroundModule = {
   getTextBoxColor: () => textBoxColor,
   setTextBoxColor: (color) => {
     textBoxColor = color;
+  },
+  getTextBoxOpacity: () => textBoxOpacity,
+  setTextBoxOpacity: (opacity) => {
+    textBoxOpacity = opacity;
   },
   loadBackgroundAssets,
   applyBgModeUI,
