@@ -1,8 +1,8 @@
         <!-- Panel: Credits -->
         <div class="panel">
           <h3>Credits</h3>
-          <div class="four-col-inline">
-            <div class="field">
+          <div class="credits-row">
+            <div class="field" style="flex: 1; min-width: 200px;">
               <label class="small" for="madeByInput">Made by (name)</label>
               <input
                 id="madeByInput"
@@ -10,10 +10,6 @@
                 placeholder="Your name or channel"
                 value=""
               />
-            </div>
-            <div class="field">
-              <label class="small" for="creditColor">Credit Color</label>
-              <input id="creditColor" type="color" value="#1f1f1f" />
             </div>
             <label class="toggle" title="Show a Made by badge">
               <input type="checkbox" id="creditMadeBy" checked />
@@ -30,6 +26,10 @@
               <input type="checkbox" id="creditCreator" checked />
               <span>Editor Developer</span>
             </label>
+            <div class="field" style="flex: 0 0 auto;">
+              <label class="small" for="creditColor">Credit Color</label>
+              <input id="creditColor" type="color" value="#1f1f1f" />
+            </div>
           </div>
         </div>
 

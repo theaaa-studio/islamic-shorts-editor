@@ -94,3 +94,30 @@ label.small {
   width: 16px;
   height: 16px;
 }
+
+/* Credits row layout - all elements in one row with flexible spacing */
+.credits-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.credits-row .field {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.credits-row .toggle {
+  padding: 10px 12px;
+  height: fit-content;
+  white-space: nowrap;
+}
+
+/* Responsive: stack on smaller screens */
+@media (max-width: 1200px) {
+  .credits-row {
+    flex-wrap: wrap;
+  }
+}
