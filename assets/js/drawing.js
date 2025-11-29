@@ -337,10 +337,11 @@ function drawPreview() {
 
     // --- Draw Label (Ayah Number) ---
     pctx.font = `600 36px ${selectedFont}`;
-    pctx.fillStyle = fontColor;
-    pctx.textAlign = "right";
-    // Position at bottom-right of the preview canvas
-    pctx.fillText(currentLabel, W - 40, H - 60);
+    pctx.fillStyle = fontColor; // Use translation text color
+    pctx.textAlign = "center";
+    // Position below the box
+    const labelY = boxTop + boxH + 50; // 50px below the box
+    pctx.fillText(currentLabel, W / 2, labelY);
 
   } else {
     // Original single-text logic
@@ -405,10 +406,12 @@ function drawPreview() {
 
     // --- Draw Label (Ayah Number) ---
     pctx.font = `600 36px ${selectedFont}`;
-    pctx.fillStyle = fontColor;
-    pctx.textAlign = "right";
-    // Position at bottom-right of the preview canvas
-    pctx.fillText(currentLabel, W - 40, H - 60);
+    pctx.fillStyle = fontColor; // Use translation text color
+    pctx.textAlign = "center";
+    // Position below the box
+    const boxBottom = y - boxPadY + totalH + boxPadY * 2;
+    const labelY = boxBottom + 50; // 50px below the box
+    pctx.fillText(currentLabel, W / 2, labelY);
   }
 
   // Bottom label (Removed)
