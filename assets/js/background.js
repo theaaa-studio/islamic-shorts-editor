@@ -40,6 +40,7 @@ const DEFAULT_BG_MEDIA = []; // fallback (optional)
 // Background state
 let backgroundMode = "color"; // 'color' | 'media'
 let bgColor = "#ffffff";
+let textBoxColor = "#000000"; // Color for text background box
 let bgMediaList = []; // [{src, type, name?}]
 let selectedBg = null; // active media item
 const bgImg = new Image();
@@ -260,6 +261,7 @@ function applyBgModeUI() {
 window.backgroundModule = {
   backgroundMode,
   bgColor,
+  textBoxColor,
   bgImg,
   bgVideo,
   selectedBg,
@@ -272,6 +274,10 @@ window.backgroundModule = {
   getBgColor: () => bgColor,
   setBgColor: (color) => {
     bgColor = color;
+  },
+  getTextBoxColor: () => textBoxColor,
+  setTextBoxColor: (color) => {
+    textBoxColor = color;
   },
   loadBackgroundAssets,
   applyBgModeUI,

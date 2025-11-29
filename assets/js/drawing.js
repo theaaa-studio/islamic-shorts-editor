@@ -177,12 +177,12 @@ function drawPreview() {
   const currentArabic = window.currentArabicText || "";
 
   if (currentArabic) {
-    // Split space: We want Translation CENTERED, and Arabic stacked ABOVE it.
+    // Split space: We want the ENTIRE GROUP (Arabic + Translation) CENTERED vertically.
     
-    // --- 1. Calculate Translation Layout (First, to determine center) ---
-    // We'll allow it to take up to ~60% of height to leave room for Arabic
+    // --- 1. Calculate Layouts (Measure first, position later) ---
+    
+    // Translation Layout
     const translationMaxH = usableH * 0.6; 
-    
     const transSpec = fitTextToBox(
       pctx,
       currentText,
@@ -194,19 +194,11 @@ function drawPreview() {
       selectedFont,
       700
     );
-
     const transTotalH = transSpec.lines.length * transSpec.lineHeight;
-    // Center Translation in the entire screen (H)
-    // This is our anchor point.
-    let transY = H / 2 - transTotalH / 2 + transSpec.lineHeight / 2;
 
-
-    // --- 2. Calculate Arabic Layout ---
-    // Arabic gets whatever space is reasonable, but we position it relative to Translation.
-    // We'll limit it to ~35% of height so it doesn't get too huge.
+    // Arabic Layout
     const arabicMaxH = usableH * 0.35;
     const arabicFont = window.selectedArabicFont || "Amiri, serif";
-    
     const arabicSpec = fitTextToBox(
       pctx,
       currentArabic,
@@ -218,34 +210,106 @@ function drawPreview() {
       arabicFont,
       700
     );
-    
     const arabicTotalH = arabicSpec.lines.length * arabicSpec.lineHeight;
 
-    // Position Arabic ABOVE Translation
-    // Gap between bottom of Arabic and top of Translation
+    // --- 2. Calculate Vertical Positioning (Visual Centering) ---
     const gap = 40 * scale; 
     
-    // Arabic Y position:
-    // Top of Translation block = (transY - transSpec.lineHeight / 2)
-    // Bottom of Arabic block should be at (Top of Translation - gap)
-    // Arabic Y (center of first line) needs to be calculated.
-    // Top of Arabic block = (Top of Translation - gap - arabicTotalH)
-    // First line Y = Top of Arabic block + arabicSpec.lineHeight / 2
+    // Initial "Line Box" positioning (just to establish relative positions)
+    // We'll treat y=0 as the top of the Arabic line box for now.
+    const arabicLineBoxH = arabicSpec.lines.length * arabicSpec.lineHeight;
+    const transLineBoxH = transSpec.lines.length * transSpec.lineHeight;
     
-    const transTop = transY - transSpec.lineHeight / 2;
-    const arabicBottom = transTop - gap;
-    const arabicTop = arabicBottom - arabicTotalH;
-    let arabicY = arabicTop + arabicSpec.lineHeight / 2;
+    // Relative Y positions (assuming top of Arabic block is 0)
+    // Arabic is at top.
+    const relArabicY = arabicSpec.lineHeight / 2;
     
-    // If Arabic goes off-screen top, we might need to push everything down or just clamp.
-    // For now, let's just clamp the top margin if it's too high, pushing Translation down if needed?
-    // Actually, user asked for "Arabic always just top based on translation". 
-    // So if translation is centered, Arabic rides on top. 
-    // If that pushes Arabic off screen, so be it (or user can resize). 
-    // But let's add a small safety check to not go above marginY if possible, 
-    // effectively pushing the whole group down if needed? 
-    // For simplicity and strict adherence to "centered translation", we'll stick to the anchor.
+    // Translation is below Arabic + Gap
+    const relTransTop = arabicLineBoxH + gap;
+    const relTransY = relTransTop + transSpec.lineHeight / 2;
     
+    // --- Measure Visual Extents (Ink) ---
+    // We need to know where the ink actually starts and ends relative to these Ys.
+    
+    // Measure Arabic Top (First Line)
+    pctx.font = `700 ${arabicSpec.fontSize}px ${arabicFont}`;
+    pctx.textBaseline = "middle";
+    const firstArLine = arabicSpec.lines[0];
+    const metricsAr = pctx.measureText(firstArLine);
+    const arAscent = metricsAr.actualBoundingBoxAscent; // Dist from middle to top of ink
+    
+    // Measure Translation Bottom (Last Line)
+    pctx.font = `700 ${transSpec.fontSize}px ${selectedFont}`;
+    const lastTransLine = transSpec.lines[transSpec.lines.length - 1];
+    const metricsTr = pctx.measureText(lastTransLine);
+    const trDescent = metricsTr.actualBoundingBoxDescent; // Dist from middle to bottom of ink
+    
+    // Calculate Visual Bounds relative to top of Arabic Block (y=0)
+    // Top of ink = relArabicY - arAscent
+    const relInkTop = relArabicY - arAscent;
+    
+    // Bottom of ink = (relTransTop + (lines-1)*lh + lh/2) + trDescent
+    // Actually, let's just get the Y of the last line.
+    const relTransLastLineY = relTransTop + (transSpec.lines.length - 1) * transSpec.lineHeight + transSpec.lineHeight / 2;
+    const relInkBottom = relTransLastLineY + trDescent;
+    
+    const totalVisualH = relInkBottom - relInkTop;
+    
+    // --- Center on Screen ---
+    // We want the visual center of the ink to be at H/2.
+    // Or simpler: We want the Ink Top to be at (H - totalVisualH) / 2.
+    const screenInkTop = (H - totalVisualH) / 2;
+    
+    // Calculate the offset to apply to our relative coordinates
+    // screenInkTop = (relInkTop + offset)
+    // offset = screenInkTop - relInkTop
+    const yOffset = screenInkTop - relInkTop;
+    
+    // Final Y positions
+    let arabicY = relArabicY + yOffset;
+    let transY = relTransY + yOffset;
+
+    // --- Draw Background Box ---
+    // Calculate max width
+    let maxLineWidth = 0;
+    
+    // Measure Arabic lines width
+    pctx.font = `700 ${arabicSpec.fontSize}px ${arabicFont}`;
+    arabicSpec.lines.forEach(line => {
+        const w = pctx.measureText(line).width;
+        if (w > maxLineWidth) maxLineWidth = w;
+    });
+
+    // Measure Translation lines width
+    pctx.font = `700 ${transSpec.fontSize}px ${selectedFont}`;
+    transSpec.lines.forEach(line => {
+        const w = pctx.measureText(line).width;
+        if (w > maxLineWidth) maxLineWidth = w;
+    });
+
+    const boxPadX = 50 * scale;
+    const boxPadY = 50 * scale;
+    const boxW = maxLineWidth + boxPadX * 2;
+    
+    // Box Top = screenInkTop
+    // Box Bottom = screenInkTop + totalVisualH
+    const boxTop = screenInkTop;
+    const boxH = totalVisualH;
+    
+    pctx.save();
+    pctx.globalAlpha = 0.12; // Same as credit box
+    pctx.fillStyle = window.backgroundModule.getTextBoxColor() || "#000";
+    drawRoundedRect(
+        pctx,
+        (W - boxW) / 2, // Center horizontally
+        boxTop - boxPadY,
+        boxW,
+        boxH + boxPadY * 2,
+        20 // Radius
+    );
+    pctx.fill();
+    pctx.restore();
+
     // --- Draw Arabic ---
     pctx.fillStyle = window.arabicFontColor || fontColor;
     pctx.textAlign = "center";

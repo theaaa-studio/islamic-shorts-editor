@@ -19,10 +19,16 @@
       <span>Media (image/video)</span>
     </label>
 
-    <!-- Solid color picker (shown when 'color' is selected) -->
-    <div class="field" id="bgColorField">
-      <label class="small" for="bgColor">Background Color</label>
-      <input id="bgColor" type="color" value="#FBEEE8" />
+    <!-- Color pickers in horizontal layout -->
+    <div class="field" style="display: flex; gap: 1rem; align-items: flex-start;">
+      <div style="flex: 1;" id="bgColorField">
+        <label class="small" for="bgColor">Background Color</label>
+        <input id="bgColor" type="color" value="#FBEEE8" />
+      </div>
+      <div style="flex: 1;">
+        <label class="small" for="textBoxColor">Text Background Box Color</label>
+        <input id="textBoxColor" type="color" value="#000000" />
+      </div>
     </div>
 
     <!-- Media selector (shown when 'media' is selected) -->

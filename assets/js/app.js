@@ -10,7 +10,7 @@ let reciterSel,
   textSizeVal,
   arabicTextSize,
   arabicTextSizeVal;
-let bgColorInput, fontColorInput, arabicFontColorInput;
+let bgColorInput, fontColorInput, arabicFontColorInput, textBoxColorInput;
 let translationEditionSel;
 let creditDataChk, creditCreatorChk, madeByInput, creditMadeByChk;
 let bgModeColor,
@@ -41,6 +41,7 @@ function initializeDOM() {
   bgColorInput = $("#bgColor");
   fontColorInput = $("#fontColor");
   arabicFontColorInput = $("#arabicFontColor");
+  textBoxColorInput = $("#textBoxColor");
 
   translationEditionSel = $("#translationEdition");
 
@@ -414,6 +415,7 @@ function setupEventListeners() {
     bgColorInput,
     fontColorInput,
     arabicFontColorInput,
+    textBoxColorInput,
     translationEditionSel,
   ]
     .filter(Boolean)
@@ -466,6 +468,9 @@ function setupEventListeners() {
   });
   fontColorInput?.addEventListener("input", () => {
     window.fontColor = fontColorInput.value;
+  });
+  textBoxColorInput?.addEventListener("input", () => {
+    window.backgroundModule.setTextBoxColor(textBoxColorInput.value);
   });
 
   // ------------------ Background mode toggles ------------------
