@@ -81,7 +81,7 @@
 
   .panel {
     padding: 0;
-    gap: 8px;
+    gap: 0px;
     height: auto;
     display: flex;
     flex-direction: column;
