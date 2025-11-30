@@ -505,6 +505,20 @@ function setAspectRatio(type) {
   }
 }
 
+// Get current aspect ratio as string for filename
+function getAspectRatioString() {
+  if (!previewCanvas) return "9-16";
+  const width = previewCanvas.width;
+  const height = previewCanvas.height;
+  
+  // Check if square (1:1)
+  if (width === height) {
+    return "1-1";
+  }
+  // Default to vertical (9:16)
+  return "9-16";
+}
+
 // ------------------ UI toggle helper ------------------
 function setDuringRecordingUI(active) {
   const stopBtn = document.getElementById("previewStopBtn");
@@ -779,12 +793,13 @@ function setupEventListeners() {
 
       const imageCount = end - start + 1;
       const ts = timestampStr();
+      const aspectRatio = getAspectRatioString();
 
       // 3. Check if we need to create a zip file (>5 images)
       if (imageCount > 5) {
         // Create zip file
         const zip = new JSZip();
-        const folder = zip.folder(`Surah-${sNum}-${safe(sName)}_Ayah-${start}-${end}_${translationName}`);
+        const folder = zip.folder(`Surah-${sNum}-${safe(sName)}_Ayah-${start}-${end}_${aspectRatio}_${translationName}`);
 
         // Show progress (optional)
         const recStatus = $("#recStatus");
@@ -822,7 +837,7 @@ function setupEventListeners() {
             });
             
             // Add to zip
-            const filename = `Surah-${sNum}-${safe(sName)}_Ayah-${i}_${translationName}.png`;
+            const filename = `Surah-${sNum}-${safe(sName)}_Ayah-${i}_${aspectRatio}_${translationName}.png`;
             folder.file(filename, blob);
 
             // Update progress
@@ -840,7 +855,7 @@ function setupEventListeners() {
         const zipBlob = await zip.generateAsync({ type: "blob" });
         const zipUrl = URL.createObjectURL(zipBlob);
         const link = document.createElement("a");
-        link.download = `Surah-${sNum}-${safe(sName)}_Ayah-${start}-${end}_${translationName}_${ts}.zip`;
+        link.download = `Surah-${sNum}-${safe(sName)}_Ayah-${start}-${end}_${aspectRatio}_${translationName}_${ts}.zip`;
         link.href = zipUrl;
         document.body.appendChild(link);
         link.click();
@@ -879,7 +894,7 @@ function setupEventListeners() {
           if (canvas) {
             const dataUrl = canvas.toDataURL("image/png");
             const link = document.createElement("a");
-            link.download = `Surah-${sNum}-${safe(sName)}_Ayah-${i}_${translationName}_${ts}.png`;
+            link.download = `Surah-${sNum}-${safe(sName)}_Ayah-${i}_${aspectRatio}_${translationName}_${ts}.png`;
             link.href = dataUrl;
             document.body.appendChild(link);
             link.click();
@@ -945,9 +960,10 @@ function setupEventListeners() {
       const ts = timestampStr();
       const translationEdition = window.translationEdition || "en.sahih";
       const translationName = translationEdition.replace(/\./g, "-");
+      const aspectRatio = getAspectRatioString();
       const filename = `Surah-${window.sessionSurah}-${safe(
         window.sessionSurahName
-      )}_Ayah-${window.sessionFrom}-${window.sessionTo}_${safe(
+      )}_Ayah-${window.sessionFrom}-${window.sessionTo}_${aspectRatio}_${safe(
         window.sessionReciterName
       )}_${translationName}_${ts}.webm`;
       const url = URL.createObjectURL(window.finalBlob);
