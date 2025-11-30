@@ -2,6 +2,47 @@
    Preview Section Styles
    ========================================================================== */
 
+.preview-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.ar-toggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.ar-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 0 12px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.ar-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ar-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
 .preview-stage {
   display: grid;
   place-items: center;
@@ -9,6 +50,16 @@
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.02);
   min-height: 0;
+  padding: 20px;
+  overflow: hidden;
+  /* Enforce 9:16 container shape to prevent layout shift */
+  /* Enforce 9:16 container shape to prevent layout shift */
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 75vh;
+  aspect-ratio: 9 / 16;
+  margin: 0 auto;
 }
 
 #previewCanvas {

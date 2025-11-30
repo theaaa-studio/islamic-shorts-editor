@@ -28,6 +28,7 @@ let bgModeColor,
   bgUploadInput;
 let previewCanvas, pctx;
 let buildPreviewBtn, downloadBtn, previewPlayBtn, dismissBtn, takePictureBtn;
+let arVerticalBtn, arSquareBtn;
 let volumeSlider, volumeVal;
 let audio, recStatus, meterBar;
 
@@ -89,6 +90,9 @@ function initializeDOM() {
   downloadBtn = $("#downloadBtn");
   previewPlayBtn = $("#previewPlayBtn");
   dismissBtn = $("#dismissBtn");
+
+  arVerticalBtn = $("#arVerticalBtn");
+  arSquareBtn = $("#arSquareBtn");
 
   // Volume UI
   volumeSlider = $("#volumeSlider");
@@ -471,6 +475,36 @@ function updateFontPickerForLanguage(langCode) {
   onAnyInputChange();
 }
 
+// ------------------ Aspect Ratio Logic ------------------
+function setAspectRatio(type) {
+  if (!previewCanvas) return;
+  
+  if (type === "square") {
+    previewCanvas.width = 1080;
+    previewCanvas.height = 1080;
+    previewCanvas.style.aspectRatio = "1 / 1";
+    
+    arVerticalBtn?.classList.remove("active");
+    arSquareBtn?.classList.add("active");
+  } else {
+    // Default: Vertical
+    previewCanvas.width = 1080;
+    previewCanvas.height = 1920;
+    previewCanvas.style.aspectRatio = "9 / 16";
+    
+    arSquareBtn?.classList.remove("active");
+    arVerticalBtn?.classList.add("active");
+  }
+
+  // Reset video buffer to force redraw with new dimensions
+  if (window.resetVideoBuffer) window.resetVideoBuffer();
+  
+  // Trigger redraw
+  if (window.drawingModule && window.drawingModule.drawPreview) {
+    window.drawingModule.drawPreview();
+  }
+}
+
 // ------------------ UI toggle helper ------------------
 function setDuringRecordingUI(active) {
   const stopBtn = document.getElementById("previewStopBtn");
@@ -749,6 +783,14 @@ function setupEventListeners() {
         }
       }
     });
+  }
+
+  // Aspect Ratio Toggles
+  if (arVerticalBtn) {
+    arVerticalBtn.addEventListener("click", () => setAspectRatio("vertical"));
+  }
+  if (arSquareBtn) {
+    arSquareBtn.addEventListener("click", () => setAspectRatio("square"));
   }
 
   // Stop button
