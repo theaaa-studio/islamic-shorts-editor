@@ -774,42 +774,114 @@ function setupEventListeners() {
         return;
       }
 
-      // 3. Iterate and capture
-      for (let i = start; i <= end; i++) {
-        // Update session info so playIndex uses correct data
-        window.sessionSurah = sNum;
-        window.sessionSurahName = sName;
-        window.sessionFrom = start;
-        window.sessionTo = end;
-        window.sessionReciterName = reciterName;
-        
-        // Prepare playlist item for this specific ayah
-        // We need to make sure window.playlist has the item we want to play
-        // But playIndex uses window.playlist[i]. 
-        // Let's just reconstruct the playlist correctly first as loadAndPlay does.
-        window.playlist = [];
-        for (let a = start; a <= end; a++) {
-            window.playlist.push({ surah: sNum, ayah: a, sName: sName });
+      const imageCount = end - start + 1;
+      const ts = timestampStr();
+
+      // 3. Check if we need to create a zip file (>5 images)
+      if (imageCount > 5) {
+        // Create zip file
+        const zip = new JSZip();
+        const folder = zip.folder(`Surah-${sNum}-${safe(sName)}_Ayah-${start}-${end}`);
+
+        // Show progress (optional)
+        const recStatus = $("#recStatus");
+        if (recStatus) {
+          recStatus.textContent = `Preparing ${imageCount} images for download...`;
         }
-        window.index = i - start; // Index in the playlist corresponding to Ayah i
 
-        // Load data (text, translation) but DO NOT autoplay
-        await window.audioModule.playIndex(window.index, false);
+        // Iterate and capture each ayah
+        for (let i = start; i <= end; i++) {
+          // Update session info
+          window.sessionSurah = sNum;
+          window.sessionSurahName = sName;
+          window.sessionFrom = start;
+          window.sessionTo = end;
+          window.sessionReciterName = reciterName;
+          
+          // Prepare playlist
+          window.playlist = [];
+          for (let a = start; a <= end; a++) {
+            window.playlist.push({ surah: sNum, ayah: a, sName: sName });
+          }
+          window.index = i - start;
 
-        // Wait a bit for canvas to render (images/fonts might take a moment)
-        await new Promise((r) => setTimeout(r, 500)); 
+          // Load data (text, translation) but DO NOT autoplay
+          await window.audioModule.playIndex(window.index, false);
 
-        // Capture canvas
-        const canvas = document.getElementById("previewCanvas");
-        if (canvas) {
-          const dataUrl = canvas.toDataURL("image/png");
-          const link = document.createElement("a");
-          const ts = timestampStr();
-          link.download = `Surah-${sNum}-${safe(sName)}_Ayah-${i}_${ts}.png`;
-          link.href = dataUrl;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          // Wait for canvas to render
+          await new Promise((r) => setTimeout(r, 500));
+
+          // Capture canvas as blob
+          const canvas = document.getElementById("previewCanvas");
+          if (canvas) {
+            const blob = await new Promise((resolve) => {
+              canvas.toBlob(resolve, "image/png");
+            });
+            
+            // Add to zip
+            const filename = `Surah-${sNum}-${safe(sName)}_Ayah-${i}.png`;
+            folder.file(filename, blob);
+
+            // Update progress
+            if (recStatus) {
+              recStatus.textContent = `Captured ${i - start + 1} of ${imageCount} images...`;
+            }
+          }
+        }
+
+        // Generate and download zip
+        if (recStatus) {
+          recStatus.textContent = `Creating zip file...`;
+        }
+
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const zipUrl = URL.createObjectURL(zipBlob);
+        const link = document.createElement("a");
+        link.download = `Surah-${sNum}-${safe(sName)}_Ayah-${start}-${end}_${ts}.zip`;
+        link.href = zipUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(zipUrl);
+
+        if (recStatus) {
+          recStatus.textContent = `Download complete! ${imageCount} images saved in zip file.`;
+        }
+
+      } else {
+        // Download individually (≤5 images)
+        for (let i = start; i <= end; i++) {
+          // Update session info
+          window.sessionSurah = sNum;
+          window.sessionSurahName = sName;
+          window.sessionFrom = start;
+          window.sessionTo = end;
+          window.sessionReciterName = reciterName;
+          
+          // Prepare playlist
+          window.playlist = [];
+          for (let a = start; a <= end; a++) {
+            window.playlist.push({ surah: sNum, ayah: a, sName: sName });
+          }
+          window.index = i - start;
+
+          // Load data (text, translation) but DO NOT autoplay
+          await window.audioModule.playIndex(window.index, false);
+
+          // Wait for canvas to render
+          await new Promise((r) => setTimeout(r, 500));
+
+          // Capture and download canvas
+          const canvas = document.getElementById("previewCanvas");
+          if (canvas) {
+            const dataUrl = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.download = `Surah-${sNum}-${safe(sName)}_Ayah-${i}_${ts}.png`;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
         }
       }
     });
