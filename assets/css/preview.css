@@ -5,7 +5,7 @@
 .preview-header {
   display: flex;
   justify-content: center;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   width: 100%;
 }
 
@@ -60,7 +60,7 @@ html[data-theme="light"] .ar-btn:hover {
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.02);
   min-height: 0;
-  padding: 20px;
+  padding: 10px;
   overflow: hidden;
   /* Enforce 9:16 container shape to prevent layout shift */
   /* Enforce 9:16 container shape to prevent layout shift */
