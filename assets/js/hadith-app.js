@@ -100,7 +100,7 @@ window.sizePercent = 100;
 window.hadithEdition = "eng-sahihbukhari";
 
 window.currentText = "Hadith text will appear here.";
-window.currentArabicText = "";
+window.currentArabicText = "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى";
 window.currentLabel = "Hadith Reference";
 
 window.fontColor = "#111111";
