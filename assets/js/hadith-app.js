@@ -1,7 +1,6 @@
 // ------------------ DOM ------------------
 let hadithBookSel,
-  hadithStartInput,
-  hadithEndInput,
+  hadithNumberInput,
   hadithEditionSel,
   fontPicker,
   arabicFontPicker,
@@ -32,8 +31,7 @@ let recStatus, meterBar;
 function initializeDOM() {
   console.log("initializeDOM called for Hadith");
   hadithBookSel = $("#hadithBook");
-  hadithStartInput = $("#hadithStart");
-  hadithEndInput = $("#hadithEnd");
+  hadithNumberInput = $("#hadithNumber");
   hadithEditionSel = $("#hadithEdition");
   
   fontPicker = $("#fontPicker");
@@ -192,13 +190,10 @@ window.onAnyInputChange = onAnyInputChange;
 
 // Update picture save count based on hadith selection
 function updatePictureSaveCount() {
-  const start = parseInt(hadithStartInput?.value) || 1;
-  const end = parseInt(hadithEndInput?.value) || 1;
-  const count = Math.max(1, end - start + 1);
-  
+  // For single hadith, count is always 1
   const pictureSaveCount = $("#pictureSaveCount");
   if (pictureSaveCount) {
-    pictureSaveCount.textContent = `(${count})`;
+    pictureSaveCount.textContent = `(1)`;
   }
 }
 
@@ -207,8 +202,7 @@ window.updatePictureSaveCount = updatePictureSaveCount;
 function setupEventListeners() {
   [
     hadithBookSel,
-    hadithStartInput,
-    hadithEndInput,
+    hadithNumberInput,
     hadithEditionSel,
     fontPicker,
     arabicFontPicker,
@@ -319,20 +313,12 @@ function setupEventListeners() {
     });
   }
 
-  // Wire up hadith range changes to update picture count
-  if (hadithStartInput) {
-    hadithStartInput.addEventListener("change", () => {
+  // Wire up hadith number changes to update picture count
+  if (hadithNumberInput) {
+    hadithNumberInput.addEventListener("change", () => {
       updatePictureSaveCount();
     });
-    hadithStartInput.addEventListener("input", () => {
-      updatePictureSaveCount();
-    });
-  }
-  if (hadithEndInput) {
-    hadithEndInput.addEventListener("change", () => {
-      updatePictureSaveCount();
-    });
-    hadithEndInput.addEventListener("input", () => {
+    hadithNumberInput.addEventListener("input", () => {
       updatePictureSaveCount();
     });
   }
@@ -341,119 +327,44 @@ function setupEventListeners() {
   if (takePictureBtn) {
     takePictureBtn.addEventListener("click", async () => {
       const book = hadithBookSel.value;
-      const start = parseInt(hadithStartInput.value) || 1;
-      const end = parseInt(hadithEndInput.value) || 1;
+      const hadithNum = parseInt(hadithNumberInput.value) || 1;
       const edition = hadithEditionSel.value;
       const bookName = window.hadithMetadata.books[book]?.name || book;
-      
-      if (start > end) {
-        alert("Invalid Hadith range.");
-        return;
-      }
-      
-      const imageCount = end - start + 1;
       const ts = timestampStr();
       const aspectRatio = getAspectRatioString();
       const editionName = edition.replace(/[^a-zA-Z0-9]/g, '-');
       
-      // Check if we need to create a zip file (>5 images)
-      if (imageCount > 5) {
-        // Create zip file
-        const zip = new JSZip();
-        const folder = zip.folder(`${safe(bookName)}_Hadith-${start}-${end}_${aspectRatio}_${editionName}`);
+      // Single hadith - no zip needed
+      // Prepare playlist with single hadith
+      window.playlist = [{ book: book, number: hadithNum, edition: edition }];
+      window.index = 0;
+      
+      // Load data but DO NOT autoplay
+      const success = await playIndex(0, false);
+      
+      if (success) {
+        // Wait for canvas to render
+        await new Promise((r) => setTimeout(r, 500));
         
-        // Show progress
-        if (recStatus) {
-          recStatus.textContent = `Preparing ${imageCount} images for download...`;
-        }
-        
-        // Iterate and capture each hadith
-        for (let i = start; i <= end; i++) {
-          // Prepare playlist
-          window.playlist = [];
-          for (let a = start; a <= end; a++) {
-            window.playlist.push({ book: book, number: a, edition: edition });
-          }
-          window.index = i - start;
+        // Capture and download canvas
+        const canvas = document.getElementById("previewCanvas");
+        if (canvas) {
+          const dataUrl = canvas.toDataURL("image/png");
+          const link = document.createElement("a");
+          link.download = `${safe(bookName)}_Hadith-${hadithNum}_${aspectRatio}_${editionName}_${ts}.png`;
+          link.href = dataUrl;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
           
-          // Load data but DO NOT autoplay
-          const success = await playIndex(window.index, false);
-          
-          if (success) {
-            // Wait for canvas to render
-            await new Promise((r) => setTimeout(r, 500));
-            
-            // Capture canvas as blob
-            const canvas = document.getElementById("previewCanvas");
-            if (canvas) {
-              const blob = await new Promise((resolve) => {
-                canvas.toBlob(resolve, "image/png");
-              });
-              
-              // Add to zip
-              const filename = `${safe(bookName)}_Hadith-${i}_${aspectRatio}_${editionName}.png`;
-              folder.file(filename, blob);
-              
-              // Update progress
-              if (recStatus) {
-                recStatus.textContent = `Captured ${i - start + 1} of ${imageCount} images...`;
-              }
-            }
-          } else {
-             console.warn(`Skipping Hadith ${i} due to load failure.`);
+          if (recStatus) {
+            recStatus.textContent = `Image saved successfully!`;
           }
         }
-        
-        // Generate and download zip
-        if (recStatus) {
-          recStatus.textContent = `Creating zip file...`;
-        }
-        
-        const zipBlob = await zip.generateAsync({ type: "blob" });
-        const zipUrl = URL.createObjectURL(zipBlob);
-        const link = document.createElement("a");
-        link.download = `${safe(bookName)}_Hadith-${start}-${end}_${aspectRatio}_${editionName}_${ts}.zip`;
-        link.href = zipUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(zipUrl);
-        
-        if (recStatus) {
-          recStatus.textContent = `Download complete! ${imageCount} images saved in zip file.`;
-        }
-        
       } else {
-        // Download individually (≤5 images)
-        for (let i = start; i <= end; i++) {
-          // Prepare playlist
-          window.playlist = [];
-          for (let a = start; a <= end; a++) {
-            window.playlist.push({ book: book, number: a, edition: edition });
-          }
-          window.index = i - start;
-          
-          // Load data but DO NOT autoplay
-          const success = await playIndex(window.index, false);
-          
-          if (success) {
-            // Wait for canvas to render
-            await new Promise((r) => setTimeout(r, 500));
-            
-            // Capture and download canvas
-            const canvas = document.getElementById("previewCanvas");
-            if (canvas) {
-              const dataUrl = canvas.toDataURL("image/png");
-              const link = document.createElement("a");
-              link.download = `${safe(bookName)}_Hadith-${i}_${aspectRatio}_${editionName}_${ts}.png`;
-              link.href = dataUrl;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }
-          } else {
-             console.warn(`Skipping Hadith ${i} due to load failure.`);
-          }
+        console.warn(`Failed to load Hadith ${hadithNum}`);
+        if (recStatus) {
+          recStatus.textContent = `Failed to load Hadith ${hadithNum}`;
         }
       }
     });
@@ -470,33 +381,17 @@ async function loadAndPlay({ record }) {
   
   // Get selections
   const book = hadithBookSel.value;
-  const start = parseInt(hadithStartInput.value) || 1;
-  const end = parseInt(hadithEndInput.value) || 1;
+  const hadithNum = parseInt(hadithNumberInput.value) || 1;
   const edition = hadithEditionSel.value;
-  
-  if (start > end) {
-      alert("Invalid Hadith range.");
-      return;
-  }
   
   // Fetch Hadith
   try {
-      // We need to fetch each hadith in the range.
-      // The API structure for single hadith: editions/{edition}/{book}/{hadith_number}.json
-      // Note: book ID in API might differ from name.
-      // hadithMetadata should provide the book ID.
       const bookId = window.hadithMetadata.books[book]?.id || book.toLowerCase().replace(/\s+/g, '');
       
-      // Fetch the first hadith to display
-      // For now, let's just display the first one.
-      // If range > 1, we might need a slideshow logic similar to Quran.
-      
-      window.playlist = [];
-      for(let i = start; i <= end; i++) {
-          window.playlist.push({ book: bookId, number: i, edition: edition });
-      }
+      // Single hadith
+      window.playlist = [{ book: bookId, number: hadithNum, edition: edition }];
       window.index = 0;
-      window.totalAyahs = window.playlist.length; // reuse variable name
+      window.totalAyahs = 1;
       
       await playIndex(0, true);
       
