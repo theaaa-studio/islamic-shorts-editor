@@ -589,7 +589,11 @@ logoImg.src = 'assets/quran.png';
   }
 
   if (showCreditData) {
-    let txt = "Data: Quran.com & AlQuran Cloud • Audio: EveryAyah.com";
+    // Detect if we're in Hadith editor or Quran editor
+    const isHadithEditor = typeof window.hadithMetadata !== 'undefined';
+    let txt = isHadithEditor 
+      ? "Data: Hadith API by fawazahmed0" 
+      : "Data: Quran.com & AlQuran Cloud • Audio: EveryAyah.com";
     pctx.font = `600 28px ${selectedFont}`;
     const th = 30;
     const bx = 40,
