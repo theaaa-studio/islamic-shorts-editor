@@ -452,7 +452,7 @@ Contributions are welcome! Please:
 
 - **Developer:** TheAAA
 - **Portfolio:** [https://theaaa-studio.github.io/AAA_Personal_Portfolio/](https://theaaa-studio.github.io/AAA_Personal_Portfolio/)
-- **Project:** https://theaaa-studio.github.io/islamic-shorts-editor/](https://theaaa-studio.github.io/islamic-shorts-editor/)
+- **Project:** [https://theaaa-studio.github.io/islamic-shorts-editor/](https://theaaa-studio.github.io/islamic-shorts-editor/)
 
 ---
 
