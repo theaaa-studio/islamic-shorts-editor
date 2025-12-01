@@ -18,13 +18,6 @@ body {
 
 .landing-header {
     margin-bottom: 4rem;
-    position: relative;
-}
-
-.header-controls {
-    position: absolute;
-    top: 0;
-    right: 0;
 }
 
 .theme-toggle {
@@ -90,9 +83,9 @@ body {
 
 .options-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
 }
 
@@ -157,23 +150,6 @@ body {
     background: var(--accent-2);
 }
 
-@media (max-width: 768px) {
-    .logo h1 {
-        font-size: 2rem;
-    }
-
-    .options-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .header-controls {
-        position: static;
-        margin-bottom: 1rem;
-        display: flex;
-        justify-content: flex-end;
-    }
-}
-
 /* Footer Styles */
 .landing-footer {
     margin-top: 4rem;
@@ -210,4 +186,139 @@ body {
 
 .developer-link:hover .footer-logo {
     opacity: 1;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    body {
+        padding: 0.5rem;
+    }
+
+    .landing-container {
+        padding: 1rem;
+    }
+
+    .landing-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .logo {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .logo img {
+        height: 40px;
+        flex-shrink: 0;
+    }
+
+    .logo h1 {
+        font-size: 1rem;
+        text-align: center;
+        flex: 1;
+    }
+
+    .theme-toggle {
+        flex-shrink: 0;
+        min-width: 40px;
+        min-height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .landing-header p {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+
+    .options-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .option-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .card-icon {
+        font-size: 2.5rem;
+    }
+
+    .option-card h2 {
+        font-size: 1.2rem;
+    }
+
+    .option-card p {
+        font-size: 0.8rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .landing-footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+    }
+
+    .developer-link {
+        font-size: 0.8rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    .landing-container {
+        padding: 0.5rem;
+    }
+
+    .logo img {
+        height: 35px;
+    }
+
+    .logo h1 {
+        font-size: 0.9rem;
+    }
+
+    .theme-toggle {
+        min-width: 36px;
+        min-height: 36px;
+        font-size: 1rem;
+    }
+
+    .landing-header p {
+        font-size: 0.75rem;
+    }
+
+    .options-grid {
+        gap: 0.75rem;
+    }
+
+    .option-card {
+        padding: 1rem 0.75rem;
+    }
+
+    .card-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .option-card h2 {
+        font-size: 1rem;
+    }
+
+    .option-card p {
+        font-size: 0.75rem;
+        line-height: 1.4;
+    }
+
+    .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+    }
 }

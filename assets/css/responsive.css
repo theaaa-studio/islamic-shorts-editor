@@ -38,13 +38,13 @@
   }
 
   .preview {
-    order: 1;
-    height: 65vh;
-    flex: 0 0 65vh;
+    order: 2;
+    height: 55vh;
+    flex: 0 0 55vh;
   }
 
   .sidebar {
-    order: 2;
+    order: 3;
   }
 
   .version-info {
@@ -52,31 +52,42 @@
   }
 
   .sidebar {
-    position: relative;
-    height: calc(35vh - 60px);
-    /* Remaining 35% minus nav height */
-    padding: 0;
-    gap: 0;
-    display: block;
-    overflow: hidden;
-    width: 100%;
-    flex: 0 0 calc(35vh - 60px);
-    /* Don't grow/shrink */
-    background: var(--panel);
+    display: contents;
+    /* Allows children to be part of the main flex container */
   }
 
   /* Direct children of sidebar (the containers) */
   .sidebar>div {
     display: none;
     width: 100%;
-    height: 100%;
+    /* height: 100%; removed to allow flex growing */
     overflow-y: auto;
     padding: 10px;
+    background: var(--panel);
   }
 
+  /* Force brand container to be visible and first */
+  #brand-container {
+    display: block !important;
+    order: 1;
+    height: auto;
+    flex: 0 0 auto;
+    border-bottom: 1px solid var(--line);
+    padding: 0;
+    /* Let internal padding handle it */
+    overflow: visible;
+  }
+
+  /* Active panel takes remaining space */
   .sidebar>div.active {
     display: flex;
     flex-direction: column;
+    order: 3;
+    flex: 1;
+    /* Grow to fill space */
+    height: auto;
+    min-height: 0;
+    /* Allow scrolling */
   }
 
   .panel {
@@ -281,10 +292,51 @@
     height: 24px;
   }
 
-  /* 6) Header tweak: keep theme button nicely placed */
+  /* 6) Header tweak: horizontal layout on mobile */
+  .brand {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 10px;
+    margin-bottom: 0;
+    order: 1;
+    flex: 0 0 auto;
+  }
+
+  .logo-link {
+    flex-shrink: 0;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+    background-size: contain;
+  }
+
+  .brand-title {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+  }
+
+  .brand-title .title {
+    font-size: 0.9rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .brand-title .subtitle {
+    display: none;
+  }
+
   .brand .theme-toggle {
     width: 40px;
     height: 40px;
+    flex-shrink: 0;
   }
 
   .mobile-version-info {

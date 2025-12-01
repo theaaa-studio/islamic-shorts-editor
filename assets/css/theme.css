@@ -67,7 +67,8 @@ html[data-theme="light"] select,
 html[data-theme="light"] button,
 html[data-theme="light"] input[type="range"],
 html[data-theme="light"] input[type="color"],
-html[data-theme="light"] input[type="text"] {
+html[data-theme="light"] input[type="text"],
+html[data-theme="light"] input[type="number"] {
   background-color: var(--panel-2);
   color: var(--text);
   border: 1px solid var(--line);
