@@ -535,34 +535,25 @@ logoImg.src = 'assets/quran.png';
 
 // ... (rest of the file)
 
+  // Always draw the logo
+  const logoSize = 56;
+  const logoPad = 10;
+  const th = 30;
+  const bx = 40,
+    by = 80;
+  
+  // Draw Logo (always visible)
+  if (logoImg.complete && logoImg.naturalWidth > 0) {
+      const rectY = by - th - badgePadY + 6;
+      const rectH = th + badgePadY * 2;
+      const centerY = rectY + rectH / 2;
+      pctx.drawImage(logoImg, bx, centerY - logoSize / 2, logoSize, logoSize);
+  }
+
+  // Draw " by TheAAA" text only if showCreditCreator is true
   if (showCreditCreator) {
     const txt = " by TheAAA";
     pctx.font = `600 36px ${selectedFont}`;
-    const tw = pctx.measureText(txt).width;
-    
-    const logoSize = 56;
-    const logoPad = 10;
-    const totalContentW = logoSize + logoPad + tw;
-
-    const th = 30;
-    const bx = 40,
-      by = 80;
-      
-    pctx.save();
-    // pctx.globalAlpha = 0.12;
-    // pctx.fillStyle = "#000";
-    // drawRoundedRect(...) removed
-    // pctx.fill();
-    pctx.restore();
-    
-    // Draw Logo
-    if (logoImg.complete && logoImg.naturalWidth > 0) {
-        const rectY = by - th - badgePadY + 6;
-        const rectH = th + badgePadY * 2;
-        const centerY = rectY + rectH / 2;
-        pctx.drawImage(logoImg, bx, centerY - logoSize / 2, logoSize, logoSize);
-    }
-
     pctx.fillStyle = creditTextColor;
     pctx.fillText(txt, bx + logoSize + logoPad, by);
   }
