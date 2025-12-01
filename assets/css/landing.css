@@ -1,0 +1,213 @@
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.landing-container {
+    text-align: center;
+    max-width: 1200px;
+    padding: 2rem;
+    width: 100%;
+}
+
+.landing-header {
+    margin-bottom: 4rem;
+    position: relative;
+}
+
+.header-controls {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.theme-toggle {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.theme-toggle:hover {
+    background: var(--panel);
+    border-color: var(--accent-1);
+    box-shadow: 0 0 0 3px var(--hover-ring);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.logo img {
+    height: 60px;
+}
+
+.logo h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+}
+
+/* Theme-specific gradients for the title */
+:root .logo h1 {
+    background: linear-gradient(135deg, #e8eef9 0%, #9fb0cc 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .logo h1 {
+    background: linear-gradient(135deg, #1a1d2e 0%, #4a5568 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.landing-header p {
+    color: var(--muted);
+    font-size: 1.2rem;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.option-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.option-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.card-icon {
+    font-size: 4rem;
+    color: var(--accent-1);
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.option-card:hover .card-icon {
+    transform: scale(1.1);
+}
+
+.option-card h2 {
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.option-card p {
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.btn {
+    margin-top: 1rem;
+    background: var(--accent-1);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.3s ease;
+}
+
+.option-card:hover .btn {
+    background: var(--accent-2);
+}
+
+@media (max-width: 768px) {
+    .logo h1 {
+        font-size: 2rem;
+    }
+
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-controls {
+        position: static;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: flex-end;
+    }
+}
+
+/* Footer Styles */
+.landing-footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 2rem;
+}
+
+.developer-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+}
+
+.developer-link:hover {
+    color: var(--accent-1);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.footer-logo {
+    height: 20px;
+    width: auto;
+    opacity: 0.8;
+}
+
+.developer-link:hover .footer-logo {
+    opacity: 1;
+}

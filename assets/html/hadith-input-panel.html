@@ -1,0 +1,30 @@
+        <!-- Panel: Input -->
+        <!-- Panel: Input -->
+        <div class="panel">
+          <h3>Choose</h3>
+          <div class="input-row">
+            <div class="field field-book">
+              <label class="small" for="hadithBook">Book</label>
+              <select id="hadithBook"></select>
+            </div>
+            <div class="field field-hadith-start">
+              <label class="small" for="hadithStart">Start Hadith</label>
+              <input type="number" id="hadithStart" min="1" value="1">
+            </div>
+            <div class="field field-hadith-end">
+              <label class="small" for="hadithEnd">End Hadith</label>
+              <input type="number" id="hadithEnd" min="1" value="1">
+            </div>
+
+            <div class="field field-translation">
+              <label class="small" for="hadithEdition"
+                >Edition (Language)</label
+              >
+              <select id="hadithEdition">
+                <!-- Will be populated by JS -->
+                <option value="eng-sahihbukhari">English - Sahih Bukhari</option>
+              </select>
+            </div>
+          </div>
+        </div>
+

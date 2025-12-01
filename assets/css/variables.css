@@ -27,3 +27,20 @@
   --hover-border: rgba(0, 108, 53, 0.55);
   --hover-shadow-btn: 0 8px 22px rgba(0, 108, 53, 0.22);
 }
+
+/* Light Theme */
+[data-theme="light"] {
+  --bg: #f5f7fa;
+  --panel: #ffffff;
+  --panel-2: #f8f9fb;
+  --text: #1a1d2e;
+  --muted: #6b7280;
+  --line: rgba(0, 0, 0, 0.1);
+  --accent-1: #006C35;
+  --accent-2: #00994D;
+
+  /* Hover & focus tokens */
+  --hover-ring: rgba(0, 108, 53, 0.2);
+  --hover-border: rgba(0, 108, 53, 0.4);
+  --hover-shadow-btn: 0 8px 22px rgba(0, 108, 53, 0.15);
+}

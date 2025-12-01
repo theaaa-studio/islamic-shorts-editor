@@ -13,8 +13,8 @@ function applyTheme(theme) {
   // 2) Update button icon + aria to match the *current* theme
   const btn = document.getElementById("themeToggle");
   if (btn) {
-    // Icon always reflects active theme
-    btn.textContent = t === THEME_LIGHT ? "☀️" : "🌙";
+    // Icon shows current theme: moon for dark, sun for light
+    btn.textContent = t === THEME_DARK ? "🌙" : "☀️";
 
     // aria-pressed = true when dark mode is ON (you can flip if you prefer)
     btn.setAttribute("aria-pressed", t === THEME_DARK ? "true" : "false");

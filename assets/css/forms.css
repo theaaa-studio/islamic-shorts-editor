@@ -7,7 +7,8 @@ select,
 button,
 input[type="range"],
 input[type="color"],
-input[type="text"] {
+input[type="text"],
+input[type="number"] {
   appearance: none;
   padding: 10px 12px;
   font-size: 14px;
@@ -151,7 +152,8 @@ input[type="text"] {
 select:hover,
 input[type="color"]:hover,
 input[type="range"]:hover,
-input[type="text"]:hover {
+input[type="text"]:hover,
+input[type="number"]:hover {
   border-color: var(--hover-border);
   box-shadow: 0 0 0 3px rgba(0, 108, 53, 0.12);
   /* ring, not a drop shadow */
@@ -159,7 +161,8 @@ input[type="text"]:hover {
 }
 
 /* Inputs/text focus (ring, not shadow) */
-input[type="text"]:focus {
+input[type="text"]:focus,
+input[type="number"]:focus {
   border-color: var(--hover-border);
   box-shadow: 0 0 0 3px rgba(0, 108, 53, 0.12);
 }
@@ -191,6 +194,7 @@ button:focus-visible,
 .brand .theme-toggle:focus-visible,
 select:focus-visible,
 input[type="text"]:focus-visible,
+input[type="number"]:focus-visible,
 input[type="color"]:focus-visible,
 input[type="range"]:focus-visible,
 input[type="checkbox"]:focus-visible,
