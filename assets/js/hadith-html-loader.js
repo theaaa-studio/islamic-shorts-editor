@@ -461,17 +461,7 @@ const TEMPLATES = {
           ></canvas>
         </div>
 
-        <div class="preview-controls">
-          <!-- Removed Play/Stop/Volume controls for Hadith Editor -->
-
-          <a
-            href="https://github.com/theaaa-studio"
-            target="_blank"
-            class="version-info"
-          >
-            <img src="assets/quran.png" alt="Logo" class="credit-logo" />
-            <span class="dev-name">Developed by TheAAA</span> • 2025
-          </a>
+        <div class="preview-controls"></div>
   `
 };
 

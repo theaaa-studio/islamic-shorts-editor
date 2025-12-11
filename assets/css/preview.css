@@ -138,6 +138,13 @@ html[data-theme="light"] .ar-btn.active {
   transform: translateX(-50%);
   right: auto;
   z-index: 20;
+}
+
+.preview-controls:empty {
+  display: none !important;
+}
+
+.preview-controls {
 
   display: flex;
   flex-direction: row;
