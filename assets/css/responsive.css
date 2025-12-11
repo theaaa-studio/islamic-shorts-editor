@@ -210,6 +210,10 @@
     gap: 6px;
   }
 
+  .background-panel .field {
+    width: 100% !important;
+  }
+
   /* Mobile layout for background panel color controls */
   .background-panel .field[style*="display: flex"] {
     flex-direction: column !important;
