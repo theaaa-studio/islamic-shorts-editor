@@ -1,165 +1,157 @@
         <!-- Panel: Typography -->
         <div class="panel">
           <h3>Typography</h3>
-          <div class="typography-grid">
-            <div class="field field-translation-style">
-              <label class="small" for="fontPicker">Translation Style</label>
-              <select id="fontPicker">
-                <!-- Latin/Western Fonts -->
-                <option value="Inter, sans-serif">Inter</option>
-                <option value="Poppins, sans-serif">Poppins</option>
-                <option value="Lora, serif">Lora</option>
-                <option value="Merriweather, serif">Merriweather</option>
-                <option value="Nunito, sans-serif">Nunito</option>
-                <option value="Roboto Slab, serif">Roboto Slab</option>
-                <option value="Montserrat, sans-serif">Montserrat</option>
-                <option value="Open Sans, sans-serif">Open Sans</option>
-                <option value="Source Sans 3, sans-serif">Source Sans 3</option>
-                <option value="Work Sans, sans-serif">Work Sans</option>
-                <option value="Raleway, sans-serif">Raleway</option>
-                <option value="Lato, sans-serif">Lato</option>
-                <option value="Oswald, sans-serif">Oswald</option>
-                <option value="Ubuntu, sans-serif">Ubuntu</option>
-                <option value="PT Sans, sans-serif">PT Sans</option>
-                <option value="Karla, sans-serif">Karla</option>
-                <option value="Rubik, sans-serif">Rubik</option>
-                <option value="Heebo, sans-serif">Heebo</option>
-                <option value="Barlow, sans-serif">Barlow</option>
-                <option value="Manrope, sans-serif">Manrope</option>
-                <option value="Space Grotesk, sans-serif">Space Grotesk</option>
-                <option value="Fira Sans, sans-serif">Fira Sans</option>
-                <option value="Playfair Display, serif">Playfair Display</option>
-                <option value="DM Serif Text, serif">DM Serif Text</option>
-                <option value="Libre Baskerville, serif">Libre Baskerville</option>
-                <option value="PT Serif, serif">PT Serif</option>
-                <option value="Quicksand, sans-serif">Quicksand</option>
-                <option value="Space Mono, monospace">Space Mono</option>
-                <option value="Fira Code, monospace">Fira Code</option>
-                <option value="JetBrains Mono, monospace">JetBrains Mono</option>
+          <div class="typography-flex" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Row 1: Translation Controls -->
+            <div class="typo-row" style="display: flex; width: 100%; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+              <div class="field field-translation-style" style="flex: 1; width: auto; min-width: 150px;">
+                <label class="small" for="fontPicker">Translation Style</label>
+                <select id="fontPicker">
+                  <!-- Latin/Western Fonts -->
+                  <option value="Inter, sans-serif">Inter</option>
+                  <option value="Poppins, sans-serif">Poppins</option>
+                  <option value="Lora, serif">Lora</option>
+                  <option value="Merriweather, serif">Merriweather</option>
+                  <option value="Nunito, sans-serif">Nunito</option>
+                  <option value="Roboto Slab, serif">Roboto Slab</option>
+                  <option value="Montserrat, sans-serif">Montserrat</option>
+                  <option value="Open Sans, sans-serif">Open Sans</option>
+                  <option value="Source Sans 3, sans-serif">Source Sans 3</option>
+                  <option value="Work Sans, sans-serif">Work Sans</option>
+                  <option value="Raleway, sans-serif">Raleway</option>
+                  <option value="Lato, sans-serif">Lato</option>
+                  <option value="Oswald, sans-serif">Oswald</option>
+                  <option value="Ubuntu, sans-serif">Ubuntu</option>
+                  <option value="PT Sans, sans-serif">PT Sans</option>
+                  <option value="Karla, sans-serif">Karla</option>
+                  <option value="Rubik, sans-serif">Rubik</option>
+                  <option value="Heebo, sans-serif">Heebo</option>
+                  <option value="Barlow, sans-serif">Barlow</option>
+                  <option value="Manrope, sans-serif">Manrope</option>
+                  <option value="Space Grotesk, sans-serif">Space Grotesk</option>
+                  <option value="Fira Sans, sans-serif">Fira Sans</option>
+                  <option value="Playfair Display, serif">Playfair Display</option>
+                  <option value="DM Serif Text, serif">DM Serif Text</option>
+                  <option value="Libre Baskerville, serif">Libre Baskerville</option>
+                  <option value="PT Serif, serif">PT Serif</option>
+                  <option value="Quicksand, sans-serif">Quicksand</option>
+                  <option value="Space Mono, monospace">Space Mono</option>
+                  <option value="Fira Code, monospace">Fira Code</option>
+                  <option value="JetBrains Mono, monospace">JetBrains Mono</option>
 
-                <!-- Arabic Fonts -->
-                <option value="Amiri, serif">Amiri (Arabic)</option>
-                <option value="Scheherazade New, serif">Scheherazade New (Arabic)</option>
-                <option value="Cairo, sans-serif">Cairo (Arabic)</option>
-                <option value="Changa, sans-serif">Changa (Arabic)</option>
-                <option value="Reem Kufi, sans-serif">Reem Kufi (Arabic)</option>
-                <option value="Noto Naskh Arabic, serif">Noto Naskh Arabic</option>
-                <option value="Noto Kufi Arabic, sans-serif">Noto Kufi Arabic</option>
-                <option value="IBM Plex Sans Arabic, sans-serif">IBM Plex Sans Arabic</option>
-                <option value="Tajawal, sans-serif">Tajawal (Arabic)</option>
-                <option value="El Messiri, sans-serif">El Messiri (Arabic)</option>
-                <option value="Markazi Text, serif">Markazi Text (Arabic)</option>
-                <option value="Lateef, serif">Lateef (Arabic)</option>
-                <option value="Harmattan, sans-serif">Harmattan (Arabic)</option>
+                  <!-- Arabic Fonts -->
+                  <option value="Amiri, serif">Amiri (Arabic)</option>
+                  <option value="Scheherazade New, serif">Scheherazade New (Arabic)</option>
+                  <option value="Cairo, sans-serif">Cairo (Arabic)</option>
+                  <option value="Changa, sans-serif">Changa (Arabic)</option>
+                  <option value="Reem Kufi, sans-serif">Reem Kufi (Arabic)</option>
+                  <option value="Noto Naskh Arabic, serif">Noto Naskh Arabic</option>
+                  <option value="Noto Kufi Arabic, sans-serif">Noto Kufi Arabic</option>
+                  <option value="IBM Plex Sans Arabic, sans-serif">IBM Plex Sans Arabic</option>
+                  <option value="Tajawal, sans-serif">Tajawal (Arabic)</option>
+                  <option value="El Messiri, sans-serif">El Messiri (Arabic)</option>
+                  <option value="Markazi Text, serif">Markazi Text (Arabic)</option>
+                  <option value="Lateef, serif">Lateef (Arabic)</option>
+                  <option value="Harmattan, sans-serif">Harmattan (Arabic)</option>
 
-                <!-- Bengali/Bangla Fonts -->
-                <option value="Hind Siliguri, sans-serif">Hind Siliguri (Bangla)</option>
-                <option value="Noto Sans Bengali, sans-serif">Noto Sans Bengali</option>
-                <option value="Noto Serif Bengali, serif">Noto Serif Bengali</option>
-                <option value="Baloo Da 2, cursive">Baloo Da 2 (Bangla)</option>
-                <option value="Mukta, sans-serif">Mukta (Bangla)</option>
+                  <!-- Bengali/Bangla Fonts -->
+                  <option value="Hind Siliguri, sans-serif">Hind Siliguri (Bangla)</option>
+                  <option value="Noto Sans Bengali, sans-serif">Noto Sans Bengali</option>
+                  <option value="Noto Serif Bengali, serif">Noto Serif Bengali</option>
+                  <option value="Baloo Da 2, cursive">Baloo Da 2 (Bangla)</option>
+                  <option value="Mukta, sans-serif">Mukta (Bangla)</option>
 
-                <!-- Hindi/Devanagari Fonts -->
-                <option value="Noto Sans Devanagari, sans-serif">Noto Sans Devanagari (Hindi)</option>
-                <option value="Noto Serif Devanagari, serif">Noto Serif Devanagari (Hindi)</option>
-                <option value="Poppins, sans-serif">Poppins (Hindi Support)</option>
-                <option value="Hind, sans-serif">Hind (Hindi)</option>
-                <option value="Tiro Devanagari Hindi, serif">Tiro Devanagari (Hindi)</option>
+                  <!-- Hindi/Devanagari Fonts -->
+                  <option value="Noto Sans Devanagari, sans-serif">Noto Sans Devanagari (Hindi)</option>
+                  <option value="Noto Serif Devanagari, serif">Noto Serif Devanagari (Hindi)</option>
+                  <option value="Poppins, sans-serif">Poppins (Hindi Support)</option>
+                  <option value="Hind, sans-serif">Hind (Hindi)</option>
+                  <option value="Tiro Devanagari Hindi, serif">Tiro Devanagari (Hindi)</option>
 
-                <!-- Chinese Fonts -->
-                <option value="Noto Sans SC, sans-serif">Noto Sans SC (Chinese Simplified)</option>
-                <option value="Noto Sans TC, sans-serif">Noto Sans TC (Chinese Traditional)</option>
-                <option value="Noto Serif SC, serif">Noto Serif SC (Chinese Simplified)</option>
-                <option value="Ma Shan Zheng, cursive">Ma Shan Zheng (Chinese)</option>
+                  <!-- Chinese Fonts -->
+                  <option value="Noto Sans SC, sans-serif">Noto Sans SC (Chinese Simplified)</option>
+                  <option value="Noto Sans TC, sans-serif">Noto Sans TC (Chinese Traditional)</option>
+                  <option value="Noto Serif SC, serif">Noto Serif SC (Chinese Simplified)</option>
+                  <option value="Ma Shan Zheng, cursive">Ma Shan Zheng (Chinese)</option>
 
-                <!-- Japanese Fonts -->
-                <option value="Noto Sans JP, sans-serif">Noto Sans JP (Japanese)</option>
-                <option value="Noto Serif JP, serif">Noto Serif JP (Japanese)</option>
-                <option value="M PLUS Rounded 1c, sans-serif">M PLUS Rounded 1c (Japanese)</option>
+                  <!-- Japanese Fonts -->
+                  <option value="Noto Sans JP, sans-serif">Noto Sans JP (Japanese)</option>
+                  <option value="Noto Serif JP, serif">Noto Serif JP (Japanese)</option>
+                  <option value="M PLUS Rounded 1c, sans-serif">M PLUS Rounded 1c (Japanese)</option>
 
-                <!-- Korean Fonts -->
-                <option value="Noto Sans KR, sans-serif">Noto Sans KR (Korean)</option>
-                <option value="Noto Serif KR, serif">Noto Serif KR (Korean)</option>
-                <option value="Black Han Sans, sans-serif">Black Han Sans (Korean)</option>
+                  <!-- Korean Fonts -->
+                  <option value="Noto Sans KR, sans-serif">Noto Sans KR (Korean)</option>
+                  <option value="Noto Serif KR, serif">Noto Serif KR (Korean)</option>
+                  <option value="Black Han Sans, sans-serif">Black Han Sans (Korean)</option>
 
-                <!-- Thai Fonts -->
-                <option value="Noto Sans Thai, sans-serif">Noto Sans Thai</option>
-                <option value="Noto Serif Thai, serif">Noto Serif Thai</option>
-                <option value="Prompt, sans-serif">Prompt (Thai)</option>
+                  <!-- Thai Fonts -->
+                  <option value="Noto Sans Thai, sans-serif">Noto Sans Thai</option>
+                  <option value="Noto Serif Thai, serif">Noto Serif Thai</option>
+                  <option value="Prompt, sans-serif">Prompt (Thai)</option>
 
-                <!-- Vietnamese Fonts -->
-                <option value="Noto Sans, sans-serif">Noto Sans (Vietnamese)</option>
-                <option value="Be Vietnam Pro, sans-serif">Be Vietnam Pro</option>
+                  <!-- Vietnamese Fonts -->
+                  <option value="Noto Sans, sans-serif">Noto Sans (Vietnamese)</option>
+                  <option value="Be Vietnam Pro, sans-serif">Be Vietnam Pro</option>
 
-                <!-- Cyrillic/Russian Fonts -->
-                <option value="Roboto, sans-serif">Roboto (Cyrillic)</option>
-                <option value="Noto Sans, sans-serif">Noto Sans (Multi-language)</option>
-              </select>
+                  <!-- Cyrillic/Russian Fonts -->
+                  <option value="Roboto, sans-serif">Roboto (Cyrillic)</option>
+                  <option value="Noto Sans, sans-serif">Noto Sans (Multi-language)</option>
+                </select>
+              </div>
+              <div class="field" style="flex: 2; min-width: 100px;">
+                <label class="small" for="textSize">Translation Size <span id="textSizeVal" class="name-chip">(100%)</span></label>
+                <input id="textSize" type="range" min="25" max="160" step="5" value="100" />
+              </div>
+              <div class="field" style="width: auto;">
+                <label class="small" for="fontColor">Translation Color</label>
+                <input id="fontColor" type="color" value="#1f1f1f" style="height: 38px; width: 40px;" />
+              </div>
             </div>
-            <div class="field">
-              <label class="small" for="textSize"
-                >Translation Size
-                <span id="textSizeVal" class="name-chip">(100%)</span></label
-              >
-              <input
-                id="textSize"
-                type="range"
-                min="25"
-                max="160"
-                step="5"
-                value="100"
-              />
+
+            <!-- Row 2: Arabic Controls -->
+            <!-- Row 2: Show Arabic Toggle -->
+            <div class="typo-row" style="display: flex; width: 100%; margin-top: 8px;">
+              <label class="toggle" title="Show Arabic Text" style="margin-top: 0; min-width: fit-content; height: 38px;">
+                <input type="checkbox" id="showArabicText" checked />
+                <span>Show Arabic Text</span>
+              </label>
             </div>
-            <div class="field">
-              <label class="small" for="fontColor">Translation Color</label>
-              <input id="fontColor" type="color" value="#1f1f1f" />
-            </div>
-            <label class="toggle" title="Show Arabic Text">
-              <input type="checkbox" id="showArabicText" checked />
-              <span>Show Arabic Text</span>
-            </label>
-            <div class="field">
-              <label class="small" for="arabicFontPicker">Arabic Style</label>
-              <select id="arabicFontPicker">
-                <!-- Only Arabic Fonts -->
-                <option value="Amiri, serif">Amiri</option>
-                <option value="Scheherazade New, serif">Scheherazade New</option>
-                <option value="Cairo, sans-serif">Cairo</option>
-                <option value="Changa, sans-serif">Changa</option>
-                <option value="Reem Kufi, sans-serif">Reem Kufi</option>
-                <option value="Noto Naskh Arabic, serif">Noto Naskh Arabic</option>
-                <option value="Noto Kufi Arabic, sans-serif">Noto Kufi Arabic</option>
-                <option value="IBM Plex Sans Arabic, sans-serif">IBM Plex Sans Arabic</option>
-                <option value="Tajawal, sans-serif">Tajawal</option>
-                <option value="El Messiri, sans-serif">El Messiri</option>
-                <option value="Markazi Text, serif">Markazi Text</option>
-                <option value="Lateef, serif">Lateef</option>
-                <option value="Harmattan, sans-serif">Harmattan</option>
-                <option value="Aref Ruqaa, serif">Aref Ruqaa</option>
-                <option value="Katibeh, cursive">Katibeh</option>
-                <option value="Lalezar, cursive">Lalezar</option>
-                <option value="Rakkas, cursive">Rakkas</option>
-                <option value="Mada, sans-serif">Mada</option>
-                <option value="Almarai, sans-serif">Almarai</option>
-              </select>
-            </div>
-            <div class="field">
-              <label class="small" for="arabicTextSize"
-                >Arabic Size
-                <span id="arabicTextSizeVal" class="name-chip">(100%)</span></label
-              >
-              <input
-                id="arabicTextSize"
-                type="range"
-                min="25"
-                max="200"
-                step="5"
-                value="100"
-              />
-            </div>
-            <div class="field">
-              <label class="small" for="arabicFontColor">Arabic Color</label>
-              <input id="arabicFontColor" type="color" value="#1f1f1f" />
+
+            <!-- Row 3: Arabic Controls (Style, Size, Color) -->
+            <div class="typo-row" style="display: flex; width: 100%; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-top: 8px;">
+              <div class="field" style="flex: 1; width: auto; min-width: 120px;">
+                <label class="small" for="arabicFontPicker">Arabic Style</label>
+                <select id="arabicFontPicker">
+                  <!-- Only Arabic Fonts -->
+                  <option value="Amiri, serif">Amiri</option>
+                  <option value="Scheherazade New, serif">Scheherazade New</option>
+                  <option value="Cairo, sans-serif">Cairo</option>
+                  <option value="Changa, sans-serif">Changa</option>
+                  <option value="Reem Kufi, sans-serif">Reem Kufi</option>
+                  <option value="Noto Naskh Arabic, serif">Noto Naskh Arabic</option>
+                  <option value="Noto Kufi Arabic, sans-serif">Noto Kufi Arabic</option>
+                  <option value="IBM Plex Sans Arabic, sans-serif">IBM Plex Sans Arabic</option>
+                  <option value="Tajawal, sans-serif">Tajawal</option>
+                  <option value="El Messiri, sans-serif">El Messiri</option>
+                  <option value="Markazi Text, serif">Markazi Text</option>
+                  <option value="Lateef, serif">Lateef</option>
+                  <option value="Harmattan, sans-serif">Harmattan</option>
+                  <option value="Aref Ruqaa, serif">Aref Ruqaa</option>
+                  <option value="Katibeh, cursive">Katibeh</option>
+                  <option value="Lalezar, cursive">Lalezar</option>
+                  <option value="Rakkas, cursive">Rakkas</option>
+                  <option value="Mada, sans-serif">Mada</option>
+                  <option value="Almarai, sans-serif">Almarai</option>
+                </select>
+              </div>
+              <div class="field" style="flex: 2; min-width: 100px;">
+                <label class="small" for="arabicTextSize">Arabic Size <span id="arabicTextSizeVal" class="name-chip">(100%)</span></label>
+                <input id="arabicTextSize" type="range" min="25" max="200" step="5" value="100" />
+              </div>
+              <div class="field" style="width: auto;">
+                <label class="small" for="arabicFontColor">Arabic Color</label>
+                <input id="arabicFontColor" type="color" value="#1f1f1f" style="height: 38px; width: 40px;" />
+              </div>
             </div>
           </div>
         </div>

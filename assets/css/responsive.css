@@ -5,6 +5,8 @@
 @media (max-width: 900px) {
   .app {
     grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    /* Allow header/footer flow */
   }
 
   .sidebar {
@@ -54,6 +56,12 @@
   .sidebar {
     display: contents;
     /* Allows children to be part of the main flex container */
+  }
+
+  /* Both sidebars act as contents */
+  .sidebar-left,
+  .sidebar-right {
+    display: contents;
   }
 
   /* Direct children of sidebar (the containers) */
@@ -115,8 +123,13 @@
     height: 60px;
     flex: 0 0 60px;
     width: 100%;
+    width: 100%;
     z-index: 10;
   }
+
+  /* Ensure sidebar-right contents (Typo/Credit/Export) come after sidebar-left contents */
+  /* But since they are all 'display: none', only 'active' matters. */
+  /* The active panel logic uses order: 3, so it should be fine. */
 
   .nav-btn {
     background: none;
@@ -194,6 +207,12 @@
     gap: 2px;
   }
 
+  /* Stack main transport buttons on mobile */
+  .transport {
+    grid-template-columns: 1fr;
+    /* Stack them */
+  }
+
   /* Reset fixed widths for mobile */
   .field-surah,
   .field-ayah-start,
@@ -255,13 +274,18 @@
 
   /* Better Mobile Controls */
   /* Better Mobile Controls */
+  /* Better Mobile Controls - Floating Pill */
   .preview-controls {
-    background: var(--panel-2);
-    padding: 6px;
-    border-radius: 8px;
-    border: 1px solid var(--line);
-    gap: 6px;
-    width: 100%;
+    /* Allow it to be floating glass pill like desktop */
+    width: auto;
+    bottom: 12px;
+    background: rgba(30, 33, 40, 0.5);
+    /* Slightly darker for contrast on small screens */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 8px 16px;
+    border-radius: 32px;
+    gap: 12px;
   }
 
   .preview-buttons {
@@ -291,6 +315,17 @@
     width: auto;
     max-width: none;
     height: 24px;
+  }
+
+  /* Fix 1:1 Ratio Overflow on Mobile */
+  /* Override desktop static height with responsive limits */
+  #previewCanvas.is-square {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
   }
 
   /* 6) Header tweak: horizontal layout on mobile */

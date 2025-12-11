@@ -6,8 +6,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
+  flex-wrap: wrap;
+  /* overflow-x: auto; */
   padding-bottom: 4px;
 }
 

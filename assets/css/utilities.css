@@ -28,8 +28,8 @@
 
 /* Transport row */
 .transport {
-  display: grid;
-  grid-template-columns: repeat(5, auto);
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   align-items: center;
 }

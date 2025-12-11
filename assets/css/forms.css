@@ -37,6 +37,8 @@ input[type="color"] {
   cursor: pointer;
   border-radius: 50%;
   border: 2px solid var(--line);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
 }
 
 input[type="color"]::-webkit-color-swatch-wrapper {
@@ -106,6 +108,11 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 10px;
   transition: transform 0.12s ease, box-shadow 0.12s ease,
     border-color 0.12s ease;
+  /* Flex for icon support */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .btn.ghost {

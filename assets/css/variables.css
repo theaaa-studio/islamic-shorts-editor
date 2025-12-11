@@ -15,8 +15,15 @@
   --gap: 14px;
 
   /* Layout split */
-  --sidebar: 70%;
-  --preview: 30%;
+  /* Layout split */
+  /* --sidebar: 70%; */
+  /* Legacy 2-column */
+  /* --preview: 30%; */
+  /* Legacy 2-column */
+
+  /* New 3-column: Left(1fr) | Preview(auto) | Right(1fr) */
+  /* --sidebar-width: 350px; */
+  /* Disabled for flexible width */
 
   /* Preview size */
   --previewMax: 360px;

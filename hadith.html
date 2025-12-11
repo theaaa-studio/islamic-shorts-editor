@@ -193,7 +193,8 @@
   <body>
     <div class="app">
       <!-- LEFT: Sidebar (70%) -->
-      <aside class="sidebar">
+      <!-- LEFT: Sidebar Left (Brand, Input, Background) -->
+      <aside class="sidebar sidebar-left">
         <!-- SECTION: SEO Content (Hidden but indexable by search engines) -->
         <div class="seo-content" style="display: none">
           <h1>
@@ -328,7 +329,16 @@
         <div id="background-panel-container">
           <!-- Loading... -->
         </div>
+      </aside>
 
+      <!-- SECTION: Preview Section -->
+      <!-- Source: assets/html/preview.html -->
+      <main id="preview-container" class="preview">
+        <!-- Loading... -->
+      </main>
+
+      <!-- RIGHT: Sidebar Right (Typography, Credits, Playback) -->
+      <aside class="sidebar sidebar-right">
         <!-- SECTION: Typography Panel -->
         <!-- Source: assets/html/typography-panel.html -->
         <div id="typography-panel-container">
@@ -347,12 +357,6 @@
           <!-- Loading... -->
         </div>
       </aside>
-
-      <!-- SECTION: Preview Section -->
-      <!-- Source: assets/html/preview.html -->
-      <main id="preview-container" class="preview">
-        <!-- Loading... -->
-      </main>
 
       <nav class="mobile-nav">
 

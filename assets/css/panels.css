@@ -99,74 +99,96 @@ label.small {
 }
 
 /* Credits row layout - all elements in one row with flexible spacing */
-.credits-row {
+/* Credits grouping layout */
+.credits-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.credits-line {
   display: flex;
   align-items: flex-end;
   gap: 12px;
-  flex-wrap: nowrap;
+  width: 100%;
+  flex-wrap: wrap;
+  /* Allow wrapping on small screens */
 }
 
-.credits-row .field {
+.credits-line .field {
   display: flex;
   flex-direction: column;
   gap: 1px;
 }
 
-.credits-row .toggle {
+.credits-line .toggle {
   padding: 10px 12px;
   height: fit-content;
   white-space: nowrap;
 }
 
-/* Responsive: stack on smaller screens */
-@media (max-width: 1200px) {
-  .credits-row {
-    flex-wrap: wrap;
-  }
-}
-
-/* Input Panel: Single Row Layout */
+/* Input Panel: Single Column Layout */
 .input-row {
   display: flex;
+  flex-direction: column;
+  /* Stack vertically */
   gap: 12px;
-  align-items: flex-end;
+  align-items: stretch;
+  /* Stretch to full width */
   width: 100%;
-  flex-wrap: wrap;
 }
 
 .input-row .field {
-  flex: 0 0 auto;
-  /* Stop growing/shrinking, respect width */
+  width: 100%;
+  /* Full width */
+  flex: 1;
+}
+
+/* Ayah Range: Start/End side by side */
+.ayah-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.ayah-row .field {
+  flex: 1;
+  width: auto !important;
+  /* Override full width */
   min-width: 0;
 }
 
-/* Fixed Sizes for PC */
-.field-surah {
-  width: 180px;
+/* Arabic Controls: Toggle + Picker side by side */
+.arabic-controls-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  align-items: flex-end;
+  /* Align toggle with input field */
+  flex-wrap: wrap;
+  margin-top: 8px;
 }
 
-.field-ayah-start {
-  width: 120px;
-}
-
-.field-ayah-end {
-  width: 120px;
-}
-
-.field-reciter {
-  width: 220px;
-}
-
-.field-translation {
-  width: 220px;
+/* Remove Fixed Sizes for PC - make them full width handled by parent */
+.field-surah,
+.field-ayah-start,
+.field-ayah-end,
+.field-reciter,
+.field-translation,
+.field-translation-style {
+  width: 100%;
 }
 
 /* Ayah Dropdowns: Wider minimum width (fallback) */
 #ayahStart,
 #ayahEnd {
-  min-width: 15ch;
+  min-width: 100%;
 }
 
-.field-translation-style {
-  width: 140px;
+/* Playback Controls Grid */
+.transport {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }

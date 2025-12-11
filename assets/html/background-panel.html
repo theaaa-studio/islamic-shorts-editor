@@ -1,60 +1,65 @@
 <!-- Panel: Background -->
 <div class="panel background-panel">
   <h3>Background</h3>
-  <div class="inline-row">
-    <!-- Mode toggles -->
-    <label class="toggle" title="Use a solid background color">
-      <input
-        type="radio"
-        name="bgMode"
-        value="color"
-        id="bgModeColor"
-        checked
-      />
-      <span>Solid Color</span>
-    </label>
+  <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+    <!-- Row 1: Mode toggles -->
+    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+      <label class="toggle" title="Use a solid background color">
+        <input
+          type="radio"
+          name="bgMode"
+          value="color"
+          id="bgModeColor"
+          checked
+        />
+        <span>Solid Color</span>
+      </label>
 
-    <label class="toggle" title="Use image/video from assets/background">
-      <input type="radio" name="bgMode" value="media" id="bgModeMedia" />
-      <span>Media (image/video)</span>
-    </label>
+      <label class="toggle" title="Use image/video from assets/background">
+        <input type="radio" name="bgMode" value="media" id="bgModeMedia" />
+        <span>Media (image/video)</span>
+      </label>
+    </div>
 
-    <!-- Background Color (shown when 'color' is selected) -->
-    <div class="field" id="bgColorField">
+    <!-- Row 2: Background Color (shown when 'color' is selected) -->
+    <div class="field" id="bgColorField" style="width: 100%;">
       <label class="small" for="bgColor">Background Color</label>
       <input id="bgColor" type="color" value="#FBEEE8" />
     </div>
 
-    <!-- Media selector (shown when 'media' is selected) -->
-    <div class="field" id="bgMediaField" style="display: none">
-      <label class="small" for="bgMediaSelect"
-        >Choose Background (Image/Video)</label
-      >
-      <select id="bgMediaSelect"></select>
-      <span class="hint" id="bgMediaHint">Using configured media list.</span>
-
-      <label
-        for="bgUploadInput"
-        class="file-trigger"
-        title="Note: Do not upload anything that can disrespect Quran. Remember Allah is always watching."
-      >
-        <!-- tiny upload icon -->
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M12 3v12m0 0l-4-4m4 4l4-4"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-          <path
-            d="M19 15v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-        </svg>
-        Choose files
-      </label>
+    <!-- Row 2 (Alternative): Media selector (shown when 'media' is selected) -->
+    <div class="field" id="bgMediaField" style="display: none; width: 100%;">
+      <label class="small">Choose Background (Image/Video)</label>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+          <select id="bgMediaSelect" style="width: 100%;"></select>
+          <span class="hint" id="bgMediaHint">Using configured media list.</span>
+        </div>
+        
+        <label
+          for="bgUploadInput"
+          class="file-trigger"
+          title="Note: Do not upload anything that can disrespect Quran. Remember Allah is always watching."
+          style="display: flex; justify-content: center; align-items: center; white-space: nowrap; height: fit-content; margin: 0; align-self: flex-start;"
+        >
+          <!-- tiny upload icon -->
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M12 3v12m0 0l-4-4m4 4l4-4"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M19 15v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          Choose files
+        </label>
+      </div>
 
       <!-- keep the same ID so existing JS continues to work -->
       <input

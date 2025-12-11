@@ -126,12 +126,14 @@ function setAspectRatio(type) {
     previewCanvas.width = 1080;
     previewCanvas.height = 1080;
     previewCanvas.style.aspectRatio = "1 / 1";
+    previewCanvas.classList.add("is-square"); // Limit width CSS
     arVerticalBtn?.classList.remove("active");
     arSquareBtn?.classList.add("active");
   } else {
     previewCanvas.width = 1080;
     previewCanvas.height = 1920;
     previewCanvas.style.aspectRatio = "9 / 16";
+    previewCanvas.classList.remove("is-square");
     arSquareBtn?.classList.remove("active");
     arVerticalBtn?.classList.add("active");
   }

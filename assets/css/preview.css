@@ -2,28 +2,56 @@
    Preview Section Styles
    ========================================================================== */
 
-.preview-header {
+/* Main Preview Container - Make it the reference for absolute positioning */
+.preview {
+  position: relative;
+  padding: 0 !important;
+  /* Override layout.css padding */
+  gap: 0 !important;
+  /* Override layout.css gap */
+  overflow: hidden !important;
+  /* Prevent scrolling, content should fit */
   display: flex;
+  align-items: center;
   justify-content: center;
-  margin-bottom: 5px;
-  width: 100%;
+  background: transparent;
+}
+
+/* Header (AR Toggles) - Overlay Top Center */
+.preview-header {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  right: auto;
+  display: flex;
+  width: auto;
+  margin: 0;
+  z-index: 20;
+  background: rgba(30, 33, 40, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  padding: 4px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  justify-content: center;
 }
 
 .ar-toggle {
   display: flex;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 4px;
+  background: transparent;
+  padding: 0;
   gap: 4px;
 }
 
 .ar-btn {
   background: transparent;
   border: none;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.7);
   padding: 0 12px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -34,8 +62,8 @@
 }
 
 .ar-btn:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .ar-btn.active {
@@ -43,83 +71,158 @@
   color: #fff;
 }
 
+/* Light theme adjustments */
+html[data-theme="light"] .preview-header {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="light"] .ar-btn {
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .ar-btn:hover,
 html[data-theme="light"] .ar-btn.active {
-  background: var(--accent-1);
+  color: #fff;
+  /* Keep active text white usually, or check accent */
+}
+
+html[data-theme="light"] .ar-btn.active {
   color: #fff;
 }
 
-html[data-theme="light"] .ar-btn:hover {
-  color: var(--text);
-  background: rgba(0, 108, 53, 0.08);
-}
 
+/* Preview Stage - The Canvas Container */
 .preview-stage {
   display: grid;
   place-items: center;
-  border: 1px dashed var(--line);
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.02);
-  min-height: 0;
-  padding: 10px;
-  overflow: hidden;
-  /* Enforce 9:16 container shape to prevent layout shift */
-  /* Enforce 9:16 container shape to prevent layout shift */
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 75vh;
-  aspect-ratio: 9 / 16;
-  margin: 0 auto;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  overflow: visible;
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  margin: 0;
 }
 
+/* The Canvas itself */
 #previewCanvas {
-  width: min(100%, var(--previewMax));
-  height: auto;
+  /* Scale to fit within the viewport height, leaving minor room if needed, but we want BIG */
+  height: 96vh;
+  width: auto;
   aspect-ratio: 9 / 16;
   background: #fff;
-  border-radius: 22px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
+  max-width: 100%;
+  object-fit: contain;
 }
 
-/* Preview controls */
+/* Constrain square preview to have the same "weight" (width) as vertical */
+#previewCanvas.is-square {
+  aspect-ratio: 1 / 1;
+  /* Animate height explicitly for smooth transition */
+  height: calc(96vh * 9 / 16);
+  max-width: calc(96vh * 9 / 16);
+}
+
+/* Controls - Overlay Bottom Center */
 .preview-controls {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  /* Center horizontally */
+  transform: translateX(-50%);
+  right: auto;
+  z-index: 20;
+
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  /* Horizontal layout */
   align-items: center;
-  gap: 8px;
-  width: 100%;
+  gap: 16px;
+  width: auto;
+
+  /* Transparent Glass Material */
+  background: rgba(30, 33, 40, 0.4);
+  /* More transparent */
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  padding: 8px 16px;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Slightly more visible border for "glass" feeling */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .preview-buttons {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   justify-content: center;
-  width: 100%;
+  width: auto;
+  order: 1;
+  /* Ensure buttons are first or second? User said: "bottom right horizontally add the play stop button also the volume". Let's put buttons, then volume. */
 }
 
 .preview-volume {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
-  width: 100%;
+  width: auto;
+  order: 2;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding-left: 12px;
 }
 
+/* Make slider smaller and white-ish */
 #volumeSlider {
-  width: 220px;
+  width: 80px;
+  accent-color: var(--accent-1);
+}
+
+.preview-volume label,
+.preview-volume span {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 11px;
+}
+
+/* Buttons inside the pill - Icon Style */
+.preview-buttons .btn {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  height: 32px;
+  width: 32px;
+  padding: 0;
+  border-radius: 50%;
+  /* Circle buttons */
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.preview-buttons .btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #fff;
+  transform: scale(1.05);
 }
 
 .audio-error-message {
-  color: #856404;
-  font-size: 14px;
-  display: none;
+  color: #ff4d4d;
+  font-size: 12px;
   text-align: center;
-  max-width: 80%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin: 0 auto;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  position: absolute;
+  top: -24px;
+  /* Show error above the pill */
+  right: 0;
+  width: 200px;
+  text-align: right;
 }
 
 audio {
@@ -130,20 +233,37 @@ audio {
   display: none;
 }
 
+/* Version Info - Hide or make very small/subtle outside the pill or inside? 
+   Let's keep it minimal below the pill or hidden if user wants 'clean'. 
+   We'll make it tiny at bottom right of screen effectively.
+*/
 .version-info {
-  text-align: center;
-  margin-top: 12px;
-  opacity: 0.7;
-  font-size: 12px;
-  color: var(--muted);
-  text-decoration: none;
+  display: none;
+  /* Hide to reduce clutter for 'maximized' view per user request */
 }
 
-.version-info .dev-name {
-  text-decoration: underline;
+/* Light Theme Adjustments for Controls */
+html[data-theme="light"] .preview-controls {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.version-info:hover {
-  text-decoration: underline;
-  cursor: pointer;
+html[data-theme="light"] .preview-volume label,
+html[data-theme="light"] .preview-volume span {
+  color: var(--text) !important;
+}
+
+html[data-theme="light"] .preview-volume {
+  border-left-color: rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="light"] .preview-buttons .btn {
+  background: transparent;
+  color: var(--text);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+html[data-theme="light"] .preview-buttons .btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: var(--text);
 }

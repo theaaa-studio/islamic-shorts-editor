@@ -1,31 +1,42 @@
 <!-- Panel: Credits -->
 <div class="panel">
   <h3>Credits</h3>
-  <div class="credits-row">
-    <div class="field" style="flex: 0.5; min-width: 150px">
-      <label class="small" for="madeByInput">Made by (name)</label>
-      <input
-        id="madeByInput"
-        type="text"
-        placeholder="Your name or channel"
-        value=""
-      />
+  <div class="credits-grid">
+    <!-- Row 1: Name Input + Made By Toggle -->
+    <div class="credits-line">
+      <div class="field" style="flex: 1;">
+        <label class="small" for="madeByInput">Made by (name)</label>
+        <input
+          id="madeByInput"
+          type="text"
+          placeholder="Your name"
+          value=""
+        />
+      </div>
+      <label class="toggle" title="Show a Made by badge" style="margin-bottom: 2px;">
+        <input type="checkbox" id="creditMadeBy" checked />
+        <span>Made by</span>
+      </label>
     </div>
-    <label class="toggle" title="Show a Made by badge">
-      <input type="checkbox" id="creditMadeBy" checked />
-      <span>Made by</span>
-    </label>
-    <label class="toggle" title="Show attribution to data/audio providers">
-      <input type="checkbox" id="creditData" checked />
-      <span>Data Source</span>
-    </label>
-    <label class="toggle" title="Show your creator tag">
-      <input type="checkbox" id="creditCreator" checked />
-      <span>Editor Developer</span>
-    </label>
-    <div class="field" style="flex: 0 0 auto">
-      <label class="small" for="creditColor">Credit Color</label>
-      <input id="creditColor" type="color" value="#1f1f1f" />
+
+    <!-- Row 2: Data Source + Developer Toggles -->
+    <div class="credits-line">
+      <label class="toggle" title="Show attribution">
+        <input type="checkbox" id="creditData" checked />
+        <span>Data Source</span>
+      </label>
+      <label class="toggle" title="Show developer tag">
+        <input type="checkbox" id="creditCreator" checked />
+        <span>Editor Developer</span>
+      </label>
+    </div>
+
+    <!-- Row 3: Color -->
+    <div class="credits-line">
+      <div class="field" style="flex: 0 0 auto">
+        <label class="small" for="creditColor">Credit Color</label>
+        <input id="creditColor" type="color" value="#1f1f1f" />
+      </div>
     </div>
   </div>
 </div>
