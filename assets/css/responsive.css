@@ -189,6 +189,10 @@
     gap: 8px;
   }
 
+  .typography-grid .toggle {
+    grid-column: 1;
+  }
+
   /* Specific overrides for very small items */
   .field {
     gap: 2px;
