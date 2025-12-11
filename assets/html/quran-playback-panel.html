@@ -1,19 +1,23 @@
         <!-- Panel: Playback & Export -->
         <div class="panel">
           <h3>Playback & Export</h3>
+          <div class="transport">
             <button id="buildPreviewBtn" class="btn ghost">
-              <i class="fas fa-play"></i> Play & Export
+              Play & Export
+            </button>
+            <button id="multiExportBtn" class="btn ghost" title="Export separate videos for each Ayah in the range">
+              Play & Multi Single Export <span id="multiExportCount">(1)</span>
             </button>
             <!-- ✅ ADD: Dismiss button -->
-            <button id="dismissBtn" class="btn ghost" disabled>
-              <i class="fas fa-times"></i> Dismiss
-            </button>
+            <button id="dismissBtn" class="btn ghost" disabled>Dismiss</button>
             <button id="downloadBtn" class="btn ghost" disabled>
-              <i class="fas fa-download"></i> Download
+              Download (WebM)
             </button>
             <button id="takePictureBtn" class="btn ghost" title="Capture and download individual images for each ayah in your selected range">
-              <i class="fas fa-camera"></i> Save Picture <span id="pictureSaveCount">(1)</span>
+              Save Picture <span id="pictureSaveCount">(1)</span>
             </button>
+            
+          </div>
 
           <div class="two-col-inline">
             <!-- <div class="status" id="status">Ready.</div> -->

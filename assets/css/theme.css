@@ -11,9 +11,7 @@
   padding: 0;
   border-radius: 8px;
   border: 1px solid var(--line);
-  background: linear-gradient(135deg,
-      rgba(0, 108, 53, 0.06),
-      rgba(0, 153, 77, 0.04));
+  background: rgba(0, 108, 53, 0.05);
   color: var(--text);
   cursor: pointer;
   font-size: 18px;
@@ -38,18 +36,12 @@ html[data-theme="light"] {
 }
 
 html[data-theme="light"] body {
-  background: radial-gradient(1200px 1200px at 10% -10%,
-      rgba(0, 108, 53, 0.06),
-      transparent 60%),
-    radial-gradient(1000px 1000px at 110% -10%,
-      rgba(0, 153, 77, 0.04),
-      transparent 55%),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
 }
 
 html[data-theme="light"] .sidebar {
-  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  background: var(--panel);
   border-right: 1px solid var(--line);
 }
 
@@ -80,7 +72,7 @@ html[data-theme="light"] select {
 
 html[data-theme="light"] .btn {
   color: #ffffff;
-  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  background: var(--accent-1);
 }
 
 html[data-theme="light"] .btn.ghost {
@@ -91,9 +83,7 @@ html[data-theme="light"] .btn.ghost {
 }
 
 html[data-theme="light"] .file-trigger {
-  background: linear-gradient(135deg,
-      rgba(0, 108, 53, 0.06),
-      rgba(0, 153, 77, 0.04));
+  background: rgba(0, 108, 53, 0.05);
   color: var(--text);
   border: 1px solid var(--line);
 }

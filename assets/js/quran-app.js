@@ -27,7 +27,7 @@ let bgModeColor,
   bgMediaHint,
   bgUploadInput;
 let previewCanvas, pctx;
-let buildPreviewBtn, downloadBtn, previewPlayBtn, dismissBtn, takePictureBtn;
+let buildPreviewBtn, downloadBtn, previewPlayBtn, dismissBtn, takePictureBtn, multiExportBtn;
 let arVerticalBtn, arSquareBtn;
 let volumeSlider, volumeVal;
 let audio, recStatus, meterBar;
@@ -88,6 +88,7 @@ function initializeDOM() {
 
   buildPreviewBtn = $("#buildPreviewBtn");
   takePictureBtn = $("#takePictureBtn");
+  multiExportBtn = $("#multiExportBtn");
   downloadBtn = $("#downloadBtn");
   previewPlayBtn = $("#previewPlayBtn");
   dismissBtn = $("#dismissBtn");
@@ -149,6 +150,8 @@ window.recordingStarted = false;
 window.finalBlob = null;
 window.hasAudioError = false;
 window.wasDismissed = false;
+window.multiExportMode = false;
+window.multiExportBlobs = [];
 
 // gate: only record when explicitly allowed
 window.allowRecording = true;
@@ -545,12 +548,58 @@ function resetSessionUI() {
   recStatus.textContent =
     "Press Play & Export to preview & auto-record. Avoid the right audio controller during recording.";
   meterBar.style.width = "0%";
+  window.multiExportMode = false;
   setDuringRecordingUI(false);
 }
 
 // Expose to window for audio module
 window.resetSessionUI = resetSessionUI;
 window.setDuringRecordingUI = setDuringRecordingUI;
+
+function handleMultiExportNext() {
+  if (!window.finalBlob) return;
+  
+  // 1. Cache current file
+  const ts = timestampStr();
+  const s = window.metadataModule.meta.surahs.find((x) => x.number === window.sessionSurah);
+  const sName = s ? s.englishName : "Unknown";
+  // current playlist item
+  const it = window.playlist[window.index];
+  const actualAyahNumber = it ? it.ayah : window.sessionFrom + window.index;
+  
+  const translationEdition = window.translationEdition || "en.sahih";
+  const translationName = translationEdition.replace(/\./g, "-");
+  const aspectRatio = getAspectRatioString();
+  
+  const filename = `Surah-${window.sessionSurah}-${safe(sName)}_Ayah-${actualAyahNumber}_${aspectRatio}_${safe(window.sessionReciterName)}_${translationName}_${ts}.webm`;
+  
+  window.multiExportBlobs.push({
+      blob: window.finalBlob,
+      filename: filename
+  });
+
+  // 2. Advance to next
+  if (window.index < window.playlist.length - 1) {
+    window.index++;
+    window.audioModule.updateMeter();
+    // Give a small delay to ensure cleanup
+    setTimeout(() => {
+         window.audioModule.playIndex(window.index, true); 
+    }, 500);
+  } else {
+    // Done
+    window.isPlaying = false;
+    window.audioModule.updateMeter();
+    const recStatus = document.getElementById("recStatus");
+    const downloadBtn = document.getElementById("downloadBtn");
+    
+    if (recStatus) recStatus.textContent = "Multi-export ready. Click 'Download' to save all videos as a Zip.";
+    if (downloadBtn) downloadBtn.disabled = false;
+    
+    setDuringRecordingUI(false);
+  }
+}
+window.handleMultiExportNext = handleMultiExportNext;
 
 function onAnyInputChange() {
   resetSessionUI();
@@ -578,14 +627,16 @@ function updatePictureSaveCount() {
   const ayahStartSel = $("#ayahStart");
   const ayahEndSel = $("#ayahEnd");
   const pictureSaveCount = $("#pictureSaveCount");
+  const multiExportCount = $("#multiExportCount");
   
-  if (!ayahStartSel || !ayahEndSel || !pictureSaveCount) return;
+  if (!ayahStartSel || !ayahEndSel) return;
   
   const start = +ayahStartSel.value || 1;
   const end = +ayahEndSel.value || 1;
   const count = Math.max(1, end - start + 1);
   
-  pictureSaveCount.textContent = `(${count})`;
+  if (pictureSaveCount) pictureSaveCount.textContent = `(${count})`;
+  if (multiExportCount) multiExportCount.textContent = `(${count})`;
 }
 
 // Expose to window for metadata module
@@ -909,6 +960,27 @@ function setupEventListeners() {
         }
       }
     });
+
+  }
+
+  // Multi Single Video Export
+  if (multiExportBtn) {
+    multiExportBtn.addEventListener("click", async () => {
+      // Setup similar to buildPreviewBtn but with mode flag
+      await window.audioModule.ensureGraphOnGesture();
+      window.allowRecording = true;
+      window.multiExportMode = true;
+      window.audioModule.updateAudioRouting();
+      window.audioModule.setVolumeFromSlider();
+      
+      // Reset cache
+      window.multiExportBlobs = [];
+
+      // Load and play - this prepares playlist and starts first item
+      // We pass record: true which resets valid flags, so set mode after
+      await window.audioModule.loadAndPlay({ record: true });
+      window.multiExportMode = true; // Ensure it stays true after loadAndPlay reset
+    });
   }
 
   // Aspect Ratio Toggles
@@ -947,6 +1019,13 @@ function setupEventListeners() {
       window.isPlaying = false;
     });
     audio.addEventListener("ended", async () => {
+      if (window.multiExportMode) {
+        // In multi-export mode, we DO NOT auto-advance here.
+        // We stop the recorder, which triggers onstop, where we handle the download and next item.
+        window.audioModule.stopRecordingIfActive();
+        return;
+      }
+
       if (window.index < window.playlist.length - 1) {
         window.index++;
         window.audioModule.updateMeter();
@@ -961,7 +1040,50 @@ function setupEventListeners() {
 
   // ------------------ Download recorded WebM ------------------
   if (downloadBtn) {
-    downloadBtn.addEventListener("click", () => {
+    downloadBtn.addEventListener("click", async () => {
+
+       // Multi-Export Zip Logic
+       if (window.multiExportMode && window.multiExportBlobs.length > 0) {
+            const zip = new JSZip();
+            window.multiExportBlobs.forEach(item => {
+                zip.file(item.filename, item.blob);
+            });
+            
+            const recStatus = $("#recStatus");
+            if (recStatus) recStatus.textContent = "Zipping files...";
+            
+            try {
+                const content = await zip.generateAsync({type:"blob"});
+                const ts = timestampStr();
+                 const s = window.metadataModule.meta.surahs.find((x) => x.number === window.sessionSurah);
+                 const sName = s ? s.englishName : "Unknown";
+                 
+                const zipName = `QuranShorts_Multi_${window.sessionSurah}-${safe(sName)}_${ts}.zip`;
+                
+                const url = URL.createObjectURL(content);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = zipName;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                    a.remove();
+                }, 1000);
+                
+                if (recStatus) recStatus.textContent = "Zip downloaded!";
+                
+                // Reset mode after successful download
+                window.multiExportMode = false;
+                window.multiExportBlobs = [];
+                
+            } catch (e) {
+                console.error("Zip generation failed:", e);
+                if (recStatus) recStatus.textContent = "Error creating zip file.";
+            }
+            return;
+       }
+
       if (!window.finalBlob) return;
       const ts = timestampStr();
       const translationEdition = window.translationEdition || "en.sahih";

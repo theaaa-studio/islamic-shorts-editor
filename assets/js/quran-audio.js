@@ -153,6 +153,14 @@ function initRecorder() {
   window.recorder.onstop = () => {
     window.finalBlob = new Blob(window.chunks, { type: mime || "video/webm" });
 
+    // Multi Export Hook
+    if (window.multiExportMode && window.handleMultiExportNext && !window.hasAudioError && !window.wasDismissed) {
+       window.recordingStarted = false; // Reset flag so next one can start
+       window.recorder = null; // Force new recorder for next track to ensure clean state
+       window.handleMultiExportNext();
+       return; // Skip default UI updates
+    }
+
     if (!window.hasAudioError && !window.wasDismissed) {
       if (downloadBtn) downloadBtn.disabled = false;
       if (recStatus) recStatus.textContent =

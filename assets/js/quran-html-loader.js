@@ -22,15 +22,15 @@ async function loadHTMLPartial(containerId, partialPath) {
 // Load all HTML partials when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
   // Load sidebar sections
-  await loadHTMLPartial('brand-container', 'assets/html/brand.html');
-  await loadHTMLPartial('input-panel-container', 'assets/html/input-panel.html');
+  await loadHTMLPartial('brand-container', 'assets/html/quran-brand.html');
+  await loadHTMLPartial('input-panel-container', 'assets/html/quran-input-panel.html');
   await loadHTMLPartial('background-panel-container', 'assets/html/background-panel.html');
   await loadHTMLPartial('typography-panel-container', 'assets/html/typography-panel.html');
   await loadHTMLPartial('credits-panel-container', 'assets/html/credits-panel.html');
-  await loadHTMLPartial('playback-panel-container', 'assets/html/playback-panel.html');
+  await loadHTMLPartial('playback-panel-container', 'assets/html/quran-playback-panel.html');
   
   // Load preview section
-  await loadHTMLPartial('preview-container', 'assets/html/preview.html');
+  await loadHTMLPartial('preview-container', 'assets/html/quran-preview.html');
   
   // Dispatch custom event when all HTML partials are loaded
   window.dispatchEvent(new CustomEvent('htmlPartialsLoaded'));

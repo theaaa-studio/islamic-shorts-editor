@@ -202,6 +202,10 @@
     gap: 8px;
   }
 
+  .typography-grid .toggle {
+    grid-column: 1;
+  }
+
   /* Specific overrides for very small items */
   .field {
     gap: 2px;
@@ -227,6 +231,10 @@
   .background-panel .inline-row {
     flex-wrap: wrap;
     gap: 6px;
+  }
+
+  .background-panel .field {
+    width: 100% !important;
   }
 
   /* Mobile layout for background panel color controls */
@@ -286,6 +294,19 @@
     padding: 8px 16px;
     border-radius: 32px;
     gap: 12px;
+  }
+
+  .transport {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .transport button {
+    width: 100%;
+    min-height: 40px;
+    /* Larger tap target */
   }
 
   .preview-buttons {

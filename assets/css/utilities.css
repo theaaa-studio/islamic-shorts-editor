@@ -22,7 +22,7 @@
   display: block;
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  background: var(--accent-1);
   transition: width 0.25s ease;
 }
 
@@ -33,4 +33,3 @@
   gap: 10px;
   align-items: center;
 }
-

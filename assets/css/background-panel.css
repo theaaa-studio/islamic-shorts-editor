@@ -50,9 +50,7 @@
   padding: 10px 14px;
   border-radius: 10px;
   border: 1px solid var(--line);
-  background: linear-gradient(135deg,
-      rgba(0, 108, 53, 0.16),
-      rgba(0, 153, 77, 0.16));
+  background: rgba(0, 108, 53, 0.06);
   color: var(--text);
   font-weight: 700;
   user-select: none;
