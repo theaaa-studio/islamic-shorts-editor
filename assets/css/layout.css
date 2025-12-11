@@ -29,7 +29,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
-  background: var(--panel);
+  background: var(--bg);
 }
 
 /* Preview (right 30%) */

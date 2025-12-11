@@ -8,7 +8,7 @@
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 14px;
-  background: #0e131a;
+  background: var(--panel);
   counter-increment: panel-step;
 }
 
@@ -86,7 +86,7 @@ label.small {
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: #0c1117;
+  background: var(--panel-2);
   transition: border-color 0.12s ease, box-shadow 0.12s ease,
     transform 0.12s ease;
   width: fit-content;
