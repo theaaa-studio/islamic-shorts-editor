@@ -284,6 +284,9 @@ function drawPreview() {
     // Arabic Layout
     const arabicMaxH = usableH * 0.35;
     const arabicFont = window.selectedArabicFont || "Amiri, serif";
+    
+    // Set RTL for accurate measurement
+    pctx.direction = "rtl";
     const arabicSpec = fitTextToBox(
       pctx,
       currentArabic,
@@ -295,6 +298,9 @@ function drawPreview() {
       arabicFont,
       700
     );
+    // Reset to LTR for subsequent calculations/translation
+    pctx.direction = "ltr";
+    
     const arabicTotalH = arabicSpec.lines.length * arabicSpec.lineHeight;
 
     // --- 2. Calculate Vertical Positioning (Visual Centering) ---
@@ -404,6 +410,7 @@ function drawPreview() {
     pctx.fillStyle = window.arabicFontColor || fontColor;
     pctx.textAlign = "center";
     pctx.textBaseline = "middle";
+    pctx.direction = "rtl"; // Enforce RTL for Arabic
     pctx.font = `700 ${arabicSpec.fontSize}px ${arabicFont}`;
     
     pctx.save();
@@ -413,6 +420,9 @@ function drawPreview() {
       pctx.fillText(ln, W / 2, arabicY + i * arabicSpec.lineHeight);
     });
     pctx.restore();
+    
+    // Reset direction for subsequent text
+    pctx.direction = "ltr";
 
     // --- Draw Translation ---
     pctx.fillStyle = fontColor;
