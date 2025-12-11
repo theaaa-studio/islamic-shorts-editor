@@ -299,7 +299,7 @@
   .transport {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     width: 100%;
   }
 
@@ -349,6 +349,25 @@
     object-fit: contain;
   }
 
+  /* Mobile Ratio Buttons (Half Size) */
+  .preview-header {
+    padding: 1px !important;
+    border-radius: 8px !important;
+    top: 0px !important;
+  }
+
+  .ar-btn {
+    height: 0px !important;
+    padding: 0 5px !important;
+    font-size: 9px !important;
+    gap: 3px !important;
+    border-radius: 4px !important;
+  }
+
+  .ar-btn i {
+    font-size: 9px !important;
+  }
+
   /* 6) Header tweak: horizontal layout on mobile */
   .brand {
     display: flex;
@@ -356,7 +375,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    padding: 10px;
+    padding: 5px 10px;
     margin-bottom: 0;
     order: 1;
     flex: 0 0 auto;
@@ -367,8 +386,8 @@
   }
 
   .logo {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     background-size: contain;
   }
 
@@ -414,6 +433,83 @@
 }
 
 @media (max-width: 600px) {
+
+  /* Stack input fields vertically but allow wrapping for side-by-side */
+  .input-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* Surah takes full width */
+  .field-surah {
+    width: 100%;
+    order: 1;
+  }
+
+  /* Start/End Ayah on same line */
+  .ayah-row {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    order: 2;
+  }
+
+  .ayah-row .field {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Reciter connects with Translation */
+  .field-reciter {
+    flex: 1;
+    min-width: 0;
+    /* Allow shrinking */
+    order: 3;
+  }
+
+  /* Translation connects with Reciter */
+  .field-translation {
+    flex: 1;
+    min-width: 0;
+    /* Allow shrinking */
+    order: 3;
+  }
+
+  /* Translation style on its own line */
+  .field-translation-style {
+    width: 100%;
+    order: 4;
+  }
+
+  /* Typography mobile layout - Translation Style, Translation Size, Translation Color */
+  .typo-row {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    align-items: flex-end;
+  }
+
+  .typo-row .field-translation-style {
+    flex: 1;
+    min-width: 120px !important;
+    order: 1;
+  }
+
+  .typo-row .field:nth-child(2) {
+    flex: 2;
+    min-width: 100px;
+    order: 2;
+  }
+
+  .typo-row .field:nth-child(3) {
+    width: auto;
+    order: 3;
+  }
+
   .background-panel .inline-row select {
     width: auto;
     max-width: 150px;

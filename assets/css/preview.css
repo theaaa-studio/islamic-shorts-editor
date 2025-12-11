@@ -81,13 +81,13 @@ html[data-theme="light"] .ar-btn {
   color: var(--text-muted);
 }
 
-html[data-theme="light"] .ar-btn:hover,
-html[data-theme="light"] .ar-btn.active {
-  color: #fff;
-  /* Keep active text white usually, or check accent */
+html[data-theme="light"] .ar-btn:hover {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.08);
 }
 
 html[data-theme="light"] .ar-btn.active {
+  background: var(--accent-1);
   color: #fff;
 }
 
