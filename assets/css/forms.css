@@ -26,8 +26,8 @@ select {
 input[type="text"]:hover,
 input[type="number"]:hover,
 select:hover {
-  border-color: var(--md-sys-color-on-surface);
-  /* MD3 uses High Emphasis on hover for border */
+  border-color: var(--md-sys-color-primary);
+  /* Brand green hover */
 }
 
 /* Focus State */
@@ -77,6 +77,11 @@ input[type="color"]::-webkit-color-swatch {
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.1);
   /* Inner subtle ring */
+}
+
+input[type="color"]:hover {
+  border-color: var(--md-sys-color-primary);
+  /* Brand green hover */
 }
 
 /* ===================== SLIDERS (MD3) ===================== */
