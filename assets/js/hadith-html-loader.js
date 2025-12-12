@@ -426,10 +426,10 @@ const TEMPLATES = {
         <div class="panel">
           <h3>Export</h3>
           <div class="transport">
-            <button id="previewPlayBtn" class="btn ghost">
+            <button id="previewPlayBtn" class="btn">
               <i class="fas fa-play"></i> Load & Preview
             </button>
-            <button id="takePictureBtn" class="btn ghost" title="Capture and download individual images for each Hadith in your selected range">
+            <button id="takePictureBtn" class="btn" title="Capture and download individual images for each Hadith in your selected range">
               <i class="fas fa-camera"></i> Save Picture <span id="pictureSaveCount">(1)</span>
             </button>
           </div>

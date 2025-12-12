@@ -200,4 +200,11 @@ label.small {
 
 .transport .btn:disabled {
   border-color: transparent;
+  background: rgba(225, 227, 222, 0.12);
+  color: rgba(225, 227, 222, 0.38);
+}
+
+[data-theme="light"] .transport .btn:disabled {
+  background: rgba(29, 29, 28, 0.12);
+  color: rgba(29, 29, 28, 0.38);
 }
