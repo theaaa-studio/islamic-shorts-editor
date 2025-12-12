@@ -1,213 +1,262 @@
 /* ==========================================================================
-   Form Controls (Inputs, Selects, Buttons)
+   Material Design 3 Components (Forms & Buttons)
    ========================================================================== */
 
-/* Form base */
-select,
-button,
-input[type="range"],
-input[type="color"],
+/* ===================== INPUTS & TEXT FIELDS (Outlined) ===================== */
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+select {
   appearance: none;
-  padding: 10px 12px;
-  font-size: 14px;
-  color: var(--text);
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  height: 48px;
+  /* Compact height (MD3 default is 56px, comfortable is 48px) */
+  padding: 0 16px;
+  font: var(--md-sys-typescale-body-large);
+  color: var(--md-sys-color-on-surface);
+  background: transparent;
+  /* Outlined fields have no fill usually, or surface */
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-small);
+  /* 4px or 8px for fields */
   outline: none;
   width: 100%;
-  transition: border-color 0.12s ease, box-shadow 0.12s ease,
-    transform 0.12s ease;
+  transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
 }
 
+/* Hover State */
+input[type="text"]:hover,
+input[type="number"]:hover,
+select:hover {
+  border-color: var(--md-sys-color-on-surface);
+  /* MD3 uses High Emphasis on hover for border */
+}
+
+/* Focus State */
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: var(--md-sys-color-primary);
+  border-width: 2px;
+  padding: 0 15px;
+  /* Adjust padding to prevent layout shift from border width change (1px -> 2px) */
+}
+
+/* Select Chevron */
 select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23e8eef9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23e1e3de' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
-  background-size: 16px;
+  background-size: 20px;
   padding-right: 40px;
 }
 
+[data-theme="light"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23444744' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* ===================== COLOR PICKER ===================== */
 input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
   width: 48px;
   height: 48px;
   padding: 4px;
   cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--md-sys-color-outline);
   border-radius: 50%;
-  border: 2px solid var(--line);
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  /* Circle */
+  box-sizing: border-box;
 }
 
 input[type="color"]::-webkit-color-swatch-wrapper {
   padding: 0;
-  border-radius: 50%;
 }
 
 input[type="color"]::-webkit-color-swatch {
   border: none;
   border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  /* Inner subtle ring */
 }
 
-input[type="color"]::-moz-color-swatch {
-  border: none;
-  border-radius: 50%;
-}
-
+/* ===================== SLIDERS (MD3) ===================== */
 input[type="range"] {
-  height: 38px;
-  padding: 0 2px;
-  background: transparent;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: 999px;
-  background: var(--accent-1);
-  opacity: 0.6;
-}
-
-input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #fff;
-  border: 2px solid #cbd5e1;
-  margin-top: -6px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+  appearance: none;
+  width: 100%;
+  height: 40px;
+  /* Touch target height */
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Track */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--md-sys-color-secondary-container);
 }
 
 input[type="range"]::-moz-range-track {
-  height: 6px;
-  border-radius: 999px;
-  background: var(--accent-1);
-  opacity: 0.6;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--md-sys-color-secondary-container);
+}
+
+/* Thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: var(--md-sys-color-primary);
+  margin-top: -8px;
+  /* Center on trace (4px track / 2 - 20px / 2) */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: none;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  height: 20px;
+  width: 20px;
   border-radius: 50%;
-  background: #fff;
-  border: 2px solid #cbd5e1;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+  background: var(--md-sys-color-primary);
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Buttons */
-.btn {
-  cursor: pointer;
-  user-select: none;
-  background: var(--accent-1);
-  color: #071018;
-  border: none;
-  font-weight: 700;
-  padding: 10px 12px;
-  border-radius: 10px;
-  transition: transform 0.12s ease, box-shadow 0.12s ease,
-    border-color 0.12s ease;
-  /* Flex for icon support */
-  display: flex;
+/* Slider Hover/Active State Layer */
+input[type="range"]:hover::-webkit-slider-thumb {
+  box-shadow: 0 0 0 8px rgba(var(--md-sys-color-primary), 0.08);
+}
+
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 10px rgba(var(--md-sys-color-primary), 0.12);
+}
+
+/* ===================== BUTTONS (MD3 Filled & Tonal) ===================== */
+/* Default .btn is MD3 Filled Button */
+.btn,
+button {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-}
-
-.btn.ghost {
-  background: var(--panel-2);
-  color: var(--text);
-  border: 1px solid var(--line);
-  box-shadow: none;
-  /* hover adds shadow for buttons only */
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-/* ===================== Interactables (affordances) ===================== */
-
-/* Pointers for interactables (text inputs keep I-beam) */
-button,
-.btn,
-.file-trigger,
-.toggle,
-.brand .theme-toggle,
-.preview-buttons button,
-.transport button,
-select,
-input[type="checkbox"],
-input[type="radio"],
-input[type="range"],
-input[type="color"],
-label[for] {
+  height: 40px;
+  padding: 0 24px;
+  border-radius: 20px;
+  /* Fully rounded */
+  border: none;
+  font: var(--md-sys-typescale-label-large);
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  /* Elevation 1 (ish) */
 }
 
-input[type="text"] {
-  cursor: text;
-}
-
-/* NON-BUTTON hover (border-only) */
-.file-trigger:hover,
-.toggle:hover,
-select:hover,
-input[type="color"]:hover,
-input[type="range"]:hover,
-input[type="text"]:hover,
-input[type="number"]:hover {
-  border-color: var(--hover-border);
-  box-shadow: 0 0 0 3px rgba(0, 108, 53, 0.12);
-  /* ring, not a drop shadow */
-  transform: none;
-}
-
-/* Inputs/text focus (ring, not shadow) */
-input[type="text"]:focus,
-input[type="number"]:focus {
-  border-color: var(--hover-border);
-  box-shadow: 0 0 0 3px rgba(0, 108, 53, 0.12);
-}
-
-/* Buttons — hover/active: shadow + blue border ring */
-.btn {
-  border: 1px solid transparent;
-}
-
-/* allow showing border color on solid buttons */
-button:hover:not(:disabled),
-.btn:hover:not(:disabled) {
-  border-color: var(--hover-border);
-  box-shadow: var(--hover-shadow-btn), 0 0 0 3px rgba(0, 108, 53, 0.12);
+/* Hover */
+/* Hover (Use Primary 50 for subtle lightness) */
+.btn:hover:not(:disabled),
+button:hover:not(:disabled) {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 8px rgba(0, 0, 0, 0.12);
+  /* Elev 2 */
+  background: var(--md-ref-palette-primary-50);
   transform: translateY(-1px);
 }
 
-button:active:not(:disabled),
-.btn:active:not(:disabled) {
-  transform: translateY(1px);
-  box-shadow: 0 4px 14px rgba(0, 108, 53, 0.18);
+/* Active */
+.btn:active:not(:disabled),
+button:active:not(:disabled) {
+  box-shadow: none;
+  filter: brightness(0.85);
+  /* Darken more on press */
+  transform: translateY(0);
 }
 
-/* Universal keyboard focus ring (all controls) */
-button:focus-visible,
-.btn:focus-visible,
-.file-trigger:focus-visible,
-.toggle:focus-visible,
-.brand .theme-toggle:focus-visible,
-select:focus-visible,
-input[type="text"]:focus-visible,
-input[type="number"]:focus-visible,
-input[type="color"]:focus-visible,
-input[type="range"]:focus-visible,
-input[type="checkbox"]:focus-visible,
-input[type="radio"]:focus-visible,
-label[for]:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 4px var(--hover-ring);
-  border-color: var(--hover-border);
+/* Tonal Button (Secondary importance) - usage: class="btn tonal" */
+.btn.tonal,
+.btn.ghost {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  box-shadow: none;
+}
+
+.btn.tonal:hover:not(:disabled),
+.btn.ghost:hover:not(:disabled) {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  filter: brightness(0.95);
+  /* Subtle darken */
+  background-image: none;
+}
+
+/* Outlined Button - usage: class="btn outlined" */
+.btn.outlined {
+  background: transparent;
+  border: 1px solid var(--md-sys-color-outline);
+  color: var(--md-sys-color-primary);
+  box-shadow: none;
+  padding: 0 23px;
+  /* Compensate for border */
+}
+
+.btn.outlined:hover:not(:disabled) {
+  background: rgba(0, 108, 53, 0.08);
+  /* Primary opacity 8% */
+  border-color: var(--md-sys-color-primary);
+  box-shadow: none;
+}
+
+/* Disabled */
+.btn:disabled,
+button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  box-shadow: none !important;
+  background: rgba(225, 227, 222, 0.12);
+  /* Neutral on Surface 12% */
+  color: rgba(225, 227, 222, 0.38);
+}
+
+/* Icon size fix */
+.btn i,
+button i {
+  font-size: 18px;
+}
+
+/* ===================== TOGGLES / CHECKBOXES (Custom) ===================== */
+/* Using .toggle class as a container for checkboxes typically */
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--md-sys-color-surface-container-high);
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.toggle:hover {
+  background: var(--md-sys-color-surface-container-highest);
+}
+
+.toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--md-sys-color-primary);
+}
+
+/* Small labels inside panels */
+label.small {
+  font: var(--md-sys-typescale-label-small);
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 8px;
+  display: block;
 }

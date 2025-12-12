@@ -160,8 +160,10 @@
   }
 
   .nav-btn.active {
-    color: var(--accent-1);
-    background: rgba(124, 92, 255, 0.05);
+    color: var(--md-sys-color-on-secondary-container);
+    background: var(--md-sys-color-secondary-container);
+    border-radius: 16px;
+    /* Pill shape for active indicator */
   }
 
   /* 2) Readability + tap targets (Compact for "No Scroll") */

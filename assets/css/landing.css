@@ -22,25 +22,32 @@ body {
 }
 
 .theme-toggle {
-    background: transparent;
-    border: 1px solid var(--line);
-    color: var(--text);
-    font-size: 1.25rem;
-    cursor: pointer;
-    padding: 0.5rem 0.75rem;
-    border-radius: 8px;
-    transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 24px;
+    border-radius: 20px;
+    /* Fully rounded */
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+    /* Elevation 1 (ish) */
     min-width: 44px;
     min-height: 44px;
 }
 
 .theme-toggle:hover {
-    background: var(--panel);
-    border-color: var(--accent-1);
-    box-shadow: 0 0 0 3px var(--hover-ring);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 8px rgba(0, 0, 0, 0.12);
+    /* Elev 2 */
+    background: var(--md-ref-palette-primary-50);
+    transform: translateY(-1px);
+    border-color: transparent;
 }
 
 .logo {
@@ -140,6 +147,8 @@ body {
     gap: 1.5rem;
     position: relative;
     overflow: hidden;
+    text-align: center;
+    /* Ensure text is centered */
 }
 
 .option-card:hover {
@@ -171,20 +180,24 @@ body {
 }
 
 .btn {
-    margin-top: 1rem;
-    background: var(--accent-1);
-    color: white;
-    padding: 0.8rem 1.5rem;
-    border-radius: 50px;
-    font-weight: 600;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    transition: background 0.3s ease;
+    margin-top: 1rem;
+    /* Inherits background/color from forms.css */
+    width: auto;
+    /* landing buttons are inline-flex */
+    padding: 0 32px;
+    /* Larger padding for landing */
+    height: 48px;
+    /* Larger target */
+    border-radius: var(--md-sys-shape-corner-full);
 }
 
+/* Subtle shift on card hover */
 .option-card:hover .btn {
-    background: var(--accent-2);
+    background: var(--md-ref-palette-primary-50);
 }
 
 /* Footer Styles */

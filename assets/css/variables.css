@@ -1,53 +1,175 @@
 /* ==========================================================================
-   CSS Variables (Root)
+   Material Design 3 Design Tokens
    ========================================================================== */
 
 :root {
-  --bg: #050805;
-  --panel: #0a0e0a;
-  --panel-2: #080b08;
-  --text: #eff7ef;
-  --muted: #8ca38c;
-  --line: rgba(255, 255, 255, 0.06);
-  --accent-1: #006C35;
-  --accent-2: #00994D;
-  --radius: 16px;
-  --gap: 14px;
+  /* ===================== PALETTES (Green Core) ===================== */
+  /* Primary Palette (Green - User Anchor #006135) */
+  --md-ref-palette-primary-0: #000000;
+  --md-ref-palette-primary-10: #00220f;
+  --md-ref-palette-primary-20: #00371a;
+  --md-ref-palette-primary-30: #004e26;
+  --md-ref-palette-primary-40: #006135;
+  /* USER ANCHOR */
+  --md-ref-palette-primary-50: #007d43;
+  --md-ref-palette-primary-60: #009951;
+  --md-ref-palette-primary-70: #29b46a;
+  --md-ref-palette-primary-80: #54cf84;
+  --md-ref-palette-primary-90: #dcedde;
+  /* Cool Mist Green */
+  --md-ref-palette-primary-95: #eef7ef;
+  --md-ref-palette-primary-99: #f7fbf7;
+  --md-ref-palette-primary-100: #ffffff;
 
-  /* Layout split */
-  /* Layout split */
-  /* --sidebar: 70%; */
-  /* Legacy 2-column */
-  /* --preview: 30%; */
-  /* Legacy 2-column */
+  /* Secondary Palette (Teal/Blue-Green) */
+  --md-ref-palette-secondary-0: #000000;
+  --md-ref-palette-secondary-10: #001f24;
+  --md-ref-palette-secondary-20: #00363d;
+  --md-ref-palette-secondary-30: #004f58;
+  --md-ref-palette-secondary-40: #006874;
+  --md-ref-palette-secondary-50: #008391;
+  --md-ref-palette-secondary-60: #009faf;
+  --md-ref-palette-secondary-70: #2cbacc;
+  --md-ref-palette-secondary-80: #4cd6e9;
+  --md-ref-palette-secondary-90: #93f1ff;
+  --md-ref-palette-secondary-95: #cefafe;
+  --md-ref-palette-secondary-99: #f2fdff;
+  --md-ref-palette-secondary-100: #ffffff;
 
-  /* New 3-column: Left(1fr) | Preview(auto) | Right(1fr) */
-  /* --sidebar-width: 350px; */
-  /* Disabled for flexible width */
+  /* Neutral Palette (Gray) */
+  --md-ref-palette-neutral-0: #000000;
+  --md-ref-palette-neutral-10: #191c1a;
+  --md-ref-palette-neutral-20: #2e312e;
+  --md-ref-palette-neutral-30: #444744;
+  --md-ref-palette-neutral-40: #5c5f5c;
+  --md-ref-palette-neutral-50: #757874;
+  --md-ref-palette-neutral-60: #8e918d;
+  --md-ref-palette-neutral-70: #a9aca7;
+  --md-ref-palette-neutral-80: #c4c7c2;
+  --md-ref-palette-neutral-90: #e1e3de;
+  --md-ref-palette-neutral-95: #eff1ec;
+  --md-ref-palette-neutral-99: #fbfcfa;
+  --md-ref-palette-neutral-100: #ffffff;
+
+  /* Neutral Variant Palette */
+  --md-ref-palette-neutral-variant-0: #000000;
+  --md-ref-palette-neutral-variant-10: #161e17;
+  --md-ref-palette-neutral-variant-20: #2a332b;
+  --md-ref-palette-neutral-variant-30: #404941;
+  --md-ref-palette-neutral-variant-40: #586158;
+  --md-ref-palette-neutral-variant-50: #707a70;
+  --md-ref-palette-neutral-variant-60: #8a9489;
+  --md-ref-palette-neutral-variant-70: #a4afa4;
+  --md-ref-palette-neutral-variant-80: #c0cbc0;
+  --md-ref-palette-neutral-variant-90: #dce7dc;
+  --md-ref-palette-neutral-variant-95: #eaf5ea;
+  --md-ref-palette-neutral-variant-99: #f4fff4;
+  --md-ref-palette-neutral-variant-100: #ffffff;
+
+  /* ===================== SYSTEM TOKENS (DARK DEFAULT) ===================== */
+  /* User Override: Use same Green (Primary-40) for Dark Mode as Light Mode */
+  --md-sys-color-primary: var(--md-ref-palette-primary-40);
+  --md-sys-color-on-primary: var(--md-ref-palette-primary-100);
+  --md-sys-color-primary-container: var(--md-ref-palette-primary-30);
+  /* Darker container */
+  --md-sys-color-on-primary-container: var(--md-ref-palette-primary-90);
+
+  --md-sys-color-secondary: var(--md-ref-palette-secondary-40);
+  /* Match intensity */
+  --md-sys-color-on-secondary: var(--md-ref-palette-secondary-100);
+  --md-sys-color-secondary-container: var(--md-ref-palette-secondary-30);
+  --md-sys-color-on-secondary-container: var(--md-ref-palette-secondary-90);
+
+  --md-sys-color-background: var(--md-ref-palette-neutral-10);
+  --md-sys-color-on-background: var(--md-ref-palette-neutral-90);
+
+  --md-sys-color-surface: var(--md-ref-palette-neutral-10);
+  --md-sys-color-on-surface: var(--md-ref-palette-neutral-90);
+  --md-sys-color-surface-variant: var(--md-ref-palette-neutral-variant-30);
+  --md-sys-color-on-surface-variant: var(--md-ref-palette-neutral-variant-80);
+
+  --md-sys-color-outline: var(--md-ref-palette-neutral-variant-60);
+  --md-sys-color-outline-variant: var(--md-ref-palette-neutral-variant-30);
+
+  /* Surface Tones for Elevation/Containment */
+  --md-sys-color-surface-container-lowest: var(--md-ref-palette-neutral-0);
+  /* Deepest black */
+  --md-sys-color-surface-container-low: #101411;
+  --md-sys-color-surface-container: #141815;
+  /* Base panel */
+  --md-sys-color-surface-container-high: #1a1e1b;
+  --md-sys-color-surface-container-highest: #252926;
+
+  /* ===================== SHAPE TOKENS ===================== */
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-full: 999px;
+
+  /* ===================== TYPOGRAPHY TOKENS ===================== */
+  --md-sys-typescale-body-large: 400 16px/24px 'Roboto', sans-serif;
+  --md-sys-typescale-body-medium: 400 14px/20px 'Roboto', sans-serif;
+  --md-sys-typescale-body-small: 400 12px/16px 'Roboto', sans-serif;
+
+  --md-sys-typescale-label-large: 500 14px/20px 'Roboto', sans-serif;
+  --md-sys-typescale-label-medium: 500 12px/16px 'Roboto', sans-serif;
+  --md-sys-typescale-label-small: 500 11px/16px 'Roboto', sans-serif;
+
+  --md-sys-typescale-title-medium: 500 16px/24px 'Roboto', sans-serif;
+  --md-sys-typescale-title-large: 400 22px/28px 'Roboto', sans-serif;
+
+  /* ===================== LEGACY MAPPING ===================== */
+  --bg: var(--md-sys-color-background);
+  --panel: var(--md-sys-color-surface-container);
+  --panel-2: var(--md-sys-color-surface-container-high);
+  --text: var(--md-sys-color-on-surface);
+  --muted: var(--md-sys-color-on-surface-variant);
+  --line: var(--md-sys-color-outline-variant);
+  --accent-1: var(--md-sys-color-primary);
+  --accent-2: var(--md-sys-color-primary-container);
+
+  /* Layout vars maintained */
+  --radius: var(--md-sys-shape-corner-large);
+  --gap: 16px;
 
   /* Preview size */
   --previewMax: 360px;
   --previewMaxMobile: 210px;
 
-  /* Hover & focus tokens */
-  --hover-ring: rgba(0, 108, 53, 0.35);
-  --hover-border: rgba(0, 108, 53, 0.55);
-  --hover-shadow-btn: 0 8px 22px rgba(0, 108, 53, 0.22);
+  /* Hover & focus tokens (Updated to MD3 State Layers) */
+  --md-sys-state-hover-opacity: 0.08;
+  --md-sys-state-focus-opacity: 0.12;
+  --md-sys-state-pressed-opacity: 0.12;
+
+  --hover-ring: var(--md-sys-color-primary);
+  --hover-border: var(--md-sys-color-outline);
+  --hover-shadow-btn: 0 1px 3px 1px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Light Theme */
+/* Light Theme Overrides */
 [data-theme="light"] {
-  --bg: #f5f7fa;
-  --panel: #ffffff;
-  --panel-2: #f8f9fb;
-  --text: #1a1d2e;
-  --muted: #6b7280;
-  --line: rgba(0, 0, 0, 0.1);
-  --accent-1: #006C35;
-  --accent-2: #00994D;
+  /* MD3 Light Scheme */
+  --md-sys-color-primary: var(--md-ref-palette-primary-40);
+  --md-sys-color-on-primary: var(--md-ref-palette-primary-100);
+  --md-sys-color-primary-container: var(--md-ref-palette-primary-90);
+  --md-sys-color-on-primary-container: var(--md-ref-palette-primary-10);
 
-  /* Hover & focus tokens */
-  --hover-ring: rgba(0, 108, 53, 0.2);
-  --hover-border: rgba(0, 108, 53, 0.4);
-  --hover-shadow-btn: 0 8px 22px rgba(0, 108, 53, 0.15);
+  --md-sys-color-background: var(--md-ref-palette-neutral-99);
+  --md-sys-color-on-background: var(--md-ref-palette-neutral-10);
+
+  --md-sys-color-surface: var(--md-ref-palette-neutral-99);
+  --md-sys-color-on-surface: var(--md-ref-palette-neutral-10);
+  --md-sys-color-surface-variant: var(--md-ref-palette-neutral-variant-90);
+  --md-sys-color-on-surface-variant: var(--md-ref-palette-neutral-variant-30);
+
+  --md-sys-color-outline: var(--md-ref-palette-neutral-variant-50);
+  --md-sys-color-outline-variant: var(--md-ref-palette-neutral-variant-80);
+
+  /* Surface Tones Light */
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f7f9f7;
+  --md-sys-color-surface-container: #f1f5f2;
+  --md-sys-color-surface-container-high: #ebefe0;
+  /* slightly warm/green tint */
+  --md-sys-color-surface-container-highest: #e5e9e5;
 }

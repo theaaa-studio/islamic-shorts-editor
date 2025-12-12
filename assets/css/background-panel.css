@@ -47,16 +47,22 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  background: rgba(0, 108, 53, 0.06);
-  color: var(--text);
-  font-weight: 700;
+  padding: 0 16px;
+  height: 40px;
+  border-radius: var(--md-sys-shape-corner-full);
+  border: 1px solid var(--md-sys-color-outline);
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-primary);
+  font: var(--md-sys-typescale-label-large);
   user-select: none;
   white-space: nowrap;
-  transition: border-color 0.12s ease, box-shadow 0.12s ease,
-    transform 0.12s ease;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-trigger:hover {
+  background: var(--md-sys-color-surface-container-high);
+  border-color: var(--md-sys-color-primary);
 }
 
 .file-trigger svg {

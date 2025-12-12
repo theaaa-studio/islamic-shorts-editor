@@ -1,24 +1,31 @@
 /* ==========================================================================
-   Panel Styles
+   Panel Styles (MD3 Cards)
    ========================================================================== */
 
 .panel {
   display: grid;
   gap: 0px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 14px;
-  background: var(--panel);
+  /* MD3 Outlined Card */
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-large);
+  /* 16px */
+  padding: 16px;
   counter-increment: panel-step;
+  transition: all 0.2s ease;
+}
+
+.panel:hover {
+  border-color: var(--md-sys-color-outline);
 }
 
 .panel h3 {
-  margin: 0 0 8px;
-  font-size: 12px;
-  font-weight: 700;
+  margin: 0 0 16px;
+  font: var(--md-sys-typescale-title-medium);
+  color: var(--md-sys-color-on-surface);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .panel h3::before {
@@ -26,31 +33,33 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 15px;
-  height: 15px;
-  background: var(--accent-1);
-  color: #fff;
-  font-size: 10px;
+  width: 20px;
+  height: 20px;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  font: var(--md-sys-typescale-label-small);
   border-radius: 50%;
 }
 
 .field {
   display: grid;
-  gap: 1px;
+  gap: 8px;
+  /* Standard spacing between label and input */
+  margin-bottom: 4px;
 }
 
 label.small {
-  font-size: 12px;
-  color: var(--muted);
+  font: var(--md-sys-typescale-label-small);
+  color: var(--md-sys-color-on-surface-variant);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .hint {
-  font-size: 11px;
-  color: var(--muted);
-  opacity: 0.9;
+  font: var(--md-sys-typescale-body-small);
+  color: var(--md-sys-color-on-surface-variant);
+  opacity: 0.8;
 }
 
 /* Helpers */
@@ -79,31 +88,12 @@ label.small {
   gap: 12px;
 }
 
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--panel-2);
-  transition: border-color 0.12s ease, box-shadow 0.12s ease,
-    transform 0.12s ease;
-  width: fit-content;
-  white-space: nowrap;
-}
-
-.toggle input {
-  width: 16px;
-  height: 16px;
-}
-
 /* Credits row layout - all elements in one row with flexible spacing */
 /* Credits grouping layout */
 .credits-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
 }
 
@@ -119,11 +109,11 @@ label.small {
 .credits-line .field {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 8px;
 }
 
 .credits-line .toggle {
-  padding: 10px 12px;
+  /* Inherit from forms.css */
   height: fit-content;
   white-space: nowrap;
 }
@@ -133,7 +123,7 @@ label.small {
   display: flex;
   flex-direction: column;
   /* Stack vertically */
-  gap: 12px;
+  gap: 16px;
   align-items: stretch;
   /* Stretch to full width */
   width: 100%;
@@ -191,4 +181,23 @@ label.small {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
+}
+
+/* Custom Playback Buttons */
+.transport .btn {
+  background: transparent;
+  color: var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-primary);
+  box-shadow: none;
+}
+
+.transport .btn:hover:not(:disabled) {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  box-shadow: 0 4px 8px rgba(0, 97, 53, 0.25);
+  transform: translateY(-2px);
+}
+
+.transport .btn:disabled {
+  border-color: transparent;
 }
