@@ -35,7 +35,7 @@ body {
     padding: 0 24px;
     border-radius: 20px;
     /* Fully rounded */
-    border: 2px solid var(--md-sys-color-primary);
+    border: 1px solid var(--md-sys-color-primary);
     font-size: 1.25rem;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
@@ -200,7 +200,7 @@ body {
     /* Outlined style by default */
     background: transparent;
     color: var(--md-sys-color-primary);
-    border: 2px solid var(--md-sys-color-primary);
+    border: 1px solid var(--md-sys-color-primary);
     box-shadow: none;
     transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
 }

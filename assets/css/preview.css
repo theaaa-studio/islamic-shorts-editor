@@ -65,7 +65,7 @@ html[data-theme="light"] .fullscreen-separator {
   /* Hidden on desktop, shown on mobile via responsive.css */
   background: var(--bg);
   color: var(--text);
-  border: 2px solid var(--accent-1) !important;
+  border: 1px solid var(--accent-1) !important;
   /* Brand green border */
   height: 32px !important;
   width: 32px !important;

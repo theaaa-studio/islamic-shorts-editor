@@ -292,7 +292,7 @@ label.small {
 .theme-toggle {
   background: transparent;
   color: var(--md-sys-color-primary);
-  border: 2px solid var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-primary);
   box-shadow: none;
 }
 
