@@ -22,16 +22,11 @@
             <button id="previewPlayBtn" class="btn btn-icon" title="Play">
               <i class="fas fa-play"></i>
             </button>
-            <button id="previewStopBtn" class="btn btn-icon" title="Stop">
-              <i class="fas fa-stop"></i>
-            </button>
           </div>
 
-          <!-- ✅ ADD: Volume control row -->
+          <!-- Volume control row -->
           <div class="preview-volume">
-            <label for="volumeSlider" class="small" style="color: var(--muted)"
-              >Volume</label
-            >
+            <i class="fas fa-volume-up" style="color: var(--muted); font-size: 14px;"></i>
             <input
               id="volumeSlider"
               type="range"
@@ -42,6 +37,12 @@
             <span id="volumeVal" class="small" style="color: var(--muted)"
               >100%</span
             >
+            <!-- Separator for fullscreen button (mobile only) -->
+            <span class="fullscreen-separator"></span>
+            <!-- Fullscreen button (mobile only) -->
+            <button id="fullscreenBtn" class="btn btn-icon fullscreen-btn" title="Toggle Fullscreen">
+              <i class="fas fa-expand"></i>
+            </button>
           </div>
 
           <a

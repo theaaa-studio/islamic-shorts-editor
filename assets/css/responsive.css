@@ -126,8 +126,8 @@
     padding: 0;
     justify-content: space-around;
     align-items: center;
-    height: 60px;
-    flex: 0 0 60px;
+    height: 44px;
+    flex: 0 0 44px;
     width: 100%;
     width: 100%;
     z-index: 10;
@@ -164,6 +164,45 @@
     background: var(--md-sys-color-secondary-container);
     border-radius: 16px;
     /* Pill shape for active indicator */
+  }
+
+  /* Fullscreen Mode Styles */
+  .fullscreen-btn {
+    display: flex !important;
+    /* Show on mobile - override desktop display:none */
+  }
+
+  .fullscreen-separator {
+    display: block !important;
+    /* Show separator on mobile */
+  }
+
+  .app.fullscreen-mode .mobile-nav,
+  .app.fullscreen-mode #brand-container,
+  .app.fullscreen-mode .sidebar>div.active {
+    display: none !important;
+  }
+
+  .app.fullscreen-mode {
+    background: var(--bg) !important;
+    /* Theme-aware background for the entire app */
+  }
+
+  .app.fullscreen-mode .preview {
+    height: 100vh !important;
+    flex: 1 1 100vh !important;
+    background: var(--bg) !important;
+    /* Theme-aware background color */
+  }
+
+  .app.fullscreen-mode .preview-stage {
+    background: var(--bg) !important;
+    /* Theme-aware background for stage */
+  }
+
+  .app.fullscreen-mode .fullscreen-btn i::before {
+    content: "\f066";
+    /* fa-compress icon */
   }
 
   /* 2) Readability + tap targets (Compact for "No Scroll") */

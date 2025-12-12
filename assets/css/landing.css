@@ -35,14 +35,13 @@ body {
     padding: 0 24px;
     border-radius: 20px;
     /* Fully rounded */
-    border: none;
+    border: 2px solid var(--md-sys-color-primary);
     font-size: 1.25rem;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
-    background: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
-    /* Elevation 1 (ish) */
+    background: transparent;
+    color: var(--md-sys-color-primary);
+    box-shadow: none;
     min-width: 44px;
     min-height: 44px;
 }
@@ -50,9 +49,10 @@ body {
 .theme-toggle:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 8px rgba(0, 0, 0, 0.12);
     /* Elev 2 */
-    background: var(--md-ref-palette-primary-50);
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
     transform: translateY(-1px);
-    border-color: transparent;
+    border-color: var(--md-sys-color-primary);
 }
 
 .logo {

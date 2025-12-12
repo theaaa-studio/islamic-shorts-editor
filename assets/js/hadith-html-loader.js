@@ -461,7 +461,12 @@ const TEMPLATES = {
           ></canvas>
         </div>
 
-        <div class="preview-controls"></div>
+        <div class="preview-controls">
+          <!-- Fullscreen button (mobile only) -->
+          <button id="fullscreenBtn" class="btn btn-icon fullscreen-btn" title="Toggle Fullscreen">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
   `
 };
 

@@ -528,10 +528,8 @@ function getAspectRatioString() {
 
 // ------------------ UI toggle helper ------------------
 function setDuringRecordingUI(active) {
-  const stopBtn = document.getElementById("previewStopBtn");
   if (dismissBtn) dismissBtn.disabled = !active;
   if (previewPlayBtn) previewPlayBtn.disabled = !!active;
-  if (stopBtn) stopBtn.disabled = !!active;
 }
 
 // ------------------ Change handling ------------------
@@ -813,11 +811,42 @@ function setupEventListeners() {
 
   if (previewPlayBtn) {
     previewPlayBtn.addEventListener("click", async () => {
-      await window.audioModule.ensureGraphOnGesture();
-      window.allowRecording = false;
-      window.audioModule.updateAudioRouting();
-      window.audioModule.setVolumeFromSlider();
-      await window.audioModule.loadAndPlay({ record: false });
+      // Toggle between play and stop
+      if (window.isPlaying) {
+        // Stop playback
+        const audio = document.getElementById("audioPlayer");
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+          window.index = 0;
+          window.audioModule.updateMeter();
+          window.isPlaying = false;
+          if (window.recorder && window.recorder.state === "recording") {
+            window.audioModule.stopRecordingIfActive();
+          }
+        }
+        // Update button icon to play
+        const icon = previewPlayBtn.querySelector("i");
+        if (icon) {
+          icon.classList.remove("fa-stop");
+          icon.classList.add("fa-play");
+        }
+        previewPlayBtn.title = "Play";
+      } else {
+        // Start playback
+        await window.audioModule.ensureGraphOnGesture();
+        window.allowRecording = false;
+        window.audioModule.updateAudioRouting();
+        window.audioModule.setVolumeFromSlider();
+        await window.audioModule.loadAndPlay({ record: false });
+        // Update button icon to stop
+        const icon = previewPlayBtn.querySelector("i");
+        if (icon) {
+          icon.classList.remove("fa-play");
+          icon.classList.add("fa-stop");
+        }
+        previewPlayBtn.title = "Stop";
+      }
     });
   }
 
@@ -991,22 +1020,7 @@ function setupEventListeners() {
     arSquareBtn.addEventListener("click", () => setAspectRatio("square"));
   }
 
-  // Stop button
-  const previewStopBtn = $("#previewStopBtn");
-  if (previewStopBtn) {
-    previewStopBtn.addEventListener("click", () => {
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-        window.index = 0;
-        window.audioModule.updateMeter();
-        window.isPlaying = false;
-        if (window.recorder && window.recorder.state === "recording") {
-          window.audioModule.stopRecordingIfActive();
-        }
-      }
-    });
-  }
+  // Play button icon is now toggled via the click handler above
 
   if (audio) {
     audio.addEventListener("play", async () => {
@@ -1017,6 +1031,16 @@ function setupEventListeners() {
     });
     audio.addEventListener("pause", () => {
       window.isPlaying = false;
+      // Reset play button icon
+      const playBtn = document.getElementById("previewPlayBtn");
+      if (playBtn) {
+        const icon = playBtn.querySelector("i");
+        if (icon) {
+          icon.classList.remove("fa-stop");
+          icon.classList.add("fa-play");
+        }
+        playBtn.title = "Play";
+      }
     });
     audio.addEventListener("ended", async () => {
       if (window.multiExportMode) {

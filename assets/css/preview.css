@@ -45,6 +45,77 @@
   gap: 4px;
 }
 
+/* Fullscreen Separator (mobile only) */
+.fullscreen-separator {
+  display: none;
+  /* Hidden on desktop, shown on mobile via responsive.css */
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 8px;
+}
+
+html[data-theme="light"] .fullscreen-separator {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Fullscreen Toggle Button (mobile only - in preview controls) */
+.fullscreen-btn {
+  display: none !important;
+  /* Hidden on desktop, shown on mobile via responsive.css */
+  background: var(--bg);
+  color: var(--text);
+  border: 2px solid var(--accent-1) !important;
+  /* Brand green border */
+  height: 32px !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin: 0 !important;
+  /* Remove all margins */
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+  justify-content: center;
+  align-items: center;
+  box-shadow: none !important;
+  /* No shadow */
+  overflow: hidden !important;
+  /* Prevent any overflow */
+}
+
+/* When fullscreen button is next to other controls, add left margin */
+.preview-buttons+.preview-volume+.fullscreen-btn,
+.preview-volume+.fullscreen-btn {
+  margin-left: 8px !important;
+}
+
+.fullscreen-btn:hover {
+  background: var(--accent-1);
+  color: #fff;
+  border-color: var(--accent-1) !important;
+  transform: scale(1.05);
+}
+
+html[data-theme="light"] .fullscreen-btn {
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--accent-1) !important;
+}
+
+html[data-theme="light"] .fullscreen-btn:hover {
+  background: var(--accent-1);
+  color: #fff;
+  border-color: var(--accent-1) !important;
+}
+
 .ar-btn {
   background: transparent;
   border: none;
@@ -113,7 +184,8 @@ html[data-theme="light"] .ar-btn.active {
   height: 96vh;
   width: auto;
   aspect-ratio: 9 / 16;
-  background: #fff;
+  background: var(--bg);
+  /* Theme-aware background color */
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
@@ -142,6 +214,17 @@ html[data-theme="light"] .ar-btn.active {
 
 .preview-controls:empty {
   display: none !important;
+}
+
+/* When preview-controls has only one child (e.g., just fullscreen button), remove the pill background */
+/* Use :has() with > to check direct children, and :only-child for single element */
+.preview-controls:has(> :only-child) {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
 .preview-controls {
