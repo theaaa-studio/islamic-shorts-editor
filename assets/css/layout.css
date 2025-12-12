@@ -31,6 +31,10 @@
   top: 0;
   height: 100vh;
   background: var(--bg);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--md-sys-color-outline) transparent;
 }
 
 /* Preview (Center - Grid Col 2) */

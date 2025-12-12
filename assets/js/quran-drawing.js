@@ -204,51 +204,51 @@ function drawPreview() {
   const madeByInput = $("#madeByInput");
   const creditMadeByChk = $("#creditMadeBy");
 
-  // Background
-  const bgMode = window.backgroundModule.getBackgroundMode();
-  const bgCol = window.backgroundModule.getBgColor();
-  const selBg = window.backgroundModule.selectedBg;
-  const bgImg = window.backgroundModule.bgImg;
-  const bgVideo = window.backgroundModule.bgVideo;
+  // Helper to draw the current background media
+  const drawCurrentBackground = (ctx, W, H) => {
+      // Background
+      const bgMode = window.backgroundModule.getBackgroundMode();
+      const bgCol = window.backgroundModule.getBgColor();
+      const selBg = window.backgroundModule.selectedBg;
+      const bgImg = window.backgroundModule.bgImg;
+      const bgVideo = window.backgroundModule.bgVideo;
 
-  if (bgMode === "media" && selBg) {
-    let drew = false;
-    if (selBg.type === "image") {
-      // Check if image is loaded
-      if (bgImg.complete && bgImg.naturalWidth > 0) {
-        drew = drawMediaCover(pctx, bgImg, W, H);
-      } else if (bgImg.src && bgImg.src !== "") {
-        // Image is loading, show background color as fallback
-        pctx.fillStyle = bgCol;
-        pctx.fillRect(0, 0, W, H);
+      if (bgMode === "media" && selBg) {
+        let drew = false;
+        
+        if (selBg.type === "image") {
+          if (bgImg.complete && bgImg.naturalWidth > 0) {
+            drew = drawMediaCover(ctx, bgImg, W, H);
+          } else if (bgImg.src && bgImg.src !== "") {
+            // fallback
+            ctx.fillStyle = bgCol;
+            ctx.fillRect(0, 0, W, H);
+          }
+        } else if (selBg.type === "video") {
+          const bufferUpdated = updateVideoBuffer(bgVideo, W, H);
+          drew = drawBufferedVideo(ctx, W, H);
+          if (!drew && !lastVideoFrameValid) {
+            ctx.fillStyle = bgCol;
+            ctx.fillRect(0, 0, W, H);
+          }
+          if (bgVideo.paused && bgVideo.src) {
+            bgVideo.play().catch(() => {});
+          }
+        }
+        
+        if (!drew && (!selBg.type || (!bgImg.src && !bgVideo.src))) {
+          ctx.fillStyle = bgCol;
+          ctx.fillRect(0, 0, W, H);
+        }
+      } else {
+        ctx.fillStyle = bgCol;
+        ctx.fillRect(0, 0, W, H);
       }
-    } else if (selBg.type === "video") {
-      // Use double buffering for smooth video playback
-      // First, try to update the buffer with the latest frame
-      const bufferUpdated = updateVideoBuffer(bgVideo, W, H);
-      
-      // Then draw from the buffer (will use last valid frame during transitions)
-      drew = drawBufferedVideo(pctx, W, H);
-      
-      // If we've never drawn a valid frame, show fallback
-      if (!drew && !lastVideoFrameValid) {
-        pctx.fillStyle = bgCol;
-        pctx.fillRect(0, 0, W, H);
-      }
-      
-      // Ensure video is playing
-      if (bgVideo.paused && bgVideo.src) {
-        bgVideo.play().catch(() => {});
-      }
-    }
-    if (!drew && (!selBg.type || (!bgImg.src && !bgVideo.src))) {
-      pctx.fillStyle = bgCol;
-      pctx.fillRect(0, 0, W, H);
-    }
-  } else {
-    pctx.fillStyle = bgCol;
-    pctx.fillRect(0, 0, W, H);
-  }
+  };
+
+  // 1. Draw Background (Clean)
+  drawCurrentBackground(pctx, W, H);
+
 
   // Text
   // Text
@@ -391,10 +391,8 @@ function drawPreview() {
     const boxH = totalGroupH + boxPadY * 2;
     
     pctx.save();
-    pctx.globalAlpha = window.backgroundModule.getTextBoxOpacity() !== undefined 
-      ? window.backgroundModule.getTextBoxOpacity() 
-      : 0.12;
-    pctx.fillStyle = window.backgroundModule.getTextBoxColor() || "#000";
+    
+    // Define path
     drawRoundedRect(
         pctx,
         (W - boxW) / 2, // Center horizontally
@@ -402,6 +400,36 @@ function drawPreview() {
         boxW,
         boxH,
         20 // Radius
+    );
+
+    // Apply Backdrop Blur if needed
+    const bgBlur = window.backgroundModule.getBgBlur ? window.backgroundModule.getBgBlur() : 0;
+    if (bgBlur > 0) {
+       pctx.save();
+       pctx.clip();
+       pctx.filter = `blur(${bgBlur}px)`;
+       drawCurrentBackground(pctx, W, H);
+       pctx.restore();
+    }
+
+    pctx.globalAlpha = window.backgroundModule.getTextBoxOpacity() !== undefined 
+      ? window.backgroundModule.getTextBoxOpacity() 
+      : 0.12;
+    pctx.fillStyle = window.backgroundModule.getTextBoxColor() || "#000";
+    
+    // Fill the path (already defined by drawRoundedRect above ?? No, we need to redefine or reuse path)
+    // Clipping consumes the path? No, standard canvas clip intersects current path.
+    // Ideally we re-trace or just call fill() if path persists.
+    // Safest is to re-trace or save path.
+    // Let's just re-call drawRoundedRect to be safe and simple.
+    
+    drawRoundedRect(
+        pctx,
+        (W - boxW) / 2, 
+        boxTop,
+        boxW,
+        boxH,
+        20 
     );
     pctx.fill();
     pctx.restore();
@@ -489,10 +517,34 @@ function drawPreview() {
     
     // --- Draw Background Box ---
     pctx.save();
+    
+    // 1. Define Path for Blur Clip
+    drawRoundedRect(
+      pctx,
+      (W - boxW) / 2,
+      startY - boxPadY,
+      boxW,
+      totalGroupH + boxPadY * 2,
+      20
+    );
+    
+    // 2. Apply Blur
+    const bgBlur = window.backgroundModule.getBgBlur ? window.backgroundModule.getBgBlur() : 0;
+    if (bgBlur > 0) {
+        pctx.save();
+        pctx.clip();
+        pctx.filter = `blur(${bgBlur}px)`;
+        drawCurrentBackground(pctx, W, H);
+        pctx.restore();
+    }
+    
+    // 3. Draw Overlay Color
     pctx.globalAlpha = window.backgroundModule.getTextBoxOpacity() !== undefined 
       ? window.backgroundModule.getTextBoxOpacity() 
       : 0.12;
     pctx.fillStyle = window.backgroundModule.getTextBoxColor() || "#000";
+    
+    // Redraw path for fill
     drawRoundedRect(
       pctx,
       (W - boxW) / 2,

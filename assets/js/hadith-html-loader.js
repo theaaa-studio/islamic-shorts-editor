@@ -50,7 +50,7 @@ const TEMPLATES = {
 <!-- Panel: Background -->
 <div class="panel background-panel">
   <h3>Background</h3>
-  <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+  <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
     <!-- Row 1: Mode toggles -->
     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
       <label class="toggle" title="Use a solid background color">
@@ -61,74 +61,80 @@ const TEMPLATES = {
           id="bgModeColor"
           checked
         />
-        <span>Solid Color</span>
+        <span>Color</span>
       </label>
 
       <label class="toggle" title="Use image/video from assets/background">
         <input type="radio" name="bgMode" value="media" id="bgModeMedia" />
-        <span>Media (image/video)</span>
+        <span>Media</span>
       </label>
+
+      <!-- File Trigger (Compact, moved up) -->
+      <label
+          id="bgUploadBtn"
+          for="bgUploadInput"
+          class="file-trigger compact"
+          title="Upload image or video"
+          style="display: none; padding: 4px 12px; height: 32px; font-size: 12px; border-radius: 16px; margin-left: auto;"
+        >
+          <svg viewBox="0 0 24 24" fill="none" style="width: 14px; height: 14px; margin-right: 4px;">
+            <path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M19 15v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Upload
+      </label>
+      <input id="bgUploadInput" class="visually-hidden" type="file" accept="image/*,video/*" multiple />
     </div>
 
     <!-- Row 2: Background Color (shown when 'color' is selected) -->
-    <div class="field" id="bgColorField" style="width: 100%;">
-      <label class="small" for="bgColor">Background Color</label>
+    <div class="field" id="bgColorField" style="display: flex; align-items: center; gap: 10px; width: 100%;">
       <input id="bgColor" type="color" value="#FBEEE8" />
+      <label class="small" for="bgColor" style="margin: 0;">Background Color</label>
     </div>
 
     <!-- Row 2 (Alternative): Media selector (shown when 'media' is selected) -->
     <div class="field" id="bgMediaField" style="display: none; width: 100%;">
-      <label class="small">Choose Background (Image/Video)</label>
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-          <select id="bgMediaSelect" style="width: 100%;"></select>
-          <span class="hint" id="bgMediaHint">Using configured media list.</span>
-        </div>
-        
-        <label
-          for="bgUploadInput"
-          class="file-trigger"
-          title="Note: Do not upload anything that can disrespect Quran. Remember Allah is always watching."
-          style="display: flex; justify-content: center; align-items: center; white-space: nowrap; height: fit-content; margin: 0; align-self: flex-start;"
-        >
-          <!-- tiny upload icon -->
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path
-              d="M12 3v12m0 0l-4-4m4 4l4-4"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-            <path
-              d="M19 15v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
-          Choose files
-        </label>
-      </div>
-
-      <!-- keep the same ID so existing JS continues to work -->
-      <input
-        id="bgUploadInput"
-        class="visually-hidden"
-        type="file"
-        accept="image/*,video/*"
-        multiple
-      />
+       <select id="bgMediaSelect" style="width: 100%; height: 32px; font-size: 13px;"></select>
+       <div style="font-size: 10px; color: var(--muted); margin-top: 2px; text-align: right;" id="bgMediaHint">Using configured media list.</div>
     </div>
 
-    <!-- Ayah Box Color and Opacity (always visible at the bottom) -->
-    <div class="field">
-      <label class="small">Ayah Box Color</label>
-      <div style="display: flex; gap: 0.5rem; align-items: center;">
-        <input id="textBoxColor" type="color" value="#000000" style="width: 50px; height: 50px;" />
-        <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem; min-width: 150px;">
-          <label class="small" for="textBoxOpacity" style="white-space: nowrap; margin: 0; font-size: 0.75rem;">Opacity:</label>
-          <input id="textBoxOpacity" type="range" min="0" max="100" value="12" style="flex: 1; min-width: 80px;" />
-          <span id="textBoxOpacityVal" class="small" style="min-width: 3ch; font-size: 0.75rem;">12%</span>
+    <hr style="border: 0; border-top: 1px solid var(--line); margin: 4px 0;" />
+
+    <!-- Row 3: Box Style -->
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div style="display: flex; gap: 12px; align-items: center; justify-content: space-between;">
+        <label class="small" style="margin: 0;">Box Style</label>
+        <div style="display: flex; gap: 4px;">
+          <label class="toggle" style="padding: 4px 10px;">
+            <input type="radio" name="boxMode" value="color" id="boxModeColor" checked />
+            <span>Color</span>
+          </label>
+          <label class="toggle" style="padding: 4px 10px;">
+            <input type="radio" name="boxMode" value="blur" id="boxModeBlur" />
+            <span>Blur</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Blur Controls -->
+      <div class="field" id="boxBlurControls" style="display: none; width: 100%;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+              <label class="small" for="bgBlur" style="margin: 0; width: 60px;">Radius</label>
+              <input id="bgBlur" type="range" min="0" max="40" value="0" step="1" style="flex: 1; height: 24px;" />
+              <span id="bgBlurVal" class="small" style="min-width: 3ch; font-size: 11px;">0px</span>
+          </div>
+      </div>
+
+      <!-- Color/Opacity Controls -->
+      <div class="field" id="boxColorControls">
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <input id="textBoxColor" type="color" value="#000000" />
+            
+            <div style="flex: 1; display: flex; align-items: center; gap: 6px;">
+              <span class="small" style="font-size: 11px;">Opac.</span>
+              <input id="textBoxOpacity" type="range" min="0" max="100" value="12" style="flex: 1; height: 24px;" />
+              <span id="textBoxOpacityVal" class="small" style="width: 3ch; font-size: 11px;">12%</span>
+            </div>
         </div>
       </div>
     </div>

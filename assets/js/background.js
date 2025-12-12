@@ -39,9 +39,11 @@ const DEFAULT_BG_MEDIA = []; // fallback (optional)
 
 // Background state
 let backgroundMode = "color"; // 'color' | 'media'
+let boxMode = "color"; // 'color' | 'blur'
 let bgColor = "#ffffff";
 let textBoxColor = "#000000"; // Color for text background box
 let textBoxOpacity = 0.12; // Opacity for text background box (0-1)
+let bgBlur = 0; // Blur radius in px
 let bgMediaList = []; // [{src, type, name?}]
 let selectedBg = null; // active media item
 const bgImg = new Image();
@@ -309,13 +311,34 @@ function onBgMediaChange() {
 function applyBgModeUI() {
   const bgColorField = $("#bgColorField");
   const bgMediaField = $("#bgMediaField");
-  if (!bgColorField || !bgMediaField) return;
+  const bgUploadBtn = $("#bgUploadBtn");
+  // bgBlurField logic handled by boxMode now inside media block?
+  
+  if (!bgColorField || !bgMediaField) return; 
+  
   if (backgroundMode === "color") {
     bgColorField.style.display = "block";
     bgMediaField.style.display = "none";
+    if (bgUploadBtn) bgUploadBtn.style.display = "none";
   } else {
     bgColorField.style.display = "none";
     bgMediaField.style.display = "block";
+    if (bgUploadBtn) bgUploadBtn.style.display = "flex"; // or block/inline-flex as needed
+  }
+}
+
+function applyBoxModeUI() {
+  const boxColorControls = $("#boxColorControls");
+  const boxBlurControls = $("#boxBlurControls");
+  if (!boxColorControls || !boxBlurControls) return;
+
+  if (boxMode === "blur") {
+    boxColorControls.style.display = "none";
+    boxBlurControls.style.display = "block";
+  } else {
+    // Color mode
+    boxColorControls.style.display = "block";
+    boxBlurControls.style.display = "none";
   }
 }
 
@@ -334,6 +357,14 @@ window.backgroundModule = {
   setBackgroundMode: (mode) => {
     backgroundMode = mode;
   },
+  getBoxMode: () => boxMode,
+  setBoxMode: (mode) => {
+    boxMode = mode;
+    // Trigger redraw
+    if (window.drawingModule && window.drawingModule.drawPreview) {
+      window.drawingModule.drawPreview();
+    }
+  },
   getBgColor: () => bgColor,
   setBgColor: (color) => {
     bgColor = color;
@@ -342,13 +373,31 @@ window.backgroundModule = {
   setTextBoxColor: (color) => {
     textBoxColor = color;
   },
-  getTextBoxOpacity: () => textBoxOpacity,
+  getTextBoxOpacity: () => {
+    // If in Blur mode, user requested "opacity disabled". 
+    // We enforce a fixed low opacity for the frosted glass tint only.
+    if (boxMode === "blur") return 0.2; 
+    return textBoxOpacity;
+  },
   setTextBoxOpacity: (opacity) => {
     textBoxOpacity = opacity;
+  },
+  getBgBlur: () => {
+     // Blur is only active in Blur Box Mode
+     if (boxMode === "blur") return bgBlur;
+     return 0;
+  },
+  setBgBlur: (val) => {
+    bgBlur = val;
+    // Trigger redraw
+    if (window.drawingModule && window.drawingModule.drawPreview) {
+      window.drawingModule.drawPreview();
+    }
   },
   getVideoIsStable: () => videoIsStable,
   loadBackgroundAssets,
   applyBgModeUI,
+  applyBoxModeUI,
   populateSelectFromList,
   onBgMediaChange,
   handleUserUploads,

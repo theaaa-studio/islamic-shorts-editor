@@ -25,7 +25,9 @@ let bgModeColor,
   bgMediaField,
   bgMediaSelect,
   bgMediaHint,
-  bgUploadInput;
+  bgUploadInput,
+  bgBlurSlider,
+  bgBlurVal;
 let previewCanvas, pctx;
 let buildPreviewBtn, downloadBtn, previewPlayBtn, dismissBtn, takePictureBtn, multiExportBtn;
 let arVerticalBtn, arSquareBtn;
@@ -68,12 +70,30 @@ function initializeDOM() {
   bgMediaSelect = $("#bgMediaSelect");
   bgMediaHint = $("#bgMediaHint");
   bgUploadInput = $("#bgUploadInput");
+  bgBlurSlider = $("#bgBlur");
+  bgBlurVal = $("#bgBlurVal");
 
-  console.log("DOM Elements found:", {
-    bgModeMedia: !!bgModeMedia,
-    bgMediaSelect: !!bgMediaSelect,
-    bgUploadInput: !!bgUploadInput,
-  });
+  // Box Mode references
+  const boxModeColor = $("#boxModeColor");
+  const boxModeBlur = $("#boxModeBlur");
+  
+  if (boxModeColor && boxModeBlur) {
+      // Set initial UI state
+      window.backgroundModule.applyBoxModeUI();
+
+      boxModeColor.addEventListener("change", () => {
+          if (boxModeColor.checked) {
+              window.backgroundModule.setBoxMode("color");
+              window.backgroundModule.applyBoxModeUI();
+          }
+      });
+      boxModeBlur.addEventListener("change", () => {
+          if (boxModeBlur.checked) {
+              window.backgroundModule.setBoxMode("blur");
+              window.backgroundModule.applyBoxModeUI();
+          }
+      });
+  }
 
   previewCanvas = $("#previewCanvas");
   if (!previewCanvas) {
@@ -727,6 +747,12 @@ function setupEventListeners() {
     const opacityPercent = parseInt(textBoxOpacitySlider.value, 10);
     if (textBoxOpacityVal) textBoxOpacityVal.textContent = `${opacityPercent}%`;
     window.backgroundModule.setTextBoxOpacity(opacityPercent / 100);
+  });
+  
+  bgBlurSlider?.addEventListener("input", () => {
+    const blurPx = parseInt(bgBlurSlider.value, 10);
+    if (bgBlurVal) bgBlurVal.textContent = `${blurPx}px`;
+    window.backgroundModule.setBgBlur(blurPx);
   });
 
   // ------------------ Background mode toggles ------------------
