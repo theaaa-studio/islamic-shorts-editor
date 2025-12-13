@@ -44,7 +44,7 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 5px;
   overflow-y: auto;
   /* Allow scrolling if height is too small */
 }

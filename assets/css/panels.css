@@ -25,7 +25,7 @@
   color: var(--md-sys-color-on-surface);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 5px;
 }
 
 .panel h3::before {
@@ -43,7 +43,7 @@
 
 .field {
   display: grid;
-  gap: 8px;
+  gap: 5px;
   /* Standard spacing between label and input */
   margin-bottom: 4px;
 }
@@ -66,26 +66,26 @@ label.small {
 .three-col {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 5px;
 }
 
 .four-col-inline {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 5px;
 }
 
 .typography-grid {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 12px;
+  gap: 5px;
 }
 
 .two-col-inline {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 5px;
 }
 
 /* Credits row layout - all elements in one row with flexible spacing */
@@ -93,14 +93,14 @@ label.small {
 .credits-grid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
   width: 100%;
 }
 
 .credits-line {
   display: flex;
   align-items: flex-end;
-  gap: 12px;
+  gap: 5px;
   width: 100%;
   flex-wrap: wrap;
   /* Allow wrapping on small screens */
@@ -109,7 +109,7 @@ label.small {
 .credits-line .field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
 }
 
 .credits-line .toggle {
@@ -123,7 +123,7 @@ label.small {
   display: flex;
   flex-direction: column;
   /* Stack vertically */
-  gap: 8px;
+  gap: 5px;
   align-items: stretch;
   /* Stretch to full width */
   width: 100%;
@@ -138,7 +138,7 @@ label.small {
 /* Ayah Range: Start/End side by side */
 .ayah-row {
   display: flex;
-  gap: 12px;
+  gap: 5px;
   width: 100%;
 }
 
@@ -152,7 +152,7 @@ label.small {
 /* Arabic Controls: Toggle + Picker side by side */
 .arabic-controls-row {
   display: flex;
-  gap: 12px;
+  gap: 5px;
   width: 100%;
   align-items: flex-end;
   /* Align toggle with input field */
@@ -180,7 +180,7 @@ label.small {
 .transport {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 5px;
 }
 
 /* Custom Playback Buttons */
