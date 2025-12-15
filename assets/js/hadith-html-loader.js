@@ -24,20 +24,25 @@ const TEMPLATES = {
         <div class="panel">
           <h3>Choose Hadith</h3>
           <div class="input-row hadith-input-row">
-            <div class="field field-book">
+            <div class="field field-book" style="margin-bottom: 10px;">
               <label class="small" for="hadithBook">Book</label>
-              <select id="hadithBook"></select>
+              <select id="hadithBook" style="width: 100%;"></select>
             </div>
             <div class="field field-hadith-number">
               <label class="small" for="hadithNumber">Hadith Number</label>
-              <input type="number" id="hadithNumber" min="1" value="1">
+              <input type="number" id="hadithNumber" min="1" value="1" style="width: 100%;">
             </div>
-
+          </div>
+        </div>
+  `,
+  'assets/html/hadith-translation-panel.html': `
+        <!-- Panel: Translation -->
+        <div class="panel">
+          <h3>Audio & Translation</h3>
+          <div class="input-row">
             <div class="field field-translation">
-              <label class="small" for="hadithEdition"
-                >Edition (Language)</label
-              >
-              <select id="hadithEdition">
+              <label class="small" for="hadithEdition">Edition (Language)</label>
+              <select id="hadithEdition" style="width: 100%;">
                 <!-- Will be populated by JS -->
                 <option value="eng-sahihbukhari">English - Sahih Bukhari</option>
               </select>
@@ -498,6 +503,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load sidebar sections
   await loadHTMLPartial('brand-container', 'assets/html/hadith-brand.html');
   await loadHTMLPartial('input-panel-container', 'assets/html/hadith-input-panel.html');
+  await loadHTMLPartial('translation-panel-container', 'assets/html/hadith-translation-panel.html');
   await loadHTMLPartial('background-panel-container', 'assets/html/background-panel.html');
   await loadHTMLPartial('typography-panel-container', 'assets/html/typography-panel.html');
   await loadHTMLPartial('credits-panel-container', 'assets/html/credits-panel.html');
