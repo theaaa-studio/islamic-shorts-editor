@@ -190,53 +190,86 @@ function drawPreview() {
   const W = previewCanvas.width,
     H = previewCanvas.height;
 
-  // Access global variables from app.js via window
-  const currentText =
-    window.currentText || "In the name of Allah, the Most Gracious, the Most Merciful";
+  // Determine source of truth: Snapshot or Live
+  const config = (window.isPlaying && window.playbackConfig) ? window.playbackConfig : window;
+
+  // Access variables from config or fallback to window defaults
+  // Note: config might be window itself if not playing
+  
+  const currentText = window.currentText || "In the name of Allah, the Most Gracious, the Most Merciful";
   const currentLabel = window.currentLabel || "Al-Fatiha 1:1";
-  const selectedFont = window.selectedFont || "Inter, sans-serif";
-  const sizePercent = window.sizePercent || 100;
-  const fontColor = window.fontColor || "#111111";
-  const showCreditCreator =
-    window.showCreditCreator !== undefined ? window.showCreditCreator : true;
-  const showCreditData =
-    window.showCreditData !== undefined ? window.showCreditData : true;
+  
+  const selectedFont = config.selectedFont || window.selectedFont || "Inter, sans-serif";
+  const sizePercent = config.sizePercent || window.sizePercent || 100;
+  const fontColor = config.fontColor || window.fontColor || "#111111";
+  const showCreditCreator = config.showCreditCreator !== undefined ? config.showCreditCreator : (window.showCreditCreator !== undefined ? window.showCreditCreator : true);
+  const showCreditData = config.showCreditData !== undefined ? config.showCreditData : (window.showCreditData !== undefined ? window.showCreditData : true);
+  
+  // Arabic specific
+  const arabicFontColor = config.arabicFontColor || window.arabicFontColor || "#111111";
+  const arabicSizePercent = config.arabicSizePercent || window.arabicSizePercent || 100;
+  
+  // NOTE: showArabicText is tricky because it might not be in config if old version
+  const showArabicText = config.showArabicText !== undefined ? config.showArabicText : (window.showArabicText !== undefined ? window.showArabicText : true);
+
   const madeByInput = $("#madeByInput");
   const creditMadeByChk = $("#creditMadeBy");
 
   // Helper to draw the current background media
   const drawCurrentBackground = (ctx, W, H) => {
-      // Background
-      const bgMode = window.backgroundModule.getBackgroundMode();
-      const bgCol = window.backgroundModule.getBgColor();
-      const selBg = window.backgroundModule.selectedBg;
-      const bgImg = window.backgroundModule.bgImg;
-      const bgVideo = window.backgroundModule.bgVideo;
+      // Determines whether to use SNAPSHOT or LIVE background
+      let bgMode, bgCol, selBg, bgImg, bgVideo;
+      
+      if (window.isPlaying && window.playbackConfig && window.playbackConfig.background) {
+          // Use SNAPSHOT
+          const bg = window.playbackConfig.background;
+          bgMode = bg.mode;
+          bgCol = bg.color;
+          selBg = bg.selectedBg;
+          bgImg = bg.bgImg;
+          // Note: bgVideo element is likely same ref, but we should check
+          // If we snapshot the video element *reference*, it's the same DOM node => live.
+          // That's usually OK for content, but if user changes *selection* in UI, 
+          // `window.backgroundModule.bgVideo` changes source.
+          // Ideally we should have stored the `src` or kept the element ref that WAS there.
+          // For now, let's assume `window.backgroundModule.bgVideo` is the player we use.
+          // Ideally the snapshot `selectedBg` tells us WHAT to play.
+          bgVideo = window.backgroundModule.bgVideo; 
+      } else {
+          // Use LIVE
+          bgMode = window.backgroundModule.getBackgroundMode();
+          bgCol = window.backgroundModule.getBgColor();
+          selBg = window.backgroundModule.selectedBg;
+          bgImg = window.backgroundModule.bgImg;
+          bgVideo = window.backgroundModule.bgVideo;
+      }
 
       if (bgMode === "media" && selBg) {
         let drew = false;
         
         if (selBg.type === "image") {
-          if (bgImg.complete && bgImg.naturalWidth > 0) {
+          if (bgImg && bgImg.complete && bgImg.naturalWidth > 0) {
             drew = drawMediaCover(ctx, bgImg, W, H);
-          } else if (bgImg.src && bgImg.src !== "") {
+          } else if (bgImg && bgImg.src && bgImg.src !== "") {
             // fallback
             ctx.fillStyle = bgCol;
             ctx.fillRect(0, 0, W, H);
           }
         } else if (selBg.type === "video") {
-          const bufferUpdated = updateVideoBuffer(bgVideo, W, H);
-          drew = drawBufferedVideo(ctx, W, H);
-          if (!drew && !lastVideoFrameValid) {
-            ctx.fillStyle = bgCol;
-            ctx.fillRect(0, 0, W, H);
-          }
-          if (bgVideo.paused && bgVideo.src) {
-            bgVideo.play().catch(() => {});
+          if (bgVideo) {
+              const bufferUpdated = updateVideoBuffer(bgVideo, W, H);
+              drew = drawBufferedVideo(ctx, W, H);
+              if (!drew && !lastVideoFrameValid) {
+                ctx.fillStyle = bgCol;
+                ctx.fillRect(0, 0, W, H);
+              }
+              if (bgVideo.paused && bgVideo.src) {
+                bgVideo.play().catch(() => {});
+              }
           }
         }
         
-        if (!drew && (!selBg.type || (!bgImg.src && !bgVideo.src))) {
+        if (!drew && (!selBg.type || (!bgImg?.src && !bgVideo?.src))) {
           ctx.fillStyle = bgCol;
           ctx.fillRect(0, 0, W, H);
         }
@@ -257,9 +290,9 @@ function drawPreview() {
   const usableW = W - 2 * marginX,
     usableH = H - 2 * marginY;
   const scale = (sizePercent || 100) / 100;
-  const arabicScale = (window.arabicSizePercent || 100) / 100;
+  const arabicScale = (arabicSizePercent || 100) / 100;
 
-  const currentArabic = (window.showArabicText !== false) ? (window.currentArabicText || "") : "";
+  const currentArabic = (showArabicText !== false) ? (window.currentArabicText || "") : "";
 
   if (currentArabic) {
     // Split space: We want the ENTIRE GROUP (Arabic + Translation) CENTERED vertically.
@@ -403,7 +436,11 @@ function drawPreview() {
     );
 
     // Apply Backdrop Blur if needed
-    const bgBlur = window.backgroundModule.getBgBlur ? window.backgroundModule.getBgBlur() : 0;
+    // Use config value if playing
+    const bgBlur = (window.isPlaying && window.playbackConfig && window.playbackConfig.background)
+        ? window.playbackConfig.background.blur
+        : (window.backgroundModule.getBgBlur ? window.backgroundModule.getBgBlur() : 0);
+
     if (bgBlur > 0) {
        pctx.save();
        pctx.clip();
@@ -412,10 +449,13 @@ function drawPreview() {
        pctx.restore();
     }
 
-    pctx.globalAlpha = window.backgroundModule.getTextBoxOpacity() !== undefined 
-      ? window.backgroundModule.getTextBoxOpacity() 
-      : 0.12;
-    pctx.fillStyle = window.backgroundModule.getTextBoxColor() || "#000";
+    pctx.globalAlpha = (window.isPlaying && window.playbackConfig && window.playbackConfig.background)
+      ? window.playbackConfig.background.textBoxOpacity
+      : (window.backgroundModule.getTextBoxOpacity() !== undefined ? window.backgroundModule.getTextBoxOpacity() : 0.12);
+      
+    pctx.fillStyle = (window.isPlaying && window.playbackConfig && window.playbackConfig.background)
+      ? window.playbackConfig.background.textBoxColor
+      : (window.backgroundModule.getTextBoxColor() || "#000");
     
     // Fill the path (already defined by drawRoundedRect above ?? No, we need to redefine or reuse path)
     // Clipping consumes the path? No, standard canvas clip intersects current path.
@@ -435,7 +475,7 @@ function drawPreview() {
     pctx.restore();
 
     // --- Draw Arabic ---
-    pctx.fillStyle = window.arabicFontColor || fontColor;
+    pctx.fillStyle = arabicFontColor || fontColor;
     pctx.textAlign = "center";
     pctx.textBaseline = "middle";
     pctx.direction = "rtl"; // Enforce RTL for Arabic
@@ -529,7 +569,10 @@ function drawPreview() {
     );
     
     // 2. Apply Blur
-    const bgBlur = window.backgroundModule.getBgBlur ? window.backgroundModule.getBgBlur() : 0;
+    const bgBlur = (window.isPlaying && window.playbackConfig && window.playbackConfig.background)
+        ? window.playbackConfig.background.blur
+        : (window.backgroundModule.getBgBlur ? window.backgroundModule.getBgBlur() : 0);
+
     if (bgBlur > 0) {
         pctx.save();
         pctx.clip();
@@ -539,10 +582,14 @@ function drawPreview() {
     }
     
     // 3. Draw Overlay Color
-    pctx.globalAlpha = window.backgroundModule.getTextBoxOpacity() !== undefined 
-      ? window.backgroundModule.getTextBoxOpacity() 
-      : 0.12;
-    pctx.fillStyle = window.backgroundModule.getTextBoxColor() || "#000";
+    // 3. Draw Overlay Color
+    pctx.globalAlpha = (window.isPlaying && window.playbackConfig && window.playbackConfig.background)
+      ? window.playbackConfig.background.textBoxOpacity
+      : (window.backgroundModule.getTextBoxOpacity() !== undefined ? window.backgroundModule.getTextBoxOpacity() : 0.12);
+      
+    pctx.fillStyle = (window.isPlaying && window.playbackConfig && window.playbackConfig.background)
+      ? window.playbackConfig.background.textBoxColor
+      : (window.backgroundModule.getTextBoxColor() || "#000");
     
     // Redraw path for fill
     drawRoundedRect(
@@ -591,7 +638,9 @@ function drawPreview() {
     badgeRadius = 14;
   pctx.textAlign = "left";
   pctx.textBaseline = "alphabetic";
-  const creditTextColor = window.creditColor || fontColor;
+  const creditTextColor = (window.isPlaying && window.playbackConfig)
+      ? (window.playbackConfig.creditColor || fontColor)
+      : (window.creditColor || fontColor);
 
 // Load logo image
 const logoImg = new Image();

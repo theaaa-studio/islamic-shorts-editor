@@ -121,10 +121,14 @@ function initializeDOM() {
   volumeVal = $("#volumeVal");
 
   audio = $("#audioPlayer");
+  window.audio2 = $("#audioPlayer2"); // Expose for listeners
   recStatus = $("#recStatus");
   meterBar = $("#meterBar");
   if (audio) {
     audio.crossOrigin = "anonymous";
+  }
+  if (window.audio2) {
+    window.audio2.crossOrigin = "anonymous";
   }
 
   return true;
@@ -850,6 +854,11 @@ function setupEventListeners() {
           if (window.recorder && window.recorder.state === "recording") {
             window.audioModule.stopRecordingIfActive();
           }
+          // Also pause audio2 if playing
+          if (window.audio2) {
+             window.audio2.pause();
+             window.audio2.currentTime = 0;
+          }
         }
         // Update button icon to play
         const icon = previewPlayBtn.querySelector("i");
@@ -1048,45 +1057,128 @@ function setupEventListeners() {
 
   // Play button icon is now toggled via the click handler above
 
-  if (audio) {
-    audio.addEventListener("play", async () => {
-      window.isPlaying = true;
-      await window.audioModule.ensureGraphOnGesture();
+  // Helper to toggle UI inputs
+  const setUIState = (disabled) => {
+     const inputs = document.querySelectorAll("select, input, textarea, button.file-trigger");
+     inputs.forEach(el => {
+         // Don't disable the main play/stop/download controls or volume
+         if (el.id === "previewPlayBtn" || el.id === "downloadBtn" || el.id === "volumeSlider" || el.closest("#playbackPanel")) return;
+         el.disabled = disabled;
+     });
+     
+     // Also handle custom elements or visuals if needed
+     const editorPanels = document.querySelectorAll(".editor-panel");
+     editorPanels.forEach(p => {
+         p.style.opacity = disabled ? "0.6" : "1";
+         p.style.pointerEvents = disabled ? "none" : "auto";
+     });
+  };
+
+  // Helper to toggle Export buttons specifically
+  const setExportButtonsState = (disabled) => {
+      // Buttons in the playback panel except standard playback/volume
+      // "Play & Export" -> #buildPreviewBtn
+      // "Download" -> #downloadBtn
+      // "Multi Single Export" -> #multiExportBtn
+      // "Dismiss" -> #dismissBtn
+      
+      // Target the container into which the panel is loaded
+      const panel = document.getElementById("playback-panel-container");
+      if (!panel) return;
+      
+      const buttons = panel.querySelectorAll("button");
+      buttons.forEach(btn => {
+          // Volume slider is an input usually, but just in case
+          if (btn.id === "previewPlayBtn" || btn.id === "volumeSlider") return;
+          
+
+          // DO NOT disable the Dismiss button, so user can cancel/stop
+          if (btn.id === "dismissBtn") return;
+          
+          // Download button logic:
+          // If DISABLING -> always disable
+          // If ENABLING -> only enable if we have a finished blob or multi-export data
+          if (btn.id === "downloadBtn") {
+              if (disabled) {
+                  btn.disabled = true;
+              } else {
+                  // Only enable if data exists
+                  const hasData = !!(window.finalBlob || (window.multiExportBlobs && window.multiExportBlobs.length > 0));
+                  btn.disabled = !hasData;
+              }
+              return;
+          }
+          
+          btn.disabled = disabled;
+      });
+  };
+
+  // Helper for play/pause events
+  const handlePlay = async () => {
+      // Lock EVERYTHING during any playback (Preview or Export)
+      setUIState(true);
+      setExportButtonsState(true);
+      
+      const playBtn = document.getElementById("previewPlayBtn");
+      
+      // If Recording/Export Mode: Disable Play Button, DO NOT change icon
+      if (window.allowRecording || window.multiExportMode) {
+          if (playBtn) playBtn.disabled = true;
+      } 
+      // If Preview Mode: Normal "Stop" toggle behavior
+      else {
+          if (playBtn) {
+            playBtn.disabled = false;
+            const icon = playBtn.querySelector("i");
+            if (icon) {
+                 icon.classList.remove("fa-play");
+                 icon.classList.add("fa-stop");
+            }
+            playBtn.title = "Stop";
+          }
+      }
+      
+      // Ensure graph and consistency
+      if (!window.audioCtx || window.audioCtx.state === "suspended") {
+          await window.audioModule.ensureGraphOnGesture();
+      }
       window.audioModule.updateAudioRouting();
       if (window.allowRecording) window.audioModule.startRecordingIfNeeded();
-    });
-    audio.addEventListener("pause", () => {
-      window.isPlaying = false;
-      // Reset play button icon
+  };
+
+  const handlePause = () => {
+      // Only reset UI if we are truly stopped (not just crossfading)
+      if (window.isPlaying) return;
+      
+      setUIState(false);
+      setExportButtonsState(false);
+      
       const playBtn = document.getElementById("previewPlayBtn");
       if (playBtn) {
+        // Always re-enable and revert to Play icon logic
+        playBtn.disabled = false;
         const icon = playBtn.querySelector("i");
         if (icon) {
-          icon.classList.remove("fa-stop");
+          icon.classList.remove("fa-stop"); 
           icon.classList.add("fa-play");
         }
         playBtn.title = "Play";
       }
-    });
-    audio.addEventListener("ended", async () => {
-      if (window.multiExportMode) {
-        // In multi-export mode, we DO NOT auto-advance here.
-        // We stop the recorder, which triggers onstop, where we handle the download and next item.
-        window.audioModule.stopRecordingIfActive();
-        return;
-      }
+  };
 
-      if (window.index < window.playlist.length - 1) {
-        window.index++;
-        window.audioModule.updateMeter();
-        await window.audioModule.playIndex(window.index, true);
-      } else {
-        window.isPlaying = false;
-        window.audioModule.updateMeter();
-        window.audioModule.stopRecordingIfActive();
-      }
-    });
+  if (audio) {
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    // Removed 'ended' listener as quran-audio.js handles sequencing now
   }
+  
+  if (window.audio2) {
+      window.audio2.addEventListener("play", handlePlay);
+      window.audio2.addEventListener("pause", handlePause);
+  }
+  
+  // Listen for custom stop event from audio sequencer
+  window.addEventListener("quran-playback-stopped", handlePause);
 
   // ------------------ Download recorded WebM ------------------
   if (downloadBtn) {
@@ -1163,8 +1255,14 @@ function setupEventListeners() {
       window.wasDismissed = true;
       try {
         if (audio) {
+          audio.play(); // This seems wrong in original code? usually pause. 
+          // Original was: audio.pause(); audio.currentTime = 0;
           audio.pause();
           audio.currentTime = 0;
+        }
+        if (window.audio2) {
+            window.audio2.pause();
+            window.audio2.currentTime = 0;
         }
         window.audioModule.stopRecordingIfActive();
       } catch {}
@@ -1173,6 +1271,8 @@ function setupEventListeners() {
       if (downloadBtn) downloadBtn.disabled = true;
       if (recStatus) recStatus.textContent = "Dismissed. Ready.";
       setDuringRecordingUI(false);
+      setUIState(false);
+      setExportButtonsState(false);
     });
   }
 
