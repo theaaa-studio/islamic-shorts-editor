@@ -21,9 +21,8 @@ const TEMPLATES = {
   `,
   'assets/html/hadith-input-panel.html': `
         <!-- Panel: Input -->
-        <!-- Panel: Input -->
         <div class="panel">
-          <h3>Choose</h3>
+          <h3>Choose Hadith</h3>
           <div class="input-row hadith-input-row">
             <div class="field field-book">
               <label class="small" for="hadithBook">Book</label>

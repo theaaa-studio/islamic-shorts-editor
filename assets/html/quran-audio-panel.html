@@ -1,0 +1,31 @@
+        <!-- Panel: Audio Settings -->
+        <div class="panel">
+          <h3>Audio & Translation</h3>
+          
+          <div class="field style="margin-bottom: 10px;">
+              <label class="small" for="translationEdition">Translation (text)</label>
+              <select id="translationEdition">
+                <option value="en.daryabadi">English — Abdul Majid Daryabadi</option>
+                <option value="en.asad">English — Muhammad Asad</option>
+                <option value="en.sahih" selected>English — Sahih International</option>
+                <option value="en.pickthall">English — Pickthall</option>
+                <option value="en.yusufali">English — Yusuf Ali</option>
+                <option value="bn.bengali">Bengali — Bengali Translation</option>
+                <option value="ur.jalandhry">Urdu — Fateh Muhammad Jalandhry</option>
+                <option value="id.indonesian">Indonesian — Bahasa Indonesia</option>
+                <option value="fr.hamidullah">French — Muhammad Hamidullah</option>
+              </select>
+          </div>
+
+          <div class="field" style="margin-bottom: 10px;">
+            <label class="small" for="reciter">Reciter</label>
+            <select id="reciter">
+                <!-- Will be populated by JS -->
+            </select>
+          </div>
+
+          <div class="field" style="margin-bottom: 10px;" title="Fade In is automatically set to 50% of Fade Out duration">
+            <label class="small" for="fadeDuration">Fade Out Duration <span id="fadeDurationVal" class="name-chip">(0.5s)</span></label>
+            <input id="fadeDuration" type="range" min="0" max="3" step="0.1" value="0.5" style="width: 100%;">
+          </div>
+        </div>

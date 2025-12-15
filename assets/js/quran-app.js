@@ -32,6 +32,7 @@ let previewCanvas, pctx;
 let buildPreviewBtn, downloadBtn, previewPlayBtn, dismissBtn, takePictureBtn, multiExportBtn;
 let arVerticalBtn, arSquareBtn;
 let volumeSlider, volumeVal;
+let fadeDurationSlider, fadeDurationVal;
 let audio, recStatus, meterBar;
 
 function initializeDOM() {
@@ -119,6 +120,10 @@ function initializeDOM() {
   // Volume UI
   volumeSlider = $("#volumeSlider");
   volumeVal = $("#volumeVal");
+
+  // Fade UI
+  fadeDurationSlider = $("#fadeDuration");
+  fadeDurationVal = $("#fadeDurationVal");
 
   audio = $("#audioPlayer");
   window.audio2 = $("#audioPlayer2"); // Expose for listeners
@@ -571,6 +576,11 @@ function resetSessionUI() {
     "Press Play & Export to preview & auto-record. Avoid the right audio controller during recording.";
   meterBar.style.width = "0%";
   window.multiExportMode = false;
+  window.multiExportMode = false;
+  // Ensure audio is stopped cleanly using the new helper
+  if (window.audioModule && window.audioModule.stopPlayback) {
+      window.audioModule.stopPlayback();
+  }
   setDuringRecordingUI(false);
 }
 
@@ -843,23 +853,9 @@ function setupEventListeners() {
     previewPlayBtn.addEventListener("click", async () => {
       // Toggle between play and stop
       if (window.isPlaying) {
-        // Stop playback
-        const audio = document.getElementById("audioPlayer");
-        if (audio) {
-          audio.pause();
-          audio.currentTime = 0;
-          window.index = 0;
-          window.audioModule.updateMeter();
-          window.isPlaying = false;
-          if (window.recorder && window.recorder.state === "recording") {
-            window.audioModule.stopRecordingIfActive();
-          }
-          // Also pause audio2 if playing
-          if (window.audio2) {
-             window.audio2.pause();
-             window.audio2.currentTime = 0;
-          }
-        }
+        // Stop playback via module
+        window.audioModule.stopPlayback();
+        
         // Update button icon to play
         const icon = previewPlayBtn.querySelector("i");
         if (icon) {
@@ -1254,17 +1250,9 @@ function setupEventListeners() {
     dismissBtn.addEventListener("click", () => {
       window.wasDismissed = true;
       try {
-        if (audio) {
-          audio.play(); // This seems wrong in original code? usually pause. 
-          // Original was: audio.pause(); audio.currentTime = 0;
-          audio.pause();
-          audio.currentTime = 0;
+        if (window.audioModule && window.audioModule.stopPlayback) {
+            window.audioModule.stopPlayback();
         }
-        if (window.audio2) {
-            window.audio2.pause();
-            window.audio2.currentTime = 0;
-        }
-        window.audioModule.stopRecordingIfActive();
       } catch {}
       window.chunks = [];
       window.finalBlob = null;
@@ -1282,6 +1270,19 @@ function setupEventListeners() {
       await window.audioModule.ensureGraphOnGesture();
       window.audioModule.setVolumeFromSlider();
       // routing unchanged, element remains audible
+    });
+  }
+
+  // ------------------ Fade Duration slider wiring ------------------
+  if (fadeDurationSlider) {
+    // Set initial value
+    fadeDurationSlider.value = window.crossfadeDuration || 0.5;
+    if (fadeDurationVal) fadeDurationVal.textContent = `(${fadeDurationSlider.value}s)`;
+
+    fadeDurationSlider.addEventListener("input", () => {
+      const val = parseFloat(fadeDurationSlider.value);
+      window.crossfadeDuration = val;
+      if (fadeDurationVal) fadeDurationVal.textContent = `(${val}s)`;
     });
   }
 }

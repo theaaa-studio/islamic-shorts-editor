@@ -1,3 +1,22 @@
+// ------------------ Listener Management ------------------
+function addListener(element, event, handler) {
+    if (!element._customListeners) {
+        element._customListeners = [];
+    }
+    // Remove it if it exists to avoid dupes (strict cleanup)
+    element.removeEventListener(event, handler);
+    element.addEventListener(event, handler);
+    element._customListeners.push({ event, handler });
+}
+
+function removeAllListeners(element) {
+    if (!element || !element._customListeners) return;
+    for (const l of element._customListeners) {
+        element.removeEventListener(l.event, l.handler);
+    }
+    element._customListeners = [];
+}
+
 // ------------------ Volume helpers ------------------
 function setVolumeFromSlider() {
   const volumeSlider = $("#volumeSlider");
@@ -154,24 +173,32 @@ function initRecorder() {
     if (recStatus) recStatus.textContent = "Recording in the background…";
   };
   window.recorder.onstop = () => {
+    // 1. Strict Dismissal Check - Priority 1
+    if (window.wasDismissed) {
+        window.finalBlob = null;
+        window.chunks = [];
+        if (downloadBtn) downloadBtn.disabled = true;
+        if (recStatus) recStatus.textContent = "Dismissed. Ready.";
+        if (window.setDuringRecordingUI) window.setDuringRecordingUI(false);
+        return;
+    }
+
     window.finalBlob = new Blob(window.chunks, { type: mime || "video/webm" });
 
     // Multi Export Hook
-    if (window.multiExportMode && window.handleMultiExportNext && !window.hasAudioError && !window.wasDismissed) {
+    if (window.multiExportMode && window.handleMultiExportNext && !window.hasAudioError) {
        window.recordingStarted = false; // Reset flag so next one can start
        window.recorder = null; // Force new recorder
        window.handleMultiExportNext();
        return; 
     }
 
-    if (!window.hasAudioError && !window.wasDismissed) {
+    if (!window.hasAudioError) {
       if (downloadBtn) downloadBtn.disabled = false;
       if (recStatus) recStatus.textContent = "Recording complete. You can download your Short.";
     } else {
       if (downloadBtn) downloadBtn.disabled = true;
-      if (recStatus) recStatus.textContent = window.wasDismissed
-        ? "Dismissed. Ready."
-        : "Recording incomplete due to audio error. Download disabled.";
+      if (recStatus) recStatus.textContent = "Recording incomplete due to audio error. Download disabled.";
     }
 
     if (window.setDuringRecordingUI) window.setDuringRecordingUI(false);
@@ -211,7 +238,7 @@ function stopRecordingIfActive() {
 // We keep track of the active player index (0 or 1)
 // 0 -> audioPlayer, 1 -> audioPlayer2
 window.currentPlayerId = 0; 
-window.crossfadeDuration = 0.25; // seconds overlap
+window.crossfadeDuration = 0.5; // seconds overlap
 
 function getPlayer(id) {
   return id === 0 ? $("#audioPlayer") : $("#audioPlayer2");
@@ -298,8 +325,41 @@ async function prepareNextTrack(index) {
   };
 }
 
+// ------------------ Playback Sequence Logic ------------------
+
+function stopPlayback() {
+    window.isPlaying = false;
+    stopRecordingIfActive();
+    
+    // Stop players and clean up
+    const p1 = $("#audioPlayer");
+    const p2 = $("#audioPlayer2");
+    
+    if (p1) {
+        p1.pause();
+        p1.currentTime = 0;
+        removeAllListeners(p1);
+        p1.dataset.triggeredNext = "";
+    }
+    if (p2) {
+        p2.pause();
+        p2.currentTime = 0;
+        removeAllListeners(p2);
+        p2.dataset.triggeredNext = "";
+    }
+    
+    window.index = 0;
+    updateMeter();
+    window.currentPlayerId = 0;
+    
+    // Dispatch event so UI can update
+    window.dispatchEvent(new Event("quran-playback-stopped"));
+}
 
 async function loadAndPlay({ record }) {
+  // Ensure strict clean start
+  stopPlayback();
+
   // Reset state
   window.allowRecording = !!record;
   if (window.resetSessionUI) window.resetSessionUI();
@@ -493,9 +553,11 @@ async function playDualSequence(startIndex) {
     const nextGain = getGainNode(nextPlayerId);
     
     if (currentGain) {
+        // Fade in is 50% of fade out duration
+        const fadeInDuration = (window.crossfadeDuration || 0.5) * 0.5;
         currentGain.gain.cancelScheduledValues(window.audioCtx.currentTime);
         currentGain.gain.setValueAtTime(0, window.audioCtx.currentTime);
-        currentGain.gain.linearRampToValueAtTime(1, window.audioCtx.currentTime + 0.1); // Quick fade in
+        currentGain.gain.linearRampToValueAtTime(1, window.audioCtx.currentTime + fadeInDuration); 
     }
     if (nextGain) {
         nextGain.gain.cancelScheduledValues(window.audioCtx.currentTime); 
@@ -519,14 +581,17 @@ async function playDualSequence(startIndex) {
         if (!window.isPlaying) return; // Stopped externally
         
         const timeLeft = currentPlayer.duration - currentPlayer.currentTime;
-        const CROSSFADE_TIME = 0.25; // 0.25 second overlap
+        const CROSSFADE_TIME = window.crossfadeDuration; 
         
-        // If we are near end and haven't triggered next yet
-        if (timeLeft <= CROSSFADE_TIME && !currentPlayer.dataset.triggeredNext) {
-             currentPlayer.dataset.triggeredNext = "true";
-             // Trigger next track if not in multi-export mode
-             if (!window.multiExportMode && startIndex + 1 < window.playlist.length) {
-                 triggerNextTrack(startIndex + 1, nextPlayerId, currentGain, nextGain);
+        // If we are near end, fade out current track
+        if (timeLeft <= CROSSFADE_TIME) {
+             if (currentGain && !currentPlayer.dataset.fadingOut) {
+                 currentPlayer.dataset.fadingOut = "true";
+                 // Anchor value first to prevent jumps
+                 try { currentGain.gain.cancelScheduledValues(window.audioCtx.currentTime); } catch {}
+                 currentGain.gain.setValueAtTime(currentGain.gain.value, window.audioCtx.currentTime);
+                 // Ramp to 0 over the remaining duration 
+                 currentGain.gain.linearRampToValueAtTime(0, window.audioCtx.currentTime + timeLeft);
              }
         }
     };
@@ -534,11 +599,14 @@ async function playDualSequence(startIndex) {
     const onEnded = () => {
          currentPlayer.removeEventListener("timeupdate", checkTime);
          currentPlayer.removeEventListener("ended", onEnded);
-         currentPlayer.dataset.triggeredNext = ""; // clear
+         currentPlayer.dataset.triggeredNext = "";
+         currentPlayer.dataset.fadingOut = "";
          
          // If we are in multi-export mode, we stop after every track
-         // If normal mode, we stop if we reached end of playlist
-         if (window.multiExportMode || startIndex + 1 >= window.playlist.length) {
+         // If normal mode, we trigger next sequentially
+         if (!window.multiExportMode && startIndex + 1 < window.playlist.length) {
+              triggerNextTrack(startIndex + 1, nextPlayerId, null, nextGain);
+         } else {
              window.isPlaying = false;
              stopRecordingIfActive();
              window.dispatchEvent(new Event("quran-playback-stopped"));
@@ -546,8 +614,9 @@ async function playDualSequence(startIndex) {
     };
     
     currentPlayer.dataset.triggeredNext = "";
-    currentPlayer.addEventListener("timeupdate", checkTime);
-    currentPlayer.addEventListener("ended", onEnded);
+    currentPlayer.dataset.fadingOut = "";
+    addListener(currentPlayer, "timeupdate", checkTime);
+    addListener(currentPlayer, "ended", onEnded);
 }
 
 async function triggerNextTrack(nextIndex, playerId, outgoingGain, incomingGain) {
@@ -561,7 +630,7 @@ async function triggerNextTrack(nextIndex, playerId, outgoingGain, incomingGain)
     // 2. Play (muted initially/low volume logic is handled by gain node)
     if (incomingGain) {
         incomingGain.gain.cancelScheduledValues(window.audioCtx.currentTime);
-        incomingGain.gain.setValueAtTime(0, window.audioCtx.currentTime);
+        incomingGain.gain.setValueAtTime(0, window.audioCtx.currentTime); 
     }
     
     try {
@@ -570,10 +639,13 @@ async function triggerNextTrack(nextIndex, playerId, outgoingGain, incomingGain)
     
     // 3. Crossfade
     const now = window.audioCtx.currentTime;
-    const fadeDuration = 0.25; 
+    const fadeDuration = window.crossfadeDuration; 
     
     if (incomingGain) {
-        incomingGain.gain.linearRampToValueAtTime(1, now + fadeDuration);
+        // Fade in is 50% of fade out duration
+        const fadeInDuration = (window.crossfadeDuration || 0.5) * 0.5;
+        incomingGain.gain.setValueAtTime(0, now);
+        incomingGain.gain.linearRampToValueAtTime(1, now + fadeInDuration);
     }
     
     if (outgoingGain) {
@@ -603,13 +675,17 @@ function setupNextTrigger(currentPlayer, currentPlayerId, currentIndex) {
         if (!currentPlayer.duration) return;
 
         const timeLeft = currentPlayer.duration - currentPlayer.currentTime;
-        const CROSSFADE_TIME = 0.25; 
+        const CROSSFADE_TIME = window.crossfadeDuration; 
         
-        if (timeLeft <= CROSSFADE_TIME && !currentPlayer.dataset.triggeredNext) {
-             currentPlayer.dataset.triggeredNext = "true";
-             // Trigger next track if not in multi-export mode
-             if (!window.multiExportMode && currentIndex + 1 < window.playlist.length) {
-                 triggerNextTrack(currentIndex + 1, nextPlayerId, currentGain, nextGain);
+        // If we are near end, fade out current track
+        if (timeLeft <= CROSSFADE_TIME) {
+             if (currentGain && !currentPlayer.dataset.fadingOut) {
+                 currentPlayer.dataset.fadingOut = "true";
+                 // Anchor value first to prevent jumps
+                 try { currentGain.gain.cancelScheduledValues(window.audioCtx.currentTime); } catch {}
+                 currentGain.gain.setValueAtTime(currentGain.gain.value, window.audioCtx.currentTime);
+                 // Ramp to 0 over the remaining duration 
+                 currentGain.gain.linearRampToValueAtTime(0, window.audioCtx.currentTime + timeLeft);
              }
         }
     };
@@ -618,8 +694,12 @@ function setupNextTrigger(currentPlayer, currentPlayerId, currentIndex) {
          currentPlayer.removeEventListener("timeupdate", checkTime);
          currentPlayer.removeEventListener("ended", onEnded);
          currentPlayer.dataset.triggeredNext = "";
+         currentPlayer.dataset.fadingOut = "";
          
-         if (window.multiExportMode || currentIndex + 1 >= window.playlist.length) {
+         // Trigger next track if not in multi-export mode
+         if (!window.multiExportMode && currentIndex + 1 < window.playlist.length) {
+             triggerNextTrack(currentIndex + 1, nextPlayerId, null, nextGain);
+         } else {
              window.isPlaying = false;
              stopRecordingIfActive();
              window.dispatchEvent(new Event("quran-playback-stopped"));
@@ -627,8 +707,9 @@ function setupNextTrigger(currentPlayer, currentPlayerId, currentIndex) {
     };
     
     currentPlayer.dataset.triggeredNext = "";
-    currentPlayer.addEventListener("timeupdate", checkTime);
-    currentPlayer.addEventListener("ended", onEnded);
+    currentPlayer.dataset.fadingOut = "";
+    addListener(currentPlayer, "timeupdate", checkTime);
+    addListener(currentPlayer, "ended", onEnded);
 }
 
 
@@ -664,6 +745,7 @@ window.audioModule = {
   startRecordingIfNeeded,
   stopRecordingIfActive,
   loadAndPlay,
+  stopPlayback,
   updateMeter,
   playIndex: async (i, autoplay) => {
       if (autoplay) {

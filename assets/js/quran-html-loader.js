@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load sidebar sections
   await loadHTMLPartial('brand-container', 'assets/html/quran-brand.html');
   await loadHTMLPartial('input-panel-container', 'assets/html/quran-input-panel.html');
+  await loadHTMLPartial('audio-panel-container', 'assets/html/quran-audio-panel.html');
   await loadHTMLPartial('background-panel-container', 'assets/html/background-panel.html');
   await loadHTMLPartial('typography-panel-container', 'assets/html/typography-panel.html');
   await loadHTMLPartial('credits-panel-container', 'assets/html/credits-panel.html');
