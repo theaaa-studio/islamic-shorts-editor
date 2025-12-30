@@ -132,7 +132,7 @@ const HadithMetadata = {
     
     // Normalize input: 1605a -> 1605.01, 1605b -> 1605.02, etc.
     // Basic logic: if ends with a letter, convert to .XX
-    const input = inputStr.toLowerCase().trim();
+    const input = String(inputStr || "").toLowerCase().trim();
     const match = input.match(/^(\d+)([a-z])?$/);
     
     if (!match) return null;

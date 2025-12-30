@@ -474,7 +474,7 @@ function setupEventListeners() {
   if (takePictureBtn) {
     takePictureBtn.addEventListener("click", async () => {
       const book = hadithBookSel.value;
-      const hadithNum = parseInt(hadithNumberInput.value) || 1;
+      const hadithNum = hadithNumberInput.value.trim() || "1";
       const edition = hadithEditionSel.value;
       const bookName = window.hadithMetadata.books[book]?.name || book;
       const ts = timestampStr();
@@ -668,8 +668,6 @@ async function initializeApp() {
   await window.backgroundModule.loadBackgroundAssets();
   
   setPanelNumbers();
-  setupMobileNav();
-  
   setupMobileNav();
   
   // Capture initial fonts
