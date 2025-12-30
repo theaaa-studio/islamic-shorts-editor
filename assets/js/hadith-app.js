@@ -528,15 +528,15 @@ async function loadAndPlay({ record }) {
   
   // Get selections
   const book = hadithBookSel.value;
-  const hadithNum = parseInt(hadithNumberInput.value) || 1;
+  const hadithInput = hadithNumberInput.value.trim() || "1";
   const edition = hadithEditionSel.value;
   
   // Fetch Hadith
   try {
       const bookId = window.hadithMetadata.books[book]?.id || book.toLowerCase().replace(/\s+/g, '');
       
-      // Single hadith
-      window.playlist = [{ book: bookId, number: hadithNum, edition: edition }];
+      // Single hadith - store raw input for resolution
+      window.playlist = [{ book: bookId, number: hadithInput, edition: edition }];
       window.index = 0;
       window.totalAyahs = 1;
       
@@ -554,8 +554,19 @@ async function playIndex(i, autoplay = false) {
     
     // Fetch text
     try {
+        // Resolve target ID from index if needed
+        const resolvedId = await window.hadithMetadata.resolveHadithId(item.book, item.edition, item.number);
+        
+        if (!resolvedId) {
+            window.currentText = `Hadith reference "${item.number}" not found in this edition.`;
+            window.currentArabicText = "";
+            window.drawingModule.drawPreview();
+            if (recStatus) recStatus.textContent = "Hadith not found.";
+            return false;
+        }
+
         // Correct API structure: /editions/{edition}/{hadith_number}.json
-        const url = `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/${item.edition}/${item.number}.json`;
+        const url = `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/${item.edition}/${resolvedId}.json`;
         console.log("Fetching Hadith from:", url);
         const res = await fetch(url);
         
@@ -578,12 +589,16 @@ async function playIndex(i, autoplay = false) {
         
         if (arabicEditionId) {
             try {
-                const araUrl = `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/${arabicEditionId}/${item.number}.json`;
-                console.log("Fetching Arabic Hadith from:", araUrl);
-                const araRes = await fetch(araUrl);
-                if (araRes.ok) {
-                    const araData = await araRes.json();
-                    arabicText = araData.hadiths?.[0]?.text || "";
+                // Also resolve Arabic ID (it might differ in some cases, though usually indexes match across editions)
+                const resolvedArabicId = await window.hadithMetadata.resolveHadithId(item.book, arabicEditionId, item.number);
+                if (resolvedArabicId) {
+                    const araUrl = `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/${arabicEditionId}/${resolvedArabicId}.json`;
+                    console.log("Fetching Arabic Hadith from:", araUrl);
+                    const araRes = await fetch(araUrl);
+                    if (araRes.ok) {
+                        const araData = await araRes.json();
+                        arabicText = araData.hadiths?.[0]?.text || "";
+                    }
                 }
             } catch(e) {
                 console.warn("Arabic hadith not found", e);

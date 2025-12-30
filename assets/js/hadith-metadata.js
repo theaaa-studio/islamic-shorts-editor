@@ -1,6 +1,7 @@
 const HadithMetadata = {
   editions: {}, // Map of editionID -> details
   books: {}, // Map of bookID -> { name, editions }
+  indexCache: {}, // Map of editionID -> full index data
   
   // API Base URL
   apiBase: 'https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1',
@@ -124,7 +125,67 @@ const HadithMetadata = {
     
     // Fallback to any Arabic edition
     const anyArabic = book.editions.find(e => e.language === 'Arabic');
-    return anyArabic ? anyArabic.id : null;
+  },
+  
+  async resolveHadithId(bookId, editionId, inputStr) {
+    if (!inputStr) return null;
+    
+    // Normalize input: 1605a -> 1605.01, 1605b -> 1605.02, etc.
+    // Basic logic: if ends with a letter, convert to .XX
+    const input = inputStr.toLowerCase().trim();
+    const match = input.match(/^(\d+)([a-z])?$/);
+    
+    if (!match) return null;
+    
+    const num = match[1];
+    const letter = match[2];
+    
+    // Calculate expected arabicnumber string: "1605.01"
+    let targetArabicNum = num;
+    if (letter) {
+      const charCode = letter.charCodeAt(0) - 'a'.charCodeAt(0) + 1;
+      targetArabicNum = `${num}.${charCode.toString().padStart(2, '0')}`;
+    } else {
+      targetArabicNum = `${num}.01`; // Default to .01 for base numbers
+    }
+    
+    console.log(`Resolving Hadith ID for Book:${bookId}, Edition:${editionId}, Input:${inputStr}, TargetArabicNum:${targetArabicNum}`);
+
+    // Load index if not cached
+    if (!this.indexCache[editionId]) {
+      try {
+        const response = await fetch(`${this.apiBase}/editions/${editionId}.json`);
+        this.indexCache[editionId] = await response.json();
+      } catch (e) {
+        console.error("Failed to load edition index", e);
+        return null;
+      }
+    }
+    
+    const indexData = this.indexCache[editionId];
+    if (!indexData || !indexData.hadiths) return null;
+    
+    // 1. Try to find by arabicnumber (formatted string "1605.01")
+    let found = indexData.hadiths.find(h => h.arabicnumber === targetArabicNum);
+    
+    // 2. If not found and no letter suffix, try finding as a pure numeric string (rare in this API but safe)
+    if (!found && !letter) {
+      found = indexData.hadiths.find(h => h.arabicnumber === num);
+    }
+    
+    // 3. Fallback: If still not found, try finding by sequential hadithnumber (the ID we'd use as filename)
+    if (!found) {
+        const numericId = parseInt(num, 10);
+        found = indexData.hadiths.find(h => h.hadithnumber === numericId);
+    }
+
+    if (found) {
+      console.log(`Resolved ${inputStr} to API Hadith Number: ${found.hadithnumber}`);
+      return found.hadithnumber;
+    }
+    
+    console.warn(`Could not resolve Hadith reference: ${inputStr}`);
+    return null;
   }
 };
 
