@@ -18,7 +18,7 @@ let bgColorInput,
   textBoxColorInput,
   textBoxOpacitySlider,
   textBoxOpacityVal;
-let creditDataChk, creditCreatorChk, madeByInput, creditMadeByChk, showArabicTextChk;
+let creditDataChk, creditCreatorChk, madeByInput, creditMadeByChk, showArabicTextChk, showTranslationTextChk;
 let bgModeColor,
   bgModeMedia,
   bgColorField,
@@ -63,6 +63,7 @@ function initializeDOM() {
   madeByInput = $("#madeByInput");
   creditMadeByChk = $("#creditMadeBy");
   showArabicTextChk = $("#showArabicText");
+  showTranslationTextChk = $("#showTranslationText");
 
   bgModeColor = $("#bgModeColor");
   bgModeMedia = $("#bgModeMedia");
@@ -164,6 +165,7 @@ window.arabicFontColor = "#111111";
 window.showCreditData = true;
 window.showCreditCreator = true;
 window.showArabicText = true;
+window.showTranslationText = true;
 
 // recording state
 window.audioCtx = null;
@@ -649,6 +651,7 @@ function onAnyInputChange() {
   window.showCreditData = !!creditDataChk?.checked;
   window.showCreditCreator = !!creditCreatorChk?.checked;
   window.showArabicText = !!showArabicTextChk?.checked;
+  window.showTranslationText = !!showTranslationTextChk?.checked;
 }
 
 // Expose to window for metadata module
@@ -693,6 +696,7 @@ function setupEventListeners() {
     textBoxColorInput,
     translationEditionSel,
     showArabicTextChk,
+    showTranslationTextChk,
   ]
     .filter(Boolean)
     .forEach((el) => {

@@ -15,7 +15,7 @@ let bgColorInput,
   textBoxColorInput,
   textBoxOpacitySlider,
   textBoxOpacityVal;
-let creditDataChk, creditCreatorChk, madeByInput, creditMadeByChk, showArabicTextChk;
+let creditDataChk, creditCreatorChk, madeByInput, creditMadeByChk, showArabicTextChk, showTranslationTextChk;
 let bgModeColor,
   bgModeMedia,
   bgColorField,
@@ -56,6 +56,7 @@ function initializeDOM() {
   madeByInput = $("#madeByInput");
   creditMadeByChk = $("#creditMadeBy");
   showArabicTextChk = $("#showArabicText");
+  showTranslationTextChk = $("#showTranslationText");
 
   bgModeColor = $("#bgModeColor");
   bgModeMedia = $("#bgModeMedia");
@@ -138,6 +139,7 @@ window.arabicFontColor = "#111111";
 window.showCreditData = true;
 window.showCreditCreator = true;
 window.showArabicText = true;
+window.showTranslationText = true;
 
 // Recording state (simplified for Hadith)
 window.audioCtx = null;
@@ -310,6 +312,7 @@ function onAnyInputChange() {
   window.showCreditData = !!creditDataChk?.checked;
   window.showCreditCreator = !!creditCreatorChk?.checked;
   window.showArabicText = !!showArabicTextChk?.checked;
+  window.showTranslationText = !!showTranslationTextChk?.checked;
 }
 
 window.onAnyInputChange = onAnyInputChange;
@@ -342,6 +345,7 @@ function setupEventListeners() {
     creditColorInput,
     textBoxColorInput,
     showArabicTextChk,
+    showTranslationTextChk,
   ]
     .filter(Boolean)
     .forEach((el) => {

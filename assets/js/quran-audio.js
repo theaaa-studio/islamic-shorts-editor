@@ -265,7 +265,43 @@ async function fetchAyahText(surah, ayah, editionId) {
     }
 }
 
-async function prepareNextTrack(index) {
+// Helper: Detect start and end of actual audio (skip silence)
+function detectSilence(audioBuffer, threshold = 0.01) {
+    const raw = audioBuffer.getChannelData(0); // Use channel 0
+    const len = raw.length;
+    let start = 0;
+    let end = len - 1;
+    
+    // Scan for start
+    while (start < len && Math.abs(raw[start]) < threshold) {
+        start++;
+    }
+    
+    // Scan for end
+    while (end > start && Math.abs(raw[end]) < threshold) {
+        end--;
+    }
+    
+    // Check if empty
+    if (start >= end) return { start: 0, end: audioBuffer.duration, trimStart: 0, trimEnd: 0, duration: audioBuffer.duration };
+    
+    const sampleRate = audioBuffer.sampleRate;
+    const startTime = start / sampleRate;
+    const endTime = end / sampleRate;
+    
+    // Safety padding (keep 0.05s of "silence" to avoid abrupt cuts)
+    const padding = 0.05; 
+    
+    return {
+        start: Math.max(0, startTime - padding),
+        end: Math.min(audioBuffer.duration, endTime + padding),
+        trimStart: Math.max(0, startTime - padding), 
+        trimEnd: Math.max(0, audioBuffer.duration - (endTime + padding)),
+        duration: Math.max(0, (endTime + padding) - (startTime - padding))
+    };
+}
+
+async function prepareNextTrack(index, skipAudio = false) {
   // Uses pre-loaded data from window.playlist
   // Returns object with url, text, arabic, duration, etc.
   
@@ -282,12 +318,45 @@ async function prepareNextTrack(index) {
   const a3 = pad3(it.ayah);
   const audioUrl = `https://everyayah.com/data/${reciter}/${s3}${a3}.mp3`;
   
+  let bufferData = null;
+  
+  // Fetch Audio Buffer if needed
+  if (!skipAudio) {
+      try {
+          // console.log("Fetching audio buffer:", audioUrl);
+          const response = await fetch(audioUrl);
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await window.audioCtx.decodeAudioData(arrayBuffer);
+          const trim = detectSilence(audioBuffer);
+          
+          bufferData = {
+              buffer: audioBuffer,
+              trim
+          };
+      } catch (e) {
+          console.warn("Audio fetch/decode failed", e);
+          // Fallback? We might return null or just no audio
+      }
+  }
+  
   // If data was pre-fetched (Batch Mode), use it
-  if (it.text && it.arabicText) {
+  if (it.text && it.arabicText && (skipAudio || bufferData)) { // Only return if audio ready overlap
       return {
           index,
           it,
           audioUrl,
+          audioData: bufferData,
+          currentText: it.text,
+          currentArabicText: it.arabicText,
+          currentLabel: `${it.sName} • Ayah ${it.ayah}`
+      };
+  } else if (it.text && it.arabicText && !skipAudio && !bufferData) {
+      // Audio failed but text exists
+       return {
+          index,
+          it,
+          audioUrl,
+          audioData: null,
           currentText: it.text,
           currentArabicText: it.arabicText,
           currentLabel: `${it.sName} • Ayah ${it.ayah}`
@@ -319,6 +388,7 @@ async function prepareNextTrack(index) {
     index,
     it,
     audioUrl,
+    audioData: bufferData,
     currentText: finalTranslation.ok ? finalTranslation.text : "(Translation unavailable)",
     currentArabicText: aResult.ok ? aResult.text : "",
     currentLabel: `${it.sName} • Ayah ${it.ayah}`
@@ -332,21 +402,11 @@ function stopPlayback() {
     stopRecordingIfActive();
     
     // Stop players and clean up
-    const p1 = $("#audioPlayer");
-    const p2 = $("#audioPlayer2");
+    stopAllNodes();
     
-    if (p1) {
-        p1.pause();
-        p1.currentTime = 0;
-        removeAllListeners(p1);
-        p1.dataset.triggeredNext = "";
-    }
-    if (p2) {
-        p2.pause();
-        p2.currentTime = 0;
-        removeAllListeners(p2);
-        p2.dataset.triggeredNext = "";
-    }
+    window.pendingTrackData = null;
+    window.isTransitioning = false;
+    window.activeTrackState = { startTime: 0, duration: 0, trimEnd: 0 };
     
     window.index = 0;
     updateMeter();
@@ -355,6 +415,7 @@ function stopPlayback() {
     // Dispatch event so UI can update
     window.dispatchEvent(new Event("quran-playback-stopped"));
 }
+
 
 async function loadAndPlay({ record }) {
   // Ensure strict clean start
@@ -425,6 +486,7 @@ async function loadAndPlay({ record }) {
       showCreditData: !!creditDataChk?.checked,
       showCreditCreator: !!creditCreatorChk?.checked,
       showArabicText: window.showArabicText, // check where this comes from
+      showTranslationText: window.showTranslationText,
       
       // BACKGROUND SNAPSHOT
       background: {
@@ -439,7 +501,9 @@ async function loadAndPlay({ record }) {
   };
   
   if (typeof window.showArabicText === 'undefined') window.showArabicText = true;
+  if (typeof window.showTranslationText === 'undefined') window.showTranslationText = true;
   window.playbackConfig.showArabicText = window.showArabicText;
+  window.playbackConfig.showTranslationText = window.showTranslationText;
 
   window.selectedFont = fontPicker.value;
   window.sizePercent = parseInt(textSize.value, 10) || 100;
@@ -521,196 +585,237 @@ async function loadAndPlay({ record }) {
   await playDualSequence(0);
 }
 
-// Function to handle the actual playback sequence with crossfading
+// Store active source nodes (instead of HTML Audio elements)
+window.activeSourceNodes = { 0: null, 1: null };
+window.activeTrackState = { startTime: 0, duration: 0, trimEnd: 0 };
+window.checkTimeInterval = null;
+
+// Store pending track data for the next player
+window.pendingTrackData = null;
+window.isTransitioning = false;
+
+// Function to handle the actual playback sequence with AudioBuffer
 async function playDualSequence(startIndex) {
     if (startIndex >= window.playlist.length) {
-        // End of sequence
         window.isPlaying = false;
-        // In verify we might have recording to stop
         stopRecordingIfActive();
+        window.dispatchEvent(new Event("quran-playback-stopped"));
         return;
     }
 
-    // Determine current player
-    const currentPlayerId = window.currentPlayerId; // 0 or 1
-    const nextPlayerId = currentPlayerId === 0 ? 1 : 0;
+    const currentPlayerId = 0; 
+    const nextPlayerId = 1;
     
-    const currentPlayer = getPlayer(currentPlayerId);
-    const nextPlayer = getPlayer(nextPlayerId);
-    
-    // Prepare data for current track
+    // START: Prepare current track immediately
     const trackData = await prepareNextTrack(startIndex);
     if (!trackData) return;
-
-    // Update UI/Text immediately for start
-    updateUIForTrack(trackData);
     
-    // Load Audio
-    currentPlayer.src = trackData.audioUrl;
-    
-    // Reset gains
-    const currentGain = getGainNode(currentPlayerId);
-    const nextGain = getGainNode(nextPlayerId);
-    
-    if (currentGain) {
-        // Fade in is 50% of fade out duration
-        const fadeInDuration = (window.crossfadeDuration || 0.5) * 0.5;
-        currentGain.gain.cancelScheduledValues(window.audioCtx.currentTime);
-        currentGain.gain.setValueAtTime(0, window.audioCtx.currentTime);
-        currentGain.gain.linearRampToValueAtTime(1, window.audioCtx.currentTime + fadeInDuration); 
-    }
-    if (nextGain) {
-        nextGain.gain.cancelScheduledValues(window.audioCtx.currentTime); 
-        nextGain.gain.setValueAtTime(0, window.audioCtx.currentTime);
-    }
-
-    // Play
-    try {
-        await currentPlayer.play();
-        if (window.allowRecording) startRecordingIfNeeded();
-    } catch (e) {
-        console.error("Play failed", e);
-        // Handle error
-        window.hasAudioError = true;
-        stopRecordingIfActive();
+    // If audio failed to load but we have text, we might want to skip or just show text?
+    // For now, assume if audioData is missing, we can't play it properly as audio.
+    if (!trackData.audioData) {
+        console.warn("Audio buffer missing for index", startIndex);
+        // Skip or stop? Let's stop to avoid infinite loops of errors
+        window.isPlaying = false; 
         return;
     }
 
-    // Listen for timeupdate to schedule next
-    const checkTime = () => {
-        if (!window.isPlaying) return; // Stopped externally
-        
-        const timeLeft = currentPlayer.duration - currentPlayer.currentTime;
-        const CROSSFADE_TIME = window.crossfadeDuration; 
-        
-        // If we are near end, fade out current track
-        if (timeLeft <= CROSSFADE_TIME) {
-             if (currentGain && !currentPlayer.dataset.fadingOut) {
-                 currentPlayer.dataset.fadingOut = "true";
-                 // Anchor value first to prevent jumps
-                 try { currentGain.gain.cancelScheduledValues(window.audioCtx.currentTime); } catch {}
-                 currentGain.gain.setValueAtTime(currentGain.gain.value, window.audioCtx.currentTime);
-                 // Ramp to 0 over the remaining duration 
-                 currentGain.gain.linearRampToValueAtTime(0, window.audioCtx.currentTime + timeLeft);
-             }
-        }
-    };
+    updateUIForTrack(trackData);
     
-    const onEnded = () => {
-         currentPlayer.removeEventListener("timeupdate", checkTime);
-         currentPlayer.removeEventListener("ended", onEnded);
-         currentPlayer.dataset.triggeredNext = "";
-         currentPlayer.dataset.fadingOut = "";
-         
-         // If we are in multi-export mode, we stop after every track
-         // If normal mode, we trigger next sequentially
-         if (!window.multiExportMode && startIndex + 1 < window.playlist.length) {
-              triggerNextTrack(startIndex + 1, nextPlayerId, null, nextGain);
-         } else {
-             window.isPlaying = false;
-             stopRecordingIfActive();
-             window.dispatchEvent(new Event("quran-playback-stopped"));
-         }
-    };
+    // Create Source Node
+    const source = window.audioCtx.createBufferSource();
+    source.buffer = trackData.audioData.buffer;
     
-    currentPlayer.dataset.triggeredNext = "";
-    currentPlayer.dataset.fadingOut = "";
-    addListener(currentPlayer, "timeupdate", checkTime);
-    addListener(currentPlayer, "ended", onEnded);
-}
-
-async function triggerNextTrack(nextIndex, playerId, outgoingGain, incomingGain) {
-    // 1. Prepare Data
-    const trackData = await prepareNextTrack(nextIndex);
-    if (!trackData) return;
-    
-    const player = getPlayer(playerId);
-    player.src = trackData.audioUrl;
-    
-    // 2. Play (muted initially/low volume logic is handled by gain node)
-    if (incomingGain) {
-        incomingGain.gain.cancelScheduledValues(window.audioCtx.currentTime);
-        incomingGain.gain.setValueAtTime(0, window.audioCtx.currentTime); 
+    // Connect to specific gain node
+    const currentGain = getGainNode(currentPlayerId);
+    if (currentGain) {
+        source.connect(currentGain);
+        // Reset Gain to 1
+        currentGain.gain.cancelScheduledValues(window.audioCtx.currentTime);
+        currentGain.gain.setValueAtTime(1, window.audioCtx.currentTime); 
     }
     
-    try {
-        await player.play();
-    } catch(e) { console.error("Next play failed", e); return; }
-    
-    // 3. Crossfade
+    // START PLAYBACK (Trimmed)
     const now = window.audioCtx.currentTime;
-    const fadeDuration = window.crossfadeDuration; 
+    const trim = trackData.audioData.trim;
     
+    // start(when, offset, duration)
+    source.start(now, trim.trimStart); 
+    
+    // Store State
+    window.activeSourceNodes[currentPlayerId] = source;
+    window.activeTrackState = {
+        startTime: now,
+        duration: trim.duration, // Real duration after trim
+        trimEnd: trim.trimEnd
+    };
+    window.currentPlayerId = currentPlayerId;
+    window.index = startIndex;
+    updateMeter();
+    
+    if (window.allowRecording) startRecordingIfNeeded();
+    
+    // Setup Scheduler
+    startScheduler(startIndex);
+    
+    // PRELOAD NEXT IMMEDIATELY
+    if (startIndex + 1 < window.playlist.length) {
+        preloadNextTrack(startIndex + 1, nextPlayerId);
+    }
+}
+
+// Pre-fetch next
+async function preloadNextTrack(index, targetPlayerId) {
+    window.pendingTrackData = await prepareNextTrack(index);
+}
+
+// Scheduler loop (replaces timeupdate event)
+function startScheduler(currentIndex) {
+    if (window.checkTimeInterval) clearInterval(window.checkTimeInterval);
+    
+    // Check every 30ms-50ms
+    window.checkTimeInterval = setInterval(() => {
+        if (!window.isPlaying) {
+            clearInterval(window.checkTimeInterval);
+            return;
+        }
+        
+        const now = window.audioCtx.currentTime;
+        const elapsed = now - window.activeTrackState.startTime;
+        const remaining = window.activeTrackState.duration - elapsed;
+        
+        // Trigger Transition
+        const CROSSFADE_TIME = window.crossfadeDuration || 0.5; 
+        
+        if (remaining <= CROSSFADE_TIME && !window.isTransitioning) {
+             // Transition Logic
+             if (!window.multiExportMode && currentIndex + 1 < window.playlist.length) {
+                 // Determine next ID
+                 const nextId = window.currentPlayerId === 0 ? 1 : 0;
+                 transitionToNext(currentIndex + 1, nextId);
+             } else if (remaining <= 0) {
+                 // End of playlist or multi-export mode
+                 window.isPlaying = false;
+                 clearInterval(window.checkTimeInterval);
+                 stopRecordingIfActive();
+                 
+                 // Stop nodes strictly
+                 stopAllNodes();
+                 window.dispatchEvent(new Event("quran-playback-stopped"));
+             }
+        }
+    }, 50);
+}
+
+async function transitionToNext(nextIndex, playerId) {
+    if (window.isTransitioning) return;
+    window.isTransitioning = true; // Block double triggers
+
+    // Get Data
+    let trackData = window.pendingTrackData;
+    if (!trackData || trackData.index !== nextIndex) {
+        trackData = await prepareNextTrack(nextIndex);
+    }
+    
+    if (!trackData || !trackData.audioData) {
+        window.isTransitioning = false;
+        return; // Gap or error
+    }
+    
+    // Create Node
+    const source = window.audioCtx.createBufferSource();
+    source.buffer = trackData.audioData.buffer;
+    
+    const currentId = playerId === 0 ? 1 : 0; // Outgoing
+    const outgoingGain = getGainNode(currentId);
+    const incomingGain = getGainNode(playerId);
+    
+    // Connect
+    if (incomingGain) source.connect(incomingGain);
+    
+    const now = window.audioCtx.currentTime;
+    const trim = trackData.audioData.trim;
+    const fadeDuration = window.crossfadeDuration || 0.5;
+
+    // Crossfade Logic
     if (incomingGain) {
-        // Fade in is 50% of fade out duration
-        const fadeInDuration = (window.crossfadeDuration || 0.5) * 0.5;
+        incomingGain.gain.cancelScheduledValues(now);
         incomingGain.gain.setValueAtTime(0, now);
-        incomingGain.gain.linearRampToValueAtTime(1, now + fadeInDuration);
+        incomingGain.gain.linearRampToValueAtTime(1, now + (fadeDuration * 0.7));
     }
     
     if (outgoingGain) {
+        outgoingGain.gain.cancelScheduledValues(now);
+        outgoingGain.gain.setValueAtTime(1, now);
         outgoingGain.gain.linearRampToValueAtTime(0, now + fadeDuration);
     }
     
-    // 4. Update UI
-    updateUIForTrack(trackData);
+    // START
+    source.start(now, trim.trimStart);
     
-    // 5. Update State
+    // Update State
+    if (window.activeSourceNodes[playerId]) {
+        // Stop old node on this channel if any (should have finished long ago but safety)
+        try { window.activeSourceNodes[playerId].stop(); } catch {}
+    }
+    window.activeSourceNodes[playerId] = source;
+    
+    window.activeTrackState = {
+        startTime: now,
+        duration: trim.duration,
+        trimEnd: trim.trimEnd
+    };
     window.currentPlayerId = playerId;
     window.index = nextIndex;
+    updateUIForTrack(trackData);
     updateMeter();
     
-    // 6. Chain
-    setupNextTrigger(player, playerId, nextIndex);
+    window.isTransitioning = false;
+    
+    // Restart Scheduler for NEW track
+    startScheduler(nextIndex);
+    
+    // Preload Next
+    if (nextIndex + 1 < window.playlist.length) {
+         const nextNextId = playerId === 0 ? 1 : 0;
+         preloadNextTrack(nextIndex + 1, nextNextId);
+    }
+    
+    // Stop outgoing node after fade
+    const outgoingNode = window.activeSourceNodes[currentId];
+    if (outgoingNode) {
+        // Give it buffer time to fade out then stop
+        // We know it ends roughly at now + remaining (closest to 0)
+        // But let's just schedule stop? 
+        // Actually, we don't strictly need to stop it if it runs out of buffer data, 
+        // BUT if file has long silence at end we skipped, we MUST stop it or it will play silence.
+        // It plays until end of buffer by default.
+        // We want to stop it at (now + remaining duration of overlap).
+        // It's cleaner to let it play out if we are mixing, 
+        // unless we want to "cut" the tail silence.
+        // Since we trimmed the Data logically, but we assume the buffer itself is long?
+        
+        // Wait, start(now, offset) plays until end of buffer.
+        // We WANT to stop it when the trimmed duration ends.
+        // So we should have executed stop() on the outgoing node?
+        // Ah, in playDualSequence we didn't schedule stop().
+        // We should schedule stop() for every node!
+        outgoingNode.stop(now + fadeDuration + 0.1); // Safety stop after fade
+    }
+    
+    // Schedule stop for THIS new node?
+    // source.stop(now + trim.duration); 
+    // Yes, we should schedule stop to avoid playing the trailing silence we wanted to trigger over.
+    source.stop(now + trim.duration);
 }
 
-function setupNextTrigger(currentPlayer, currentPlayerId, currentIndex) {
-    const nextPlayerId = currentPlayerId === 0 ? 1 : 0;
-    const currentGain = getGainNode(currentPlayerId);
-    const nextGain = getGainNode(nextPlayerId);
-
-     const checkTime = () => {
-        if (!window.isPlaying) return;
-        
-        if (!currentPlayer.duration) return;
-
-        const timeLeft = currentPlayer.duration - currentPlayer.currentTime;
-        const CROSSFADE_TIME = window.crossfadeDuration; 
-        
-        // If we are near end, fade out current track
-        if (timeLeft <= CROSSFADE_TIME) {
-             if (currentGain && !currentPlayer.dataset.fadingOut) {
-                 currentPlayer.dataset.fadingOut = "true";
-                 // Anchor value first to prevent jumps
-                 try { currentGain.gain.cancelScheduledValues(window.audioCtx.currentTime); } catch {}
-                 currentGain.gain.setValueAtTime(currentGain.gain.value, window.audioCtx.currentTime);
-                 // Ramp to 0 over the remaining duration 
-                 currentGain.gain.linearRampToValueAtTime(0, window.audioCtx.currentTime + timeLeft);
-             }
-        }
-    };
-    
-    const onEnded = () => {
-         currentPlayer.removeEventListener("timeupdate", checkTime);
-         currentPlayer.removeEventListener("ended", onEnded);
-         currentPlayer.dataset.triggeredNext = "";
-         currentPlayer.dataset.fadingOut = "";
-         
-         // Trigger next track if not in multi-export mode
-         if (!window.multiExportMode && currentIndex + 1 < window.playlist.length) {
-             triggerNextTrack(currentIndex + 1, nextPlayerId, null, nextGain);
-         } else {
-             window.isPlaying = false;
-             stopRecordingIfActive();
-             window.dispatchEvent(new Event("quran-playback-stopped"));
-         }
-    };
-    
-    currentPlayer.dataset.triggeredNext = "";
-    currentPlayer.dataset.fadingOut = "";
-    addListener(currentPlayer, "timeupdate", checkTime);
-    addListener(currentPlayer, "ended", onEnded);
+function stopAllNodes() {
+    if (window.activeSourceNodes[0]) { try { window.activeSourceNodes[0].stop(); } catch {} window.activeSourceNodes[0] = null; }
+    if (window.activeSourceNodes[1]) { try { window.activeSourceNodes[1].stop(); } catch {} window.activeSourceNodes[1] = null; }
+    if (window.checkTimeInterval) clearInterval(window.checkTimeInterval);
 }
+
+// Stub for old setupNextTrigger (removed)
+function setupNextTrigger() {}
 
 
 function updateUIForTrack(data) {
@@ -754,8 +859,8 @@ window.audioModule = {
            window.isPlaying = true;
            await playDualSequence(i);
       } else {
-          // Just load data (for Picture mode)
-          const data = await prepareNextTrack(i);
+          // Just load data (for Picture mode) - Skip Audio
+          const data = await prepareNextTrack(i, true);
           if (data) updateUIForTrack(data);
       }
   }

@@ -211,6 +211,7 @@ function drawPreview() {
   
   // NOTE: showArabicText is tricky because it might not be in config if old version
   const showArabicText = config.showArabicText !== undefined ? config.showArabicText : (window.showArabicText !== undefined ? window.showArabicText : true);
+  const showTranslationText = config.showTranslationText !== undefined ? config.showTranslationText : (window.showTranslationText !== undefined ? window.showTranslationText : true);
 
   const madeByInput = $("#madeByInput");
   const creditMadeByChk = $("#creditMadeBy");
@@ -293,17 +294,18 @@ function drawPreview() {
   const arabicScale = (arabicSizePercent || 100) / 100;
 
   const currentArabic = (showArabicText !== false) ? (window.currentArabicText || "") : "";
+  const currentTranslation = (showTranslationText !== false) ? currentText : "";
 
-  if (currentArabic) {
+  if (currentArabic || currentTranslation) {
     // Split space: We want the ENTIRE GROUP (Arabic + Translation) CENTERED vertically.
     
     // --- 1. Calculate Layouts (Measure first, position later) ---
     
-    // Translation Layout
+    // Translation Layout (only if showing translation)
     const translationMaxH = usableH * 0.6; 
-    const transSpec = fitTextToBox(
+    const transSpec = currentTranslation ? fitTextToBox(
       pctx,
-      currentText,
+      currentTranslation,
       usableW,
       translationMaxH,
       72 * scale,
@@ -311,7 +313,7 @@ function drawPreview() {
       1.25,
       selectedFont,
       700
-    );
+    ) : { lines: [], lineHeight: 0, fontSize: 34 };
     const transTotalH = transSpec.lines.length * transSpec.lineHeight;
 
     // Arabic Layout
@@ -515,10 +517,10 @@ function drawPreview() {
     pctx.fillText(currentLabel, W / 2, labelY);
 
   } else {
-    // Original single-text logic
+    // Fallback: Show only label when both Arabic and Translation are hidden
     const spec = fitTextToBox(
       pctx,
-      currentText,
+      currentLabel,
       usableW,
       usableH,
       72 * scale,

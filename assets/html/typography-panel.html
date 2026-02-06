@@ -5,6 +5,29 @@
     class="typography-flex"
     style="display: flex; flex-direction: column; gap: 5px"
   >
+    <!-- Display Options: Show/Hide Text Toggles -->
+    <div class="typo-row" style="display: flex; flex-direction: column; width: 100%; margin-top: 0px; margin-bottom: 8px;">
+      <label class="small" style="margin-bottom: 6px;">Display Options</label>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <label
+          class="toggle"
+          title="Show Translation Text"
+          style="margin-top: 0; min-width: fit-content;"
+        >
+          <input type="checkbox" id="showTranslationText" checked />
+          <span>Translation</span>
+        </label>
+        <label
+          class="toggle"
+          title="Show Arabic Text"
+          style="margin-top: 0; min-width: fit-content;"
+        >
+          <input type="checkbox" id="showArabicText" checked />
+          <span>Arabic</span>
+        </label>
+      </div>
+    </div>
+
     <!-- Row 1: Translation Controls -->
     <div
       class="typo-row"
@@ -165,18 +188,8 @@
       </div>
     </div>
 
-    <!-- Row 2: Arabic Controls -->
-    <!-- Row 2: Show Arabic Toggle -->
-    <div class="typo-row" style="display: flex; width: 100%; margin-top: 8px">
-      <label
-        class="toggle"
-        title="Show Arabic Text"
-        style="margin-top: 0; min-width: fit-content;"
-      >
-        <input type="checkbox" id="showArabicText" checked />
-        <span>Show Arabic Text</span>
-      </label>
-    </div>
+    <!-- Row 1: Translation Controls -->
+    <!-- (Previous content continues...) -->
 
     <!-- Row 3: Arabic Controls (Style, Size, Color) -->
     <div
@@ -193,28 +206,35 @@
       <div class="field" style="flex: 1; width: auto; min-width: 120px">
         <label class="small" for="arabicFontPicker">Arabic Style</label>
         <select id="arabicFontPicker">
-          <!-- Only Arabic Fonts -->
+          <!-- Premium Quran-Specific Fonts (Best for Quran Display) -->
+          <option value="Amiri Quran, Amiri, serif">Amiri Quran ★</option>
           <option value="Amiri, serif">Amiri</option>
-          <option value="Scheherazade New, serif">Scheherazade New</option>
-          <option value="Cairo, sans-serif">Cairo</option>
-          <option value="Changa, sans-serif">Changa</option>
-          <option value="Reem Kufi, sans-serif">Reem Kufi</option>
-          <option value="Noto Naskh Arabic, serif">Noto Naskh Arabic</option>
+          <option value="Noto Naskh Arabic, serif" selected>Noto Naskh Arabic ★</option>
+          <option value="Scheherazade New, serif">Scheherazade New ★</option>
+          <option value="Lateef, serif">Lateef ★</option>
+          
+          <!-- Traditional Naskh/Scholarly Fonts -->
           <option value="Noto Kufi Arabic, sans-serif">Noto Kufi Arabic</option>
-          <option value="IBM Plex Sans Arabic, sans-serif">
-            IBM Plex Sans Arabic
-          </option>
-          <option value="Tajawal, sans-serif">Tajawal</option>
-          <option value="El Messiri, sans-serif">El Messiri</option>
           <option value="Markazi Text, serif">Markazi Text</option>
-          <option value="Lateef, serif">Lateef</option>
           <option value="Harmattan, sans-serif">Harmattan</option>
           <option value="Aref Ruqaa, serif">Aref Ruqaa</option>
+          
+          <!-- Modern Arabic Fonts -->
+          <option value="Cairo, sans-serif">Cairo</option>
+          <option value="Tajawal, sans-serif">Tajawal</option>
+          <option value="Almarai, sans-serif">Almarai</option>
+          <option value="IBM Plex Sans Arabic, sans-serif">IBM Plex Sans Arabic</option>
+          <option value="Mada, sans-serif">Mada</option>
+          <option value="Changa, sans-serif">Changa</option>
+          <option value="El Messiri, sans-serif">El Messiri</option>
+          <option value="Reem Kufi, sans-serif">Reem Kufi</option>
+          
+          <!-- Decorative/Calligraphic Fonts -->
           <option value="Katibeh, cursive">Katibeh</option>
           <option value="Lalezar, cursive">Lalezar</option>
           <option value="Rakkas, cursive">Rakkas</option>
-          <option value="Mada, sans-serif">Mada</option>
-          <option value="Almarai, sans-serif">Almarai</option>
+          <option value="Mirza, cursive">Mirza</option>
+          <option value="Lemonada, cursive">Lemonada</option>
         </select>
       </div>
       <div class="field" style="flex: 2; min-width: 100px">

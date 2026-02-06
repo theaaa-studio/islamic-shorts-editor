@@ -76,14 +76,25 @@ const RECITERS = [
   "aziz_alili_128kbps",
   "khalefa_al_tunaiji_64kbps",
   "mahmoud_ali_al_banna_32kbps",
+  // Warsh Recitations (Different Reading Style)
+  "warsh/warsh_Abdul_Basit_128kbps",
+  "warsh/warsh_ibrahim_aldosary_128kbps",
+  "warsh/warsh_yassin_al_jazaery_64kbps",
+  
+  // MultiLanguage (Arabic + English Together)
+  "MultiLanguage/Basfar_Walk_192kbps",
+  "MultiLanguage/Shaatree_Walk_64kbps",
+  
   // Non-Arabic Language Translations
   "English/Sahih_Intnl_Ibrahim_Walk_192kbps",
+  "English/Ibrahim_Walk_192kbps_TEST",
   "translations/urdu_shamshad_ali_khan_46kbps",
   "translations/urdu_farhat_hashmi",
   "translations/Makarem_Kabiri_16Kbps",
   "translations/Fooladvand_Hedayatfar_40Kbps",
   "translations/besim_korkut_ajet_po_ajet",
   "translations/azerbaijani/balayev",
+  "translations/bosnian",
 ];
 
 // ---------- Reciter helpers: bitrate + normalization (FULL) ----------
