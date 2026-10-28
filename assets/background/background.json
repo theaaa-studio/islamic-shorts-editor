@@ -63,5 +63,35 @@
         "src": "./assets/background/galaxy.mp4",
         "type": "video",
         "name": "Galaxy Stars Video"
+    },
+    {
+        "src": "./assets/background/rain.mp4",
+        "type": "video",
+        "name": "Rain Mercy Video"
+    },
+    {
+        "src": "./assets/background/desert.mp4",
+        "type": "video",
+        "name": "Desert Dunes Video"
+    },
+    {
+        "src": "./assets/background/mountain.mp4",
+        "type": "video",
+        "name": "Misty Mountain Video"
+    },
+    {
+        "src": "./assets/background/moon.mp4",
+        "type": "video",
+        "name": "Night Moon Video"
+    },
+    {
+        "src": "./assets/background/sunset_sea.mp4",
+        "type": "video",
+        "name": "Sunset Ocean Video"
+    },
+    {
+        "src": "./assets/background/candle.mp4",
+        "type": "video",
+        "name": "Candle Light Video"
     }
 ]
