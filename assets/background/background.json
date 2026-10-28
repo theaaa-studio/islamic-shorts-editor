@@ -33,5 +33,35 @@
         "src": "./assets/background/sejda.mp4",
         "type": "video",
         "name": "Sejda Video"
+    },
+    {
+        "src": "./assets/background/nature.mp4",
+        "type": "video",
+        "name": "Nature Forest Video"
+    },
+    {
+        "src": "./assets/background/waterfall.mp4",
+        "type": "video",
+        "name": "Waterfall Video"
+    },
+    {
+        "src": "./assets/background/deep_sea.mp4",
+        "type": "video",
+        "name": "Deep Sea Video"
+    },
+    {
+        "src": "./assets/background/jellyfish.mp4",
+        "type": "video",
+        "name": "Deep Sea Jellyfish Video"
+    },
+    {
+        "src": "./assets/background/earth.mp4",
+        "type": "video",
+        "name": "Planet Earth Video"
+    },
+    {
+        "src": "./assets/background/galaxy.mp4",
+        "type": "video",
+        "name": "Galaxy Stars Video"
     }
 ]
